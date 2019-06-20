@@ -58,4 +58,4 @@ _temp/
 
 # Ignore Example Files
 font
-ex.*
+ex*

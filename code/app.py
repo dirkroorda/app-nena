@@ -285,7 +285,11 @@ class TFApp:
                 
             # for now, do nothing more
             # ...
-            
+        
+        # format children with recursive call
+        for child in children:
+            app._pretty(child, False, html, firstSlot, lastSlot, **options)
+        
         # --
         # CLOSE the node's div
         # --

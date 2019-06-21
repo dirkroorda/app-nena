@@ -19,7 +19,7 @@ sections = {'dialect', 'title', 'line'}
 micros = {'char', 'morpheme'}
 soft_border = {'prosa'}
 
-class TFApp:
+class TfApp:
 
     '''
     Constructs and delivers HTML for representing

@@ -45,9 +45,9 @@ class TfApp:
         version = app.version
         
         # format string of node's embedding section
-        dialect, text, line = T.sectionFromNode(n, fillup=True)
+        dialect, text_title, line = T.sectionFromNode(n, fillup=True)
         passageText = app.sectionStrFromNode(n)
-        
+                
         # format the link
         if not _noUrl:
             href = plain_link.format(org=app.org, 
@@ -60,12 +60,12 @@ class TfApp:
             href = '#'
             
         # format the link text
-        if text is None:
+        if text is None:            
             text = passageText
             title = 'see this passage in its source document'
         else:
             title = passageText
-            
+
         # returns a formatted anchor string
         target = '' if _noUrl else None
         link = outLink(text, 
@@ -73,7 +73,7 @@ class TfApp:
                        title=title,
                        className=className,
                        target=target,
-                       passage=passageText)
+                       passage=passageText)        
         
         # give the link
         if _asString: 
@@ -108,12 +108,11 @@ class TfApp:
             nodeRep = f' <i>{n}</i> ' if opts.withNodes else ''
             
         # configure object's representation
-        
         isText = opts.fmt is None or '-orig-' in opts.fmt
         
         # configure char-word
         if otype == 'char':
-            
+                        
             # format text with any highlights
             # e.g. <span  class="hl"  style="background-color: green;">TEXT</span>
             rep = hlText(app, [n], opts.highlights, fmt=opts.fmt)
@@ -148,9 +147,10 @@ class TfApp:
             rep = hlText(app, L.d(n, otype='char'), opts.highlights, fmt=opts.fmt)
             
         # configure links
+
         if isLinked and otype != 'line':
             rep = app.webLink(n, text=rep, _asString=True)
-        
+                
         # finalize span and add formatted string
         tClass = display.formatClass[opts.fmt] if isText else 'trb' # div class
         rep = f'<span class="{tClass}">{rep}</span>'
@@ -204,6 +204,14 @@ class TfApp:
         if condense and otypeRank[otype] > otypeRank[condense]:
             bigType = True
         
+        # determine whether object is outermost object
+        # if it is and it is also a micro, toggle showMicro to True
+        # this determines whether char/morpheme gets borders and features
+        if outer:
+            html.append('<div class="outeritem">')
+            if otype in micros:
+                opts.showMicro = True
+        
         # skip non-displayed micros
         if otype in micros and not opts.showMicro:
             return
@@ -226,14 +234,6 @@ class TfApp:
             children = L.d(n, 'sentence')
         else:
             children = L.d(n, otype='word')
-
-        # determine whether object is outermost object
-        # if it is and it is also a micro, toggle showMicro to True
-        # this determines whether char/morpheme gets borders and features
-        if outer:
-            html.append('<div class="outeritem">')
-            if otype in micros:
-                opts.showMicro = True
         
         # --
         # OPEN the div for the node

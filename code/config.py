@@ -29,7 +29,7 @@ MODULE_SPECS = ()
 
 ZIP = [REPO]
 
-CONDENSE_TYPE = 'line'
+CONDENSE_TYPE = 'sentence'
 
 NONE_VALUES = {None, 'NA', 'none', 'unknown'} # TO REVISIT 
 

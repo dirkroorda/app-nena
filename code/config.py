@@ -55,7 +55,7 @@ SECTION_SEP1 = ', '
 SECTION_SEP2 = ', Ln. '
 
 DEFAULT_CLS = 'trb'
-DEFAULT_CLS_ORIG = 'arL'
+DEFAULT_CLS_ORIG = 'ara'
 
 FORMAT_CSS = {'orig':DEFAULT_CLS_ORIG,
               'trans':DEFAULT_CLS

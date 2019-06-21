@@ -152,7 +152,8 @@ class TfApp:
             rep = app.webLink(n, text=rep, _asString=True)
                 
         # finalize span and add formatted string
-        tClass = display.formatClass[opts.fmt] if isText else 'trb' # div class
+        
+        tClass = display.formatClass[opts.fmt] if isText else 'trb' # div class        
         rep = f'<span class="{tClass}">{rep}</span>'
         result += f'{rep}{nodeRep}'
         

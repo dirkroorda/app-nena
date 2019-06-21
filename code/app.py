@@ -10,13 +10,19 @@ from tf.applib.display import prettyPre, getFeatures
 from tf.applib.highlight import hlText, hlRep
 from tf.applib.api import setupApi
 from tf.applib.links import outLink
+from textwrap import dedent, indent
 
 # TODO: format user-friendly texts in Github for plain_link to point to.
 plain_link = 'https://github.com/{org}/{repo}/blob/master/texts/{dialect}/{text}'
 
-sections = {'dialect', 'text', 'line'}
+sections = {'dialect', 'title', 'line'}
 line = {'line'}
-subwords = {'morpheme', 'char'}
+micros = {'char', 'morpheme'}
+soft_border = {'prosa'}
+
+# render chars and morphemes without borders when
+# they are embedded in another object
+blank_styles = {'char', 'morpheme'}
 
 class TFApp:
 
@@ -202,28 +208,83 @@ class TFApp:
         isHtml = options.get('fmt', None) in app.textFormats
         
         # determine size of object
+        # objects bigger than condense type will not have
+        # any children
         bigType = False
         condense = opts.condenseType
         if condense and otypeRank[otype] > otypeRank[condense]:
             bigType = True
         
         # determine embedded objects to show
+        # these will be called recursively
         if bigType:
             children = ()
-        elif otype == slotType:
-            children = ()
+        elif otype == 'char':
+            chldren = ()
+        elif otype == 'morpheme':
+            children = L.d(n, 'char')
+        elif otype == 'word':
+            children = list(L.d(n, 'morpheme'))+list(L.d(n, 'char'))
+        elif otype == 'prosa':
+            children = L.d(n 'word')
+        elif otype == 'sentence':
+            children = L.d(n, 'prosa')
+        elif otype == 'line':
+            children = L.d(n, 'sentence')
         else:
-            children = L.d(n, otype='char')
+            children = L.d(n, otype='word')
             
-        # get div attributes for object
+        # get the highlighting attributes for the object
         hlClass, hlStyle = hlAtt
         
-        # determine whether to compose an outer div
-        do_outer = outer and otype == slotType
-        if do_outer:
+        # determine whether object is outermost object
+        # if it is and it is also a micro, toggle showMicro to True
+        # this determines whether char/morpheme gets borders and features
+        if outer:
             html.append('<div class="outeritem">')
+            if otype in micros:
+                options['showMicro'] = True
+        
+        # --
+        # open the div for the node
+        # set the border attribute accordingly
+        # --
+        if options['showMicro'] or otype not in soft_border:
+            borderClass = 'hard' # line
+        elif otype in soft_border:
+            borderClass = 'soft' # dotted
+        else:
+            borderClass = 'clear' # none         
+        html.append(f'<div class="{className} {borderClass} {boundaryClass} {hlClass}" {hlStyle}>')
+        
+        # format section text to appear over all items
+        if otype in sections:
+            passage = app.webLink(n, _asString=True)
+            featurePart = getFeatures(app, n, (), **options)
             
-        # begin object div, format class and style
-        html.append(f'<div class="{className} {boundaryClass} {hlClass}" {hlStyle}>')
-        
-        
+            sectionHTML = f'''
+            <div class="vl">
+                <div class="line">{passage}</div>
+                {nodePart}
+                {featurePart}
+            </div>
+            '''
+            sectionHTML = indent(dedent(sectionHTML), '    ')
+            html.append(sectionHTML)
+            
+        # format micro objects
+        elif otype in micros:
+            text = T.text([n], fmt=opts.fmt)
+            textHTML = f'<div class="ara">{text}</div>'
+            
+            # show node number only if asked
+            if nodePart and options['showMicro']:
+                html.append(nodePart)
+            
+        # format word objects
+        elif otype == 'word':
+            
+
+        # format everything else
+        else:
+            

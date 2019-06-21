@@ -84,7 +84,6 @@ class TFApp:
     def _plain(app, n, passage, isLinked, _asString, secLabel, **options):
         '''
         Format a plain HTML representation of a TF node:
-        e.g. Barwar A8:1 xá-yuma
         '''
         
         # get display settings

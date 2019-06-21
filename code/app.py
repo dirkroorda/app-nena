@@ -168,7 +168,7 @@ class TfApp:
         '''
         Formats a TF node with pretty HTML formatting.
         '''
-        
+
         # get display settings
         display = app.display
         opts = display.get(options)
@@ -194,7 +194,7 @@ class TfApp:
         api = app.api
         L, T = api.L, api.T
         otypeRank = api.otypeRank
-        isHtml = options.get('fmt', None) in app.textFormats
+        isHtml = options.get('fmt', None) in app.textFormats        
         
         # determine size of object
         # objects bigger than condense type will not have
@@ -204,6 +204,10 @@ class TfApp:
         if condense and otypeRank[otype] > otypeRank[condense]:
             bigType = True
         
+        # skip non-displayed micros
+        if otype in micros and not opts.showMicro:
+            return
+            
         # determine embedded objects to show
         # these will be called recursively
         if bigType:
@@ -213,7 +217,7 @@ class TfApp:
         elif otype == 'morpheme':
             children = L.d(n, 'char')
         elif otype == 'word':
-            children = list(L.d(n, 'morpheme'))+list(L.d(n, 'char'))
+            children = L.d(n, 'morpheme')
         elif otype == 'prosa':
             children = L.d(n, 'word')
         elif otype == 'sentence':
@@ -222,12 +226,7 @@ class TfApp:
             children = L.d(n, 'sentence')
         else:
             children = L.d(n, otype='word')
-        
-        try:
-            children
-        except:
-            print(otype)
-        
+
         # determine whether object is outermost object
         # if it is and it is also a micro, toggle showMicro to True
         # this determines whether char/morpheme gets borders and features
@@ -240,13 +239,15 @@ class TfApp:
         # OPEN the div for the node
         # set the border attribute and other classes accordingly
         # --
-        if opts.showMicro and otype not in soft_border:
+        if otype not in micros|soft_border:
             borderClass = 'hard' # line
+        elif otype in micros and opts.showMicro:
+            borderClass = 'hard'
         elif otype in soft_border:
             borderClass = 'soft' # dotted
         else:
             borderClass = 'clear' # none         
-                    
+                                
         hlClass, hlStyle = hlAtt # highlighting attributes
         
         # package it all up:
@@ -269,9 +270,11 @@ class TfApp:
             
         # format micro objects
         elif otype in micros and opts.showMicro:
-            text = T.text([n], fmt=opts.fmt)
-            textHTML = f'<div class="ara">{text}</div>'
-            html.append(textHTML)
+            
+            if otype == 'char':
+                text = T.text([n], fmt=opts.fmt)
+                textHTML = f'<div class="ara">{text}</div>'
+                html.append(textHTML)
             
             # show additional features only if asked
             featurePart = getFeatures(app, n, (), **options)
@@ -279,6 +282,16 @@ class TfApp:
             nodeHTML = f'{nodePart}{featurePart}'
             html.append(nodeHTML)
 
+        elif otype == 'word' and not opts.showMicro:
+            text = T.text([n], fmt=opts.fmt)
+            textHTML = f'<div class="ara">{text}</div>'
+            html.append(textHTML)
+            
+            # do features of word
+            nodePart = nodePart or ''
+            featurePart = getFeatures(app, n, (), **options)
+            html.append(f'{nodePart}{featurePart}')
+            
         # format everything else
         else:
             

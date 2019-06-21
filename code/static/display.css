@@ -54,14 +54,14 @@
     border-radius: 0.2em;
 }
 .soft {
-    border: 1px dotted #4f4c4c;
+    border: 1.5px dotted #4f4c4c;
     border-radius: 0.2em;
 }
 .clear {
     border: none;
 }
 
-.word,.micro {
+.word,.micro,.macro {
     padding: 0.1em;
     margin: 0.1em;
     border-radius: 0.1em;
@@ -71,17 +71,16 @@
     background-color: #ffffff;
 }
 
-.macro, {
-    margin-top: -1.2em;
-    margin-left: 1em;
-    background: #ffffff none repeat scroll 0 0;
-    padding: 0 0.3em;
-    font-size: small;
-    display: block;
-    width: fit-content;
-    max-width: fit-content;
-    direction: rtl;
+.prosa {
+    padding: 0.1em;
+    margin: 0.1em;
+    border-color: #a30404;
+    display: flex;
+    flex-flow: row wrap;
+    direction: ltr;
+    background-color: #ffffff;
 }
+
 
 .line {
     display: flex;

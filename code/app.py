@@ -133,7 +133,7 @@ class TFApp:
             rep = hlRep(app, rep, n, opts.highlights)
             
             # configure lines to show words as well
-            elif otype == 'line':
+            if otype == 'line':
                 
                 # first add link if necessary
                 if isLinked:
@@ -217,7 +217,7 @@ class TFApp:
         elif otype == 'word':
             children = list(L.d(n, 'morpheme'))+list(L.d(n, 'char'))
         elif otype == 'prosa':
-            children = L.d(n 'word')
+            children = L.d(n, 'word')
         elif otype == 'sentence':
             children = L.d(n, 'prosa')
         elif otype == 'line':

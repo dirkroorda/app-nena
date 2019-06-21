@@ -19,10 +19,6 @@ sections = {'dialect', 'title', 'line'}
 micros = {'char', 'morpheme'}
 soft_border = {'prosa'}
 
-# render chars and morphemes without borders when
-# they are embedded in another object
-blank_styles = {'char', 'morpheme'}
-
 class TFApp:
 
     '''

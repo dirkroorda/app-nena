@@ -1,2 +1,2 @@
 # app-nena
-App for the [Northeast Neo-Aramaic Corpus](https://github.com/CambridgeSemiticsLab/nena_corpus)
+App for the [Northeastern Neo-Aramaic Corpus](https://github.com/CambridgeSemiticsLab/nena_corpus)

@@ -16,7 +16,6 @@ from textwrap import dedent, indent
 plain_link = 'https://github.com/{org}/{repo}/blob/master/texts/{dialect}/{text}'
 
 sections = {'dialect', 'title', 'line'}
-line = {'line'}
 micros = {'char', 'morpheme'}
 soft_border = {'prosa'}
 
@@ -134,7 +133,7 @@ class TFApp:
             rep = hlRep(app, rep, n, opts.highlights)
             
             # configure lines to show words as well
-            elif otype in line:
+            elif otype == 'line':
                 
                 # first add link if necessary
                 if isLinked:

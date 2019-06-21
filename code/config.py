@@ -5,7 +5,9 @@ HOST = 'localhost'
 PORT = {'kernel':18982,
         'web':8102}
 
-OPTIONS = ('showMicro')
+OPTIONS = (
+    ('showMicro', False, 'checkbox', 'subwordc', 'show char and morpheme boundaries'),
+          )
 
 ORG = 'CambridgeSemiticsLab'
 REPO = 'nena_corpus'

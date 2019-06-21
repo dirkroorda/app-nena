@@ -42,15 +42,6 @@ class TFApp:
         '''
         Formats a HTML link to a source text 
         that contains a supplied TF node.
-        
-        --input--
-        * TF app object
-        * TF node
-        * kwargs
-        
-        --output--
-        * link string if _asString
-        * or display HTML
         '''
         
         # make TF methods available
@@ -80,7 +71,7 @@ class TFApp:
         else:
             title = passageText
             
-        # outLink returns a formatted anchor string
+        # returns a formatted anchor string
         link = outLink(text, 
                        href, 
                        title=title,
@@ -178,6 +169,7 @@ class TFApp:
             
     def _pretty(app, n, outer, html, firstSlot, lastSlot, **options):
         '''
+        Formats a TF node with pretty HTML formatting.
         '''
         
         # get display settings
@@ -191,15 +183,15 @@ class TFApp:
         if not pre:
             return
         
-        # unpackage preprocessed objects
-        slotType = pre[0]
-        otype = pre[1]
-        className = pre[2]
-        boundaryClass = pre[3]
-        hlAtt = pre[4]
-        nodePart = pre[5]
-        myStart = pre[6]
-        myEnd = pre[7]
+        # unpackage preprocessed data
+        slotType = pre[0] # slot type in databe
+        otype = pre[1] # node's object type in database
+        className = pre[2] # default div class for this otype
+        boundaryClass = pre[3] # ?div class for boundary?
+        hlAtt = pre[4] # div class for highlighted nodes
+        nodePart = pre[5] # html repre. of node number
+        myStart = pre[6] # first slot number in node
+        myEnd = pre[7] # last slot number in node
         
         # prepare TF api methods and data
         api = app.api
@@ -234,9 +226,6 @@ class TFApp:
         else:
             children = L.d(n, otype='word')
             
-        # get the highlighting attributes for the object
-        hlClass, hlStyle = hlAtt
-        
         # determine whether object is outermost object
         # if it is and it is also a micro, toggle showMicro to True
         # this determines whether char/morpheme gets borders and features
@@ -246,8 +235,8 @@ class TFApp:
                 options['showMicro'] = True
         
         # --
-        # open the div for the node
-        # set the border attribute accordingly
+        # OPEN the div for the node
+        # set the border attribute and other classes accordingly
         # --
         if options['showMicro'] or otype not in soft_border:
             borderClass = 'hard' # line
@@ -255,6 +244,9 @@ class TFApp:
             borderClass = 'soft' # dotted
         else:
             borderClass = 'clear' # none         
+        hlClass, hlStyle = hlAtt # highlighting attributes
+        
+        # package it all up:
         html.append(f'<div class="{className} {borderClass} {boundaryClass} {hlClass}" {hlStyle}>')
         
         # format section text to appear over all items
@@ -263,7 +255,7 @@ class TFApp:
             featurePart = getFeatures(app, n, (), **options)
             
             sectionHTML = f'''
-            <div class="vl">
+            <div class="ll">
                 <div class="line">{passage}</div>
                 {nodePart}
                 {featurePart}
@@ -276,15 +268,30 @@ class TFApp:
         elif otype in micros:
             text = T.text([n], fmt=opts.fmt)
             textHTML = f'<div class="ara">{text}</div>'
+            html.append(textHTML)
             
-            # show node number only if asked
-            if nodePart and options['showMicro']:
-                html.append(nodePart)
-            
-        # format word objects
-        elif otype == 'word':
-            
+            # show additional features only if asked
+            if options['showMicro']:
+                featurePart = getFeatures(app, n, (), **options)
+                nodePart = nodePart or ''
+                nodeHTML = f'{nodePart}{featurePart}'
+                html.append(nodeHTML)
 
         # format everything else
         else:
             
+            # add node number if asked
+            if nodePart:
+                html.append(nodePart)
+                
+            # for now, do nothing more
+            # ...
+            
+        # --
+        # CLOSE the node's div
+        # --
+        html.append('</div>')
+        
+        # close outer div if necessary
+        if outer:
+            html.append('</div>')

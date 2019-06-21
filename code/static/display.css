@@ -48,23 +48,12 @@
     direction: ltr;
 }
 
-/* Format various kinds of borders */
-.hard {
+.word,.micro,.macro {
     border: 1px solid #4f4c4c;
     border-radius: 0.2em;
-}
-.soft {
-    border: 1.5px dotted #4f4c4c;
-    border-radius: 0.2em;
-}
-.clear {
-    border: none;
-}
-
-.word,.micro,.macro {
+    border-spacing: 5px;
     padding: 0.1em;
-    margin: 0.1em;
-    border-radius: 0.1em;
+    margin: 0.4em;
     display: flex;
     flex-flow: row wrap;
     direction: ltr;
@@ -72,8 +61,10 @@
 }
 
 .prosa {
+    border: 1.5px dotted #4f4c4c;
+    border-radius: 0.2em;
     padding: 0.1em;
-    margin: 0.1em;
+    margin: 0.4em;
     border-color: #a30404;
     display: flex;
     flex-flow: row wrap;
@@ -105,8 +96,8 @@
 
 .ara,.ara a:visited,.ara a:link {
     font-family: "CharisSIL-R";
-    font-size: large;
-    color: #000044;
+    font-size: 12pt;
+    color: #000000;
     direction: ltr;
     text-decoration: none;
 }

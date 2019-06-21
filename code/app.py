@@ -239,19 +239,11 @@ class TfApp:
         # OPEN the div for the node
         # set the border attribute and other classes accordingly
         # --
-        if otype not in micros|soft_border:
-            borderClass = 'hard' # line
-        elif otype in micros and opts.showMicro:
-            borderClass = 'hard'
-        elif otype in soft_border:
-            borderClass = 'soft' # dotted
-        else:
-            borderClass = 'clear' # none         
                                 
         hlClass, hlStyle = hlAtt # highlighting attributes
         
         # package it all up:
-        html.append(f'<div class="{className} {borderClass} {boundaryClass} {hlClass}" {hlStyle}>')
+        html.append(f'<div class="{className} {boundaryClass} {hlClass}" {hlStyle}>')
         
         # format section text to appear over all items
         if otype in sections:
@@ -296,8 +288,9 @@ class TfApp:
         else:
             
             # add node number if asked
-            if nodePart:
-                html.append(nodePart)
+            nodePart = nodePart or ''
+            featurePart = getFeatures(app, n, (), **options)
+            html.append(f'{nodePart}{featurePart}')
                 
             # for now, do nothing more
             # ...

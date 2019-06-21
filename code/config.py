@@ -12,7 +12,7 @@ OPTIONS = (
 ORG = 'CambridgeSemiticsLab'
 REPO = 'nena_corpus'
 CORPUS = 'Northeastern Neo-Aramaic Text Corpus'
-VERSION = '0.1'
+VERSION = ''
 RELATIVE = 'tf'
 
 DOI_TEXT = '10.5281/zenodo.3250721'

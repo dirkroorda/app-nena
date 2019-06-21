@@ -67,6 +67,7 @@ class TfApp:
             title = passageText
             
         # returns a formatted anchor string
+        target = '' if _noUrl else None
         link = outLink(text, 
                        href, 
                        title=title,
@@ -102,11 +103,13 @@ class TfApp:
         
         # configure HTML for node number rendering if requested
         if _asApp:
-            nodeRep = f' <a href="#" class="nd">{n}</a> ' if d.withNodes else ''
+            nodeRep = f' <a href="#" class="nd">{n}</a> ' if opts.withNodes else ''
         else:
-            nodeRep = f' <i>{n}</i> ' if d.withNodes else ''
+            nodeRep = f' <i>{n}</i> ' if opts.withNodes else ''
             
         # configure object's representation
+        
+        isText = opts.fmt is None or '-orig-' in opts.fmt
         
         # configure char-word
         if otype == 'char':
@@ -142,10 +145,10 @@ class TfApp:
                 
         # configure all other otypes
         else:
-            rep = hlText(app, L.d(n, otype='char'), opts.highlights, fmt=opts.highlights)
+            rep = hlText(app, L.d(n, otype='char'), opts.highlights, fmt=opts.fmt)
             
         # configure links
-        if isLinked and otype not in line:
+        if isLinked and otype != 'line':
             rep = app.webLink(n, text=rep, _asString=True)
         
         # finalize span and add formatted string
@@ -206,7 +209,7 @@ class TfApp:
         if bigType:
             children = ()
         elif otype == 'char':
-            chldren = ()
+            children = ()
         elif otype == 'morpheme':
             children = L.d(n, 'char')
         elif otype == 'word':
@@ -219,25 +222,31 @@ class TfApp:
             children = L.d(n, 'sentence')
         else:
             children = L.d(n, otype='word')
-            
+        
+        try:
+            children
+        except:
+            print(otype)
+        
         # determine whether object is outermost object
         # if it is and it is also a micro, toggle showMicro to True
         # this determines whether char/morpheme gets borders and features
         if outer:
             html.append('<div class="outeritem">')
             if otype in micros:
-                options['showMicro'] = True
+                opts.showMicro = True
         
         # --
         # OPEN the div for the node
         # set the border attribute and other classes accordingly
         # --
-        if options['showMicro'] or otype not in soft_border:
+        if opts.showMicro and otype not in soft_border:
             borderClass = 'hard' # line
         elif otype in soft_border:
             borderClass = 'soft' # dotted
         else:
             borderClass = 'clear' # none         
+                    
         hlClass, hlStyle = hlAtt # highlighting attributes
         
         # package it all up:
@@ -259,17 +268,16 @@ class TfApp:
             html.append(sectionHTML)
             
         # format micro objects
-        elif otype in micros:
+        elif otype in micros and opts.showMicro:
             text = T.text([n], fmt=opts.fmt)
             textHTML = f'<div class="ara">{text}</div>'
             html.append(textHTML)
             
             # show additional features only if asked
-            if options['showMicro']:
-                featurePart = getFeatures(app, n, (), **options)
-                nodePart = nodePart or ''
-                nodeHTML = f'{nodePart}{featurePart}'
-                html.append(nodeHTML)
+            featurePart = getFeatures(app, n, (), **options)
+            nodePart = nodePart or ''
+            nodeHTML = f'{nodePart}{featurePart}'
+            html.append(nodeHTML)
 
         # format everything else
         else:

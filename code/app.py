@@ -13,7 +13,7 @@ from tf.applib.links import outLink
 from textwrap import dedent, indent
 
 # TODO: format user-friendly texts in Github for plain_link to point to.
-plain_link = 'https://github.com/{org}/{repo}/blob/master/texts/{dialect}/{text}'
+plain_link = 'https://github.com/{org}/{repo}/blob/master/texts/{dialect}/{title}'
 
 sections = {'dialect', 'title', 'line'}
 micros = {'char', 'morpheme'}
@@ -54,7 +54,7 @@ class TfApp:
                                      repo=app.repo, 
                                      version=version,
                                      dialect=dialect,
-                                     text=text) 
+                                     title=text_title) 
         # or return link to current page
         else:
             href = '#'
@@ -110,13 +110,12 @@ class TfApp:
         # configure object's representation
         isText = opts.fmt is None or '-orig-' in opts.fmt
         
-        # configure char-word
+        # configure char
         if otype == 'char':
                         
             # format text with any highlights
             # e.g. <span  class="hl"  style="background-color: green;">TEXT</span>
             rep = hlText(app, [n], opts.highlights, fmt=opts.fmt)
-            rep = mdhtmlEsc(rep)
                         
         # configure sections
         elif otype in sections:
@@ -147,7 +146,6 @@ class TfApp:
         # configure all other otypes
         else:
             rep = hlText(app, L.d(n, otype='word'), opts.highlights, fmt=opts.fmt)
-            rep = mdhtmlEsc(rep)
             
         # configure links
 
@@ -156,7 +154,7 @@ class TfApp:
                 
         # finalize span and add formatted string
         
-        tClass = display.formatClass[opts.fmt] if isText else 'trb' # div class        
+        tClass = display.formatClass[opts.fmt] if isText else 'trb' # div class   
         rep = f'<span class="{tClass}">{rep}</span>'
         result += f'{rep}{nodeRep}'
         

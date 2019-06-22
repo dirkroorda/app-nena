@@ -116,6 +116,7 @@ class TfApp:
             # format text with any highlights
             # e.g. <span  class="hl"  style="background-color: green;">TEXT</span>
             rep = hlText(app, [n], opts.highlights, fmt=opts.fmt)
+            rep = mdhtmlEsc(rep)
                         
         # configure sections
         elif otype in sections:

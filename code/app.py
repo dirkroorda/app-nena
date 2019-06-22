@@ -145,8 +145,8 @@ class TfApp:
                 
         # configure all other otypes
         else:
+            rep = hlText(app, L.d(n, otype='word'), opts.highlights, fmt=opts.fmt)
             rep = mdhtmlEsc(rep)
-            rep = hlText(app, L.d(n, otype='char'), opts.highlights, fmt=opts.fmt)
             
         # configure links
 

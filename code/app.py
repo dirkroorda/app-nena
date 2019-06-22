@@ -120,14 +120,14 @@ class TfApp:
         # configure sections
         elif otype in sections:
             
-            if secLabel and opts.withPassages:
+            if secLabel and opts.withPassage:
                 rep = app.sectionStrFromNode(n)
             else:
                 rep = ''
             
             # do not format sections as text segments
             isText = False
-            rep = mdhtmlEscp(rep)
+            rep = mdhtmlEsc(rep)
             rep = hlRep(app, rep, n, opts.highlights)
             
             # configure lines to show words as well

@@ -126,7 +126,8 @@ class TfApp:
                 rep = ''
             
             # do not format sections as text segments
-            isText = False            
+            isText = False
+            rep = mdhtmlEscp(rep)
             rep = hlRep(app, rep, n, opts.highlights)
             
             # configure lines to show words as well
@@ -266,6 +267,7 @@ class TfApp:
             
             if otype == 'char':
                 text = T.text([n], fmt=opts.fmt)
+                text = htmlEsc(text)
                 textHTML = f'<div class="ara">{text}</div>'
                 html.append(textHTML)
             
@@ -277,6 +279,7 @@ class TfApp:
 
         elif otype == 'word' and not opts.showMicro:
             text = T.text([n], fmt=opts.fmt)
+            text = htmlEsc(text)
             textHTML = f'<div class="ara">{text}</div>'
             html.append(textHTML)
             

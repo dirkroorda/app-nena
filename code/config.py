@@ -2,8 +2,8 @@ from os.path import dirname, abspath
 
 PROTOCOL = 'http://'
 HOST = 'localhost'
-PORT = {'kernel':18982,
-        'web':8102}
+PORT = {'kernel':19700,
+        'web':9700}
 
 OPTIONS = (
     ('showMicro', False, 'checkbox', 'subwordc', 'show char and morpheme boundaries'),

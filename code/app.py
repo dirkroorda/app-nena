@@ -16,8 +16,8 @@ from textwrap import dedent, indent
 plain_link = 'https://github.com/{org}/{repo}/blob/master/texts/{dialect}/{title}'
 
 sections = {'dialect', 'title', 'line'}
-micros = {'char', 'morpheme'}
-soft_border = {'prosa'}
+micros = {'letter', 'morpheme'}
+soft_border = {'inton'}
 
 class TfApp:
 
@@ -110,8 +110,8 @@ class TfApp:
         # configure object's representation
         isText = opts.fmt is None or '-orig-' in opts.fmt
         
-        # configure char
-        if otype == 'char':
+        # configure letter
+        if otype == 'letter':
                         
             # format text with any highlights
             # e.g. <span  class="hl"  style="background-color: green;">TEXT</span>
@@ -140,7 +140,7 @@ class TfApp:
                     rep = f'<span class="ln">{rep}</span>'
                 
                 # then add words from the line
-                rep += hlText(app, L.d(n, otype='char'), opts.highlights, fmt=opts.fmt)
+                rep += hlText(app, L.d(n, otype='morpheme'), opts.highlights, fmt=opts.fmt)
                 isText = True # treat line like text
                 
         # configure all other otypes
@@ -208,7 +208,7 @@ class TfApp:
         
         # determine whether object is outermost object
         # if it is and it is also a micro, toggle showMicro to True
-        # this determines whether char/morpheme gets borders and features
+        # this determines whether letter/morpheme gets borders and features
         if outer:
             html.append('<div class="outeritem">')
             if otype in micros:
@@ -222,16 +222,16 @@ class TfApp:
         # these will be called recursively
         if bigType:
             children = ()
-        elif otype == 'char':
+        elif otype == 'letter':
             children = ()
         elif otype == 'morpheme':
-            children = L.d(n, 'char')
+            children = L.d(n, 'letter')
         elif otype == 'word':
             children = L.d(n, 'morpheme')
-        elif otype == 'prosa':
+        elif otype == 'inton':
             children = L.d(n, 'word')
         elif otype == 'sentence':
-            children = L.d(n, 'prosa')
+            children = L.d(n, 'inton')
         elif otype == 'line':
             children = L.d(n, 'sentence')
         else:
@@ -265,8 +265,13 @@ class TfApp:
         # format micro objects
         elif otype in micros and opts.showMicro:
             
-            if otype == 'char':
-                text = T.text([n], fmt=opts.fmt)
+            if otype == 'letter':
+                if opts.fmt == 'text-trans-full':
+                    text = F.trans_f.v(n)
+                elif opts.fmt == 'text-trans-lite':
+                    text = F.trans_l.v(n)
+                else:
+                    text = F.text.v(n)
                 text = htmlEsc(text)
                 textHTML = f'<div class="ara">{text}</div>'
                 html.append(textHTML)

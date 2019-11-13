@@ -12,7 +12,7 @@ from tf.applib.api import setupApi
 from tf.applib.links import outLink
 from textwrap import dedent, indent
 
-plain_link = 'https://github.com/{org}/nena_corpus/blob/master/nena/{version}/{dialect}/{title}.nena
+plain_link = 'https://github.com/{org}/nena_corpus/blob/master/nena/{version}/{dialect}/{title}.nena'
 
 sections = {'dialect', 'title', 'line'}
 micros = {'letter', 'morpheme'}

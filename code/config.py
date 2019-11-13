@@ -10,9 +10,9 @@ OPTIONS = (
           )
 
 ORG = 'CambridgeSemiticsLab'
-REPO = 'nena_corpus'
+REPO = 'nena_tf'
 CORPUS = 'Northeastern Neo-Aramaic Text Corpus'
-VERSION = ''
+VERSION = '0.01'
 RELATIVE = 'tf'
 
 DOI_TEXT = '10.5281/zenodo.3250721'
@@ -35,7 +35,7 @@ NONE_VALUES = {None, 'NA', 'none', 'unknown'} # TO REVISIT
 
 STANDARD_FEATURES = '''
 
-    dialect title utf8 trailer
+    dialect title text trailer
     
 '''.strip().split()
 
@@ -44,7 +44,7 @@ EXCLUDED_FEATURES = set()
 NO_DESCEND_TYPES = {}
 
 EXAMPLE_SECTION = (
-    f'<code>Genesis 1:1</code> (use'
+    f'<code>Village Life 1.1</code> (use'
     f' <a href="https://github.com/{ORG}/{REPO}'
     f'/blob/master/tf/{VERSION}/book%40en.tf" target="_blank">'
     f'English book names</a>)'
@@ -61,11 +61,11 @@ FORMAT_CSS = {'orig':DEFAULT_CLS_ORIG,
               'trans':DEFAULT_CLS
              }
 
-CLASS_NAMES = {'char':'micro',
+CLASS_NAMES = {'letter':'micro',
                'morpheme':'micro',
                'word':'word',
                'subsentence':'macro',
-               'prosa':'prosa',
+               'inton':'prosa',
                'sentence':'macro',
                'line':'line'}
 

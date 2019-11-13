@@ -41,6 +41,7 @@ class TfApp:
         # make TF methods available
         api = app.api
         T = api.T
+        F = api.F
         version = app.version
         
         # format string of node's embedding section

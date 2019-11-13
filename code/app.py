@@ -193,7 +193,7 @@ class TfApp:
         
         # prepare TF api methods and data
         api = app.api
-        L, T = api.L, api.T
+        L, F, T = api.L, api.F, api.T
         otypeRank = api.otypeRank
         isHtml = options.get('fmt', None) in app.textFormats        
         

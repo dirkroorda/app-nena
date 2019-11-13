@@ -12,8 +12,7 @@ from tf.applib.api import setupApi
 from tf.applib.links import outLink
 from textwrap import dedent, indent
 
-# TODO: format user-friendly texts in Github for plain_link to point to.
-plain_link = 'https://github.com/{org}/{repo}/blob/master/texts/{dialect}/{title}'
+plain_link = 'https://github.com/{org}/nena_corpus/blob/master/nena/{version}/{dialect}/{title}.nena
 
 sections = {'dialect', 'title', 'line'}
 micros = {'letter', 'morpheme'}
@@ -51,7 +50,6 @@ class TfApp:
         # format the link
         if not _noUrl:
             href = plain_link.format(org=app.org, 
-                                     repo=app.repo, 
                                      version=version,
                                      dialect=dialect,
                                      title=text_title) 

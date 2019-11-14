@@ -139,7 +139,7 @@ class TfApp:
                     rep = f'<span class="ln">{rep}</span>'
                 
                 # then add words from the line
-                rep += hlText(app, L.d(n, otype='morpheme'), opts.highlights, fmt=opts.fmt)
+                rep += hlText(app, L.d(n, otype='letter'), opts.highlights, fmt=opts.fmt)
                 isText = True # treat line like text
                 
         # configure all other otypes
@@ -276,7 +276,10 @@ class TfApp:
                 html.append(textHTML)
             
             # show additional features only if asked
-            featurePart = getFeatures(app, n, (), **options)
+            if opts.showFeatures:
+                featurePart = getFeatures(app, n, (), **options)
+            else:
+                featurePart = ''
             nodePart = nodePart or ''
             nodeHTML = f'{nodePart}{featurePart}'
             html.append(nodeHTML)
@@ -289,7 +292,10 @@ class TfApp:
             
             # do features of word
             nodePart = nodePart or ''
-            featurePart = getFeatures(app, n, (), **options)
+            if opts.showFeatures:
+                featurePart = getFeatures(app, n, (), **options)
+            else:
+                featurePart = ''
             html.append(f'{nodePart}{featurePart}')
             
         # format everything else
@@ -297,7 +303,10 @@ class TfApp:
             
             # add node number if asked
             nodePart = nodePart or ''
-            featurePart = getFeatures(app, n, (), **options)
+            if opts.showFeatures:
+                featurePart = getFeatures(app, n, (), **options)
+            else:
+                featurePart = ''
             html.append(f'{nodePart}{featurePart}')
                 
             # for now, do nothing more

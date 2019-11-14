@@ -1,3 +1,8 @@
+# Ignore Example Files
+font
+ex*
+dev
+
 # Compiled source #
 ###################
 *.com
@@ -55,7 +60,3 @@ _temp/
 # Config files which get locally modified
 #########################################
 .jekyll-metadata
-
-# Ignore Example Files
-font
-ex*

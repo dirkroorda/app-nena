@@ -7,6 +7,7 @@ PORT = {'kernel':19700,
 
 OPTIONS = (
     ('showMicro', False, 'checkbox', 'subwordc', 'show char and morpheme boundaries'),
+     ('showFeatures', False, 'checkbox', '', 'show feature values'), 
           )
 
 ORG = 'CambridgeSemiticsLab'

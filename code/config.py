@@ -5,14 +5,15 @@ HOST = "localhost"
 PORT = {"kernel": 19700, "web": 9700}
 
 OPTIONS = (
-    ("showMicro", False, "checkbox", "subwordc", "show char and morpheme boundaries"),
+    ("showChar", False, "checkbox", "subchar", "show character boundaries"),
+    ("showWord", False, "checkbox", "subword", "show word boundaries"),
     ("showFeatures", None, "checkbox", "", "show feature values"),
 )
 
 ORG = "CambridgeSemiticsLab"
 REPO = "nena_tf"
 CORPUS = "Northeastern Neo-Aramaic Text Corpus"
-VERSION = "0.01"
+VERSION = "0.02"
 RELATIVE = "tf"
 
 DOI_TEXT = "10.5281/zenodo.3250721"
@@ -34,7 +35,7 @@ CONDENSE_TYPE = "sentence"
 NONE_VALUES = {None, "NA", "none", "unknown"}  # TO REVISIT
 
 STANDARD_FEATURES = """
-    dialect title text trailer
+    dialect title text end
 """.strip().split()
 
 EXCLUDED_FEATURES = set()
@@ -58,11 +59,11 @@ DEFAULT_CLS_ORIG = "ara"
 FORMAT_CSS = {"orig": DEFAULT_CLS_ORIG, "trans": DEFAULT_CLS}
 
 CLASS_NAMES = {
-    "letter": "micro",
-    "morpheme": "micro",
+    "letter": "letter",
     "word": "word",
-    "subsentence": "macro",
+    "stress": "stress",
     "inton": "prosa",
+    "subsentence": "macro",
     "sentence": "macro",
     "line": "line",
 }

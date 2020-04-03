@@ -48,8 +48,7 @@
     direction: ltr;
 }
 
-.word,.micro,.macro {
-    border: 1px solid #4f4c4c;
+.stress,.word,.letter,.macro {
     border-radius: 0.2em;
     border-spacing: 5px;
     padding: 0.1em;
@@ -60,8 +59,20 @@
     background-color: #ffffff;
 }
 
+.letter {
+    border: 1px solid #eecccc;
+}
+
+.word {
+    border: 1px solid #cc8888;
+}
+
+.stress {
+    border: 1px solid #aa4444;
+}
+
 .prosa {
-    border: 1.5px dotted #4f4c4c;
+    border: 1.5px dotted #993333;
     border-radius: 0.2em;
     padding: 0.1em;
     margin: 0.4em;
@@ -70,6 +81,10 @@
     flex-flow: row wrap;
     direction: ltr;
     background-color: #ffffff;
+}
+
+.macro {
+    border: 2px solid #444499;
 }
 
 

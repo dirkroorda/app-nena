@@ -18,7 +18,7 @@ plain_link = (
 )
 
 sections = {"dialect", "title", "line"}
-micros = {"letter", "morpheme"}
+micros = {"letter", "word"}
 soft_border = {"inton"}
 
 
@@ -104,6 +104,8 @@ class TfApp:
         nType = F.otype.v(n)
         result = passage
 
+        descendType = "letter" if d.showChar else "word" if d.showWord else "stress"
+
         # configure HTML for node number rendering if requested
         if _asApp:
             nodeRep = f' <a href="#" class="nd">{n}</a> ' if d.withNodes else ""
@@ -113,16 +115,9 @@ class TfApp:
         # configure object's representation
         isText = d.fmt is None or "-orig-" in d.fmt
 
-        # configure letter
-        if nType == "letter":
-
-            # format text with any highlights
-            # e.g. <span  class="hl"  style="background-color: green;">TEXT</span>
+        if nType in {"letter", "word", "stress"}:
             rep = hlText(app, [n], d.highlights, fmt=d.fmt)
-
-        # configure sections
         elif nType in sections:
-
             if secLabel and d.withPassage:
                 rep = app.sectionStrFromNode(n)
             else:
@@ -133,7 +128,7 @@ class TfApp:
             rep = mdhtmlEsc(rep)
             rep = hlRep(app, rep, n, d.highlights)
 
-            # configure lines to show words as well
+            # configure lines to show stresses as well
             if nType == "line":
 
                 # first add link if necessary
@@ -142,30 +137,23 @@ class TfApp:
                 else:
                     rep = f'<span class="ln">{rep}</span>'
 
-                # then add words from the line
-                rep += hlText(app, L.d(n, otype="letter"), d.highlights, fmt=d.fmt)
+                # then add stresses from the line
+                rep += hlText(app, L.d(n, otype=descendType), d.highlights, fmt=d.fmt)
                 isText = True  # treat line like text
 
-        # configure all other otypes
         else:
-            rep = hlText(app, L.d(n, otype="word"), d.highlights, fmt=d.fmt)
-
-        # configure links
+            rep = hlText(app, L.d(n, otype=descendType), d.highlights, fmt=d.fmt)
 
         if isLinked and not passage and nType != "line":
             rep = app.webLink(n, text=rep, _asString=True)
-
-        # finalize span and add formatted string
 
         tClass = display.formatClass[d.fmt] if isText else "trb"  # div class
         rep = f'<span class="{tClass}">{rep}</span>'
         result += f"{rep}{nodeRep}"
 
-        # return as string
         if _asString or _asApp:
             return result
 
-        # or display
         else:
             display_HTML(result)
 
@@ -174,26 +162,14 @@ class TfApp:
         Formats a TF node with pretty HTML formatting.
         """
 
-        # get display settings
         display = app.display
         d = display.get(options)
 
-        # preprocess and validate node
         goOn = prettyPre(app, n, firstSlot, lastSlot, d)
 
         # error out
         if not goOn:
             return
-
-        # unpackage preprocessed data
-        # slotType : slot type in database
-        # nType : node's object type in database
-        # className : default div class for this node type
-        # boundaryClass : ?div class for boundary?
-        # hlAtt : div class for highlighted nodes
-        # nodePart : html repre. of node number
-        # myStart : first slot number in node
-        # myEnd : last slot number in node
 
         goOn = prettyPre(app, n, firstSlot, lastSlot, d)
         if not goOn:
@@ -210,122 +186,93 @@ class TfApp:
             myEnd,
         ) = goOn
 
-        # prepare TF api methods and data
         api = app.api
         F = api.F
         L = api.L
         T = api.T
         isHtml = options.get("fmt", None) in app.textFormats
 
-        # determine whether object is outermost object
-        # if it is and it is also a micro, toggle showMicro to True
-        # this determines whether letter/morpheme gets borders and features
         if outer:
             html.append('<div class="outeritem">')
-            if nType in micros:
-                d.showMicro = True
 
-        # skip non-displayed micros
-        if nType in micros and not d.showMicro:
-            return
-
-        # determine embedded objects to show
-        # these will be called recursively
         if isBigType:
             children = ()
         elif nType == "letter":
             children = ()
-        elif nType == "morpheme":
-            children = L.d(n, "letter")
         elif nType == "word":
-            children = L.d(n, "morpheme")
+            children = L.d(n, "letter") if d.showChar else ()
+        elif nType == "stress":
+            children = (
+                L.d(n, "word") if d.showWord else L.d(n, "letter") if d.showChar else ()
+            )
         elif nType == "inton":
-            children = L.d(n, "word")
+            children = L.d(n, "stress")
         elif nType == "sentence":
             children = L.d(n, "inton")
         elif nType == "line":
             children = L.d(n, "sentence")
         else:
-            children = L.d(n, otype="word")
+            children = L.d(n, otype="stress")
 
-        # --
-        # OPEN the div for the node
-        # set the border attribute and other classes accordingly
-        # --
+        hlClass, hlStyle = hlAtt
 
-        hlClass, hlStyle = hlAtt  # highlighting attributes
-
-        # package it all up:
         html.append(f'<div class="{className} {boundaryClass} {hlClass}" {hlStyle}>')
 
-        # format section text to appear over all items
         doShowFeatures = d.showFeatures or (d.showFeatures is None and d.extraFeatures)
+        featurePart = getFeatures(app, n, (), **options) if doShowFeatures else ""
+        nodePart = nodePart or ""
+        nodeHTML = f"{nodePart}{featurePart}"
 
         if nType in sections:
             passage = app.webLink(n, _asString=True)
-            featurePart = getFeatures(app, n, (), **options)
 
             sectionHTML = f"""
             <div class="ll">
                 <div class="line">{passage}</div>
-                {nodePart}
-                {featurePart}
+                {nodeHTML}
             </div>
             """
             sectionHTML = indent(dedent(sectionHTML), "    ")
             html.append(sectionHTML)
-
-        # format micro objects
-        elif nType in micros and d.showMicro:
-
-            if nType == "letter":
-                if d.fmt == "text-trans-full":
-                    text = F.trans_f.v(n)
-                elif d.fmt == "text-trans-lite":
-                    text = F.trans_l.v(n)
-                else:
-                    text = F.text.v(n)
-                text = text if isHtml else htmlEsc(text)
-                textHTML = f'<div class="ara">{text}</div>'
-                html.append(textHTML)
-
-            # show additional features only if asked
-            featurePart = getFeatures(app, n, (), **options) if doShowFeatures else ""
-            nodePart = nodePart or ""
-            nodeHTML = f"{nodePart}{featurePart}"
-            html.append(nodeHTML)
-
-        elif nType == "word" and not d.showMicro:
-            text = T.text([n], fmt=d.fmt)
+        elif nType == "letter":
+            text = (
+                F.trans_f.v(n)
+                if d.fmt == "text-trans-full"
+                else F.lite.v(n)
+                if d.fmt == "text-trans-lite"
+                else F.text.v(n)
+            )
             text = text if isHtml else htmlEsc(text)
             textHTML = f'<div class="ara">{text}</div>'
             html.append(textHTML)
-
-            # do features of word
-            nodePart = nodePart or ""
-            featurePart = getFeatures(app, n, (), **options) if doShowFeatures else ""
-            html.append(f"{nodePart}{featurePart}")
-
-        # format everything else
+            html.append(nodeHTML)
+        elif nType == "word":
+            if not d.showChar:
+                text = (
+                    F.trans_f.v(n)
+                    if d.fmt == "text-trans-full"
+                    else F.lite.v(n)
+                    if d.fmt == "text-trans-lite"
+                    else F.text.v(n)
+                )
+                text = text if isHtml else htmlEsc(text)
+                textHTML = f'<div class="ara">{text}</div>'
+                html.append(textHTML)
+            html.append(nodeHTML)
+        elif nType == "stress":
+            if not (d.showWord or d.showChar):
+                text = T.text([n], fmt=d.fmt)
+                text = text if isHtml else htmlEsc(text)
+                textHTML = f'<div class="ara">{text}</div>'
+                html.append(textHTML)
+            html.append(nodeHTML)
         else:
+            html.append(nodeHTML)
 
-            # add node number if asked
-            nodePart = nodePart or ""
-            featurePart = getFeatures(app, n, (), **options) if doShowFeatures else ""
-            html.append(f"{nodePart}{featurePart}")
-
-            # for now, do nothing more
-            # ...
-
-        # format children with recursive call
         for child in children:
             app._pretty(child, False, html, firstSlot, lastSlot, **options)
 
-        # --
-        # CLOSE the node's div
-        # --
         html.append("</div>")
 
-        # close outer div if necessary
         if outer:
             html.append("</div>")

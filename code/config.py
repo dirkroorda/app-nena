@@ -5,8 +5,8 @@ HOST = "localhost"
 PORT = {"kernel": 19700, "web": 9700}
 
 OPTIONS = (
-    ("showChar", False, "checkbox", "subchar", "show character boundaries"),
-    ("showWord", False, "checkbox", "subword", "show word boundaries"),
+    ("showChar", False, "checkbox", "subchar", "show character level"),
+    ("showWord", False, "checkbox", "subword", "show word level"),
     ("showFeatures", None, "checkbox", "", "show feature values"),
 )
 
@@ -73,7 +73,14 @@ FONT_NAME = "CharisSIL-R"
 FONT = "CharisSIL-R.otf"
 FONTW = "CharisSIL-R.woff"
 
-TEXT_FORMATS = {}
+TEXT_FORMATS = {
+    "layout-orig-full": "layoutOrigFull",
+    "layout-orig-lite": "word#layoutOrigLite",
+    "layout-trans-full": "word#layoutTransFull",
+    "layout-trans-fuzzy": "word#layoutTransFuzzy",
+    "layout-trans-lite": "word#layoutTransLite",
+}
+
 
 BROWSE_NAV_LEVEL = 2
 BROWSE_CONTENT_PRETTY = False

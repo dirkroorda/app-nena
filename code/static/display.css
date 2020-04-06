@@ -60,15 +60,15 @@
 }
 
 .letter {
-    border: 1px solid #eecccc;
+    border: 1px solid #cccccc;
 }
 
 .word {
-    border: 1px solid #cc8888;
+    border: 1px solid #00ffff;
 }
 
 .stress {
-    border: 1px solid #aa4444;
+    border: 1px solid #0000ff;
 }
 
 .prosa {
@@ -81,6 +81,13 @@
     flex-flow: row wrap;
     direction: ltr;
     background-color: #ffffff;
+}
+
+.speaker {
+    vertical-align: super;
+    font-size: small;
+    font-weight: bold;
+    color: #6666dd;
 }
 
 .macro {

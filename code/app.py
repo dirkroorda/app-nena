@@ -4,6 +4,7 @@ North Eastern Neo Aramaic Text-Fabric app,
 which visualizes queries and results in TF.
 """
 
+import re
 from tf.core.helpers import mdhtmlEsc, htmlEsc
 from tf.applib.helpers import dh as display_HTML
 from tf.applib.display import prettyPre, getFeatures
@@ -17,9 +18,23 @@ plain_link = (
     "{version}/{dialect}/{title}.nena"
 )
 
-sections = {"dialect", "title", "line"}
-micros = {"letter", "word"}
-soft_border = {"inton"}
+LETTER = "letter"
+WORD = "word"
+STRESS = "stress"
+INTON = "inton"
+SENTENCE = "sentence"
+
+DIALECT = "dialect"
+TEXT = "text"
+LINE = "line"
+
+SECTIONS = {DIALECT, TEXT, LINE}
+
+speakerRe = re.compile(r"""«([^»]+)»""", re.S)
+
+
+def speakerRepl(match):
+    return f"""<span class="speaker">{htmlEsc(match.group(1))}</span>"""
 
 
 class TfApp:
@@ -85,6 +100,31 @@ class TfApp:
         else:
             display_HTML(link)
 
+    def fmt_layoutOrigFull(app, n):
+        return app._wrapHtml(n, "text-orig-full")
+
+    def fmt_layoutOrigLite(app, n):
+        return app._wrapHtml(n, "text-orig-lite")
+
+    def fmt_layoutTransFull(app, n):
+        return app._wrapHtml(n, "text-trans-full")
+
+    def fmt_layoutTransFuzzy(app, n):
+        return app._wrapHtml(n, "text-trans-fuzzy")
+
+    def fmt_layoutTransLite(app, n):
+        return app._wrapHtml(n, "text-trans-lite")
+
+    def _wrapHtml(app, n, fmt):
+        api = app.api
+        T = api.T
+        F = api.F
+
+        nType = F.otype.v(n)
+        material = T.text(n, fmt=fmt, descend=False if nType == LETTER else None)
+        material = speakerRe.sub(speakerRepl, material)
+        return material
+
     def _plain(app, n, passage, isLinked, _asString, secLabel, **options):
         """
         Format a plain HTML representation of a TF node:
@@ -105,7 +145,8 @@ class TfApp:
         nType = F.otype.v(n)
         result = passage
 
-        descendType = "letter" if d.showChar else "word" if d.showWord else "stress"
+        descendType = LETTER if d.showChar else WORD if d.showWord else STRESS
+        descendOption = dict(descend=False) if descendType == LETTER else {}
 
         # configure HTML for node number rendering if requested
         if _asApp:
@@ -116,9 +157,29 @@ class TfApp:
         # configure object's representation
         isText = d.fmt is None or "-orig-" in d.fmt
 
-        if nType in {"letter", "word", "stress"}:
-            rep = hlText(app, [n], d.highlights, fmt=d.fmt)
-        elif nType in sections:
+        if nType == LETTER:
+            rep = hlText(app, n, d.highlights, fmt=d.fmt, descend=False)
+        elif nType == WORD:
+            rep = (
+                hlText(
+                    app,
+                    L.d(n, otype=descendType),
+                    d.highlights,
+                    **descendOption,
+                    fmt=d.fmt,
+                )
+                if descendType == LETTER
+                else hlText(app, [n], d.highlights, fmt=d.fmt)
+            )
+        elif nType == STRESS:
+            rep = hlText(
+                app,
+                L.d(n, otype=descendType),
+                d.highlights,
+                **descendOption,
+                fmt=d.fmt,
+            )
+        elif nType in SECTIONS:
             if secLabel and d.withPassage:
                 rep = app.sectionStrFromNode(n)
             else:
@@ -130,7 +191,7 @@ class TfApp:
             rep = hlRep(app, rep, n, d.highlights)
 
             # configure lines to show stresses as well
-            if nType == "line":
+            if nType == LINE:
 
                 # first add link if necessary
                 if isLinked:
@@ -139,13 +200,21 @@ class TfApp:
                     rep = f'<span class="ln">{rep}</span>'
 
                 # then add stresses from the line
-                rep += hlText(app, L.d(n, otype=descendType), d.highlights, fmt=d.fmt)
+                rep += hlText(
+                    app,
+                    L.d(n, otype=descendType),
+                    d.highlights,
+                    **descendOption,
+                    fmt=d.fmt,
+                )
                 isText = True  # treat line like text
 
         else:
-            rep = hlText(app, L.d(n, otype=descendType), d.highlights, fmt=d.fmt)
+            rep = hlText(
+                app, L.d(n, otype=descendType), d.highlights, **descendOption, fmt=d.fmt
+            )
 
-        if isLinked and not passage and nType != "line":
+        if isLinked and not passage and nType != LINE:
             rep = app.webLink(n, text=rep, _asString=True)
 
         tClass = display.formatClass[d.fmt] if isText else "trb"  # div class
@@ -197,22 +266,22 @@ class TfApp:
 
         if isBigType:
             children = ()
-        elif nType == "letter":
+        elif nType == LETTER:
             children = ()
-        elif nType == "word":
-            children = L.d(n, "letter") if d.showChar else ()
-        elif nType == "stress":
+        elif nType == WORD:
+            children = L.d(n, LETTER) if d.showChar else ()
+        elif nType == STRESS:
             children = (
-                L.d(n, "word") if d.showWord else L.d(n, "letter") if d.showChar else ()
+                L.d(n, WORD) if d.showWord else L.d(n, LETTER) if d.showChar else ()
             )
-        elif nType == "inton":
-            children = L.d(n, "stress")
-        elif nType == "sentence":
-            children = L.d(n, "inton")
-        elif nType == "line":
-            children = L.d(n, "sentence")
+        elif nType == INTON:
+            children = L.d(n, STRESS)
+        elif nType == SENTENCE:
+            children = L.d(n, INTON)
+        elif nType == LINE:
+            children = L.d(n, SENTENCE)
         else:
-            children = L.d(n, otype="stress")
+            children = L.d(n, otype=STRESS)
 
         hlClass, hlStyle = hlAtt
 
@@ -223,31 +292,31 @@ class TfApp:
         nodePart = nodePart or ""
         nodeHTML = f"{nodePart}{featurePart}"
 
-        if nType in sections:
+        if nType in SECTIONS:
             passage = app.webLink(n, _asString=True)
 
             sectionHTML = f"""
             <div class="ll">
-                <div class="line">{passage}</div>
+                <div class="{LINE}">{passage}</div>
                 {nodeHTML}
             </div>
             """
             sectionHTML = indent(dedent(sectionHTML), "    ")
             html.append(sectionHTML)
-        elif nType == "letter":
-            text = T.text([n], fmt=d.fmt)
+        elif nType == LETTER:
+            text = T.text([n], fmt=d.fmt, descend=False)
             text = text if isHtml else htmlEsc(text)
             textHTML = f'<div class="ara">{text}</div>'
             html.append(textHTML)
             html.append(nodeHTML)
-        elif nType == "word":
+        elif nType == WORD:
             if not d.showChar:
                 text = T.text([n], fmt=d.fmt)
                 text = text if isHtml else htmlEsc(text)
                 textHTML = f'<div class="ara">{text}</div>'
                 html.append(textHTML)
             html.append(nodeHTML)
-        elif nType == "stress":
+        elif nType == STRESS:
             if not (d.showWord or d.showChar):
                 text = T.text([n], fmt=d.fmt)
                 text = text if isHtml else htmlEsc(text)

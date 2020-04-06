@@ -97,7 +97,8 @@ class TfApp:
         # prepare api methods
         _asApp = app._asApp  # determine whether running in browser?
         api = app.api
-        L, F = api.L, api.F
+        F = api.F
+        L = api.L
 
         # format and return HTML with format {section}{nodeUTF8}
         # the representation of the node depends on the node type and embedding
@@ -187,7 +188,6 @@ class TfApp:
         ) = goOn
 
         api = app.api
-        F = api.F
         L = api.L
         T = api.T
         isHtml = options.get("fmt", None) in app.textFormats
@@ -235,26 +235,14 @@ class TfApp:
             sectionHTML = indent(dedent(sectionHTML), "    ")
             html.append(sectionHTML)
         elif nType == "letter":
-            text = (
-                F.trans_f.v(n)
-                if d.fmt == "text-trans-full"
-                else F.lite.v(n)
-                if d.fmt == "text-trans-lite"
-                else F.text.v(n)
-            )
+            text = T.text([n], fmt=d.fmt)
             text = text if isHtml else htmlEsc(text)
             textHTML = f'<div class="ara">{text}</div>'
             html.append(textHTML)
             html.append(nodeHTML)
         elif nType == "word":
             if not d.showChar:
-                text = (
-                    F.trans_f.v(n)
-                    if d.fmt == "text-trans-full"
-                    else F.lite.v(n)
-                    if d.fmt == "text-trans-lite"
-                    else F.text.v(n)
-                )
+                text = T.text([n], fmt=d.fmt)
                 text = text if isHtml else htmlEsc(text)
                 textHTML = f'<div class="ara">{text}</div>'
                 html.append(textHTML)

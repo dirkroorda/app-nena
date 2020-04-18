@@ -1,14 +1,10 @@
 from os.path import dirname, abspath
 
+API_VERSION = 1
+
 PROTOCOL = "http://"
 HOST = "localhost"
 PORT = {"kernel": 19700, "web": 9700}
-
-OPTIONS = (
-    ("showChar", False, "checkbox", "subchar", "show character level"),
-    ("showWord", False, "checkbox", "subword", "show word level"),
-    ("showFeatures", None, "checkbox", "", "show feature values"),
-)
 
 ORG = "CambridgeSemiticsLab"
 REPO = "nena_tf"
@@ -30,9 +26,10 @@ MODULE_SPECS = ()
 
 ZIP = [REPO]
 
+BASE_TYPE = "stress"
 CONDENSE_TYPE = "sentence"
 
-NONE_VALUES = {None, "NA", "none", "unknown"}  # TO REVISIT
+NONE_VALUES = {None, "NA", "none", "unknown"}
 
 STANDARD_FEATURES = """
     dialect title text end
@@ -53,22 +50,9 @@ EXAMPLE_SECTION_TEXT = "Barwar, The Monk and the Angel, 1"
 SECTION_SEP1 = ", "
 SECTION_SEP2 = ", Ln. "
 
-DEFAULT_CLS = "trb"
-DEFAULT_CLS_ORIG = "ara"
+WRITING = "cld"
+WRITING_DIR = "ltr"
 
-FORMAT_CSS = {"orig": DEFAULT_CLS_ORIG, "trans": DEFAULT_CLS}
-
-CLASS_NAMES = {
-    "letter": "letter",
-    "word": "word",
-    "stress": "stress",
-    "inton": "prosa",
-    "subsentence": "macro",
-    "sentence": "macro",
-    "line": "line",
-}
-
-# fonts are from
 FONT_NAME = "CharisSIL-R"
 FONT = "CharisSIL-R.otf"
 FONTW = "CharisSIL-R.woff"
@@ -81,9 +65,63 @@ TEXT_FORMATS = {
     "layout-trans-lite": "word#layoutTransLite",
 }
 
-
 BROWSE_NAV_LEVEL = 2
 BROWSE_CONTENT_PRETTY = False
+
+VERSES = None
+
+LEX = None
+
+TRANSFORM = None
+
+CHILD_TYPE = dict(
+    word="letter",
+    stress="word",
+    inton="stress",
+    sentence="inton",
+    paragraph="sentence",
+    line="paragraph",
+    text="line",
+    dialect="text",
+)
+
+SUPER_TYPE = None
+
+PLAIN_TYPES = None
+
+PRETTY_TYPES = dict(
+    dialect=("{dialect}", "", ""),
+    text=("{text_id}", "informant", "title place"),
+    paragraph=("{number}", "", ""),
+    line=("{number}", "", ""),
+    sentence=("", "", ""),
+    subsentence=("", "", ""),
+    inton=("", "", ""),
+    stress=("", "", ""),
+    word=(True, "", "lemma gloss"),
+    letter=(True, "", ""),
+)
+
+LEVELS = dict(
+    dialect=dict(level=3, flow="col", wrap=False, stretch=False),
+    text=dict(level=3, flow="col", wrap=False, strectch=False),
+    paragraph=dict(level=3, flow="col", wrap=False, strectch=True),
+    line=dict(level=2, flow="row", wrap=True, strectch=True),
+    sentence=dict(level=2, flow="row", wrap=True, strectch=True),
+    subsentence=dict(level=2, flow="row", wrap=True, strectch=True),
+    inton=dict(level=1, flow="row", wrap=True, strectch=True),
+    stress=dict(level=1, flow="row", wrap=True, strectch=True),
+    word=dict(level=1, flow="row", wrap=True, strectch=True),
+    letter=dict(level=0, flow="col", wrap=False, strectch=False),
+)
+
+INTERFACE_DEFAULTS = dict(
+    withTypes=True,
+    withNodes=False,
+    showFeatures=True,
+    lineNumbers=None,
+    graphics=None,
+)
 
 
 def deliver():

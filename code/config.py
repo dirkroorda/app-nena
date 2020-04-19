@@ -68,7 +68,7 @@ TEXT_FORMATS = {
 BROWSE_NAV_LEVEL = 2
 BROWSE_CONTENT_PRETTY = False
 
-VERSES = None
+VERSE_TYPES = None
 
 LEX = None
 
@@ -116,11 +116,7 @@ LEVELS = dict(
 )
 
 INTERFACE_DEFAULTS = dict(
-    withTypes=True,
-    withNodes=False,
-    showFeatures=True,
-    lineNumbers=None,
-    graphics=None,
+    showFeatures=False,
 )
 
 

@@ -87,32 +87,67 @@ CHILD_TYPE = dict(
 
 SUPER_TYPE = None
 
-PLAIN_TYPES = None
-
-PRETTY_TYPES = dict(
-    dialect=("{dialect}", "", ""),
-    text=("{text_id}", "informant", "title place"),
-    paragraph=("{number}", "", ""),
-    line=("{number}", "", ""),
-    sentence=("", "", ""),
-    subsentence=("", "", ""),
-    inton=("", "", ""),
-    stress=("", "", ""),
-    word=(True, "", "lemma gloss"),
-    letter=(True, "", ""),
-)
-
-LEVELS = dict(
-    dialect=dict(level=3, flow="col", wrap=False, stretch=False),
-    text=dict(level=3, flow="col", wrap=False, strectch=False),
-    paragraph=dict(level=3, flow="col", wrap=False, strectch=True),
-    line=dict(level=2, flow="row", wrap=True, strectch=True),
-    sentence=dict(level=2, flow="row", wrap=True, strectch=True),
-    subsentence=dict(level=2, flow="row", wrap=True, strectch=True),
-    inton=dict(level=1, flow="row", wrap=True, strectch=True),
-    stress=dict(level=1, flow="row", wrap=True, strectch=True),
-    word=dict(level=1, flow="row", wrap=True, strectch=True),
-    letter=dict(level=0, flow="col", wrap=False, strectch=False),
+TYPE_DISPLAY = dict(
+    dialect=dict(
+        template="{dialect}",
+        bareFeatures="",
+        features="",
+        level=3, flow="col", wrap=False, stretch=False,
+    ),
+    text=dict(
+        template="{text_id}",
+        bareFeatures="informant",
+        features="title place",
+        level=3, flow="col", wrap=False, strectch=False,
+    ),
+    paragraph=dict(
+        template="{number}",
+        bareFeatures="",
+        features="",
+        level=3, flow="col", wrap=False, strectch=True,
+    ),
+    line=dict(
+        template="{number}",
+        bareFeatures="",
+        features="",
+        level=2, flow="row", wrap=True, strectch=True,
+    ),
+    sentence=dict(
+        template="",
+        bareFeatures="",
+        features="",
+        level=2, flow="row", wrap=True, strectch=True,
+    ),
+    subsentence=dict(
+        template="",
+        bareFeatures="",
+        features="",
+        level=2, flow="row", wrap=True, strectch=True,
+    ),
+    inton=dict(
+        template="",
+        bareFeatures="",
+        features="",
+        level=1, flow="row", wrap=True, strectch=True,
+    ),
+    stress=dict(
+        template="",
+        bareFeatures="",
+        features="",
+        level=1, flow="row", wrap=True, strectch=True,
+    ),
+    word=dict(
+        template=True,
+        bareFeatures="gloss",
+        features="gloss",
+        level=1, flow="row", wrap=True, strectch=True,
+    ),
+    letter=dict(
+        template=True,
+        bareFeatures="",
+        features="",
+        level=0, flow="col", wrap=False, strectch=False,
+    ),
 )
 
 INTERFACE_DEFAULTS = dict(

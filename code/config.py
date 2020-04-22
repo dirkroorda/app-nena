@@ -26,18 +26,7 @@ MODULE_SPECS = ()
 
 ZIP = [REPO]
 
-BASE_TYPE = "stress"
-CONDENSE_TYPE = "sentence"
-
 NONE_VALUES = {None, "NA", "none", "unknown"}
-
-STANDARD_FEATURES = """
-    dialect title text end
-""".strip().split()
-
-EXCLUDED_FEATURES = set()
-
-NO_DESCEND_TYPES = {}
 
 EXAMPLE_SECTION = (
     f"<code>Village Life 1.1</code> (use"
@@ -47,105 +36,81 @@ EXAMPLE_SECTION = (
 )
 EXAMPLE_SECTION_TEXT = "Barwar, The Monk and the Angel, 1"
 
-SECTION_SEP1 = ", "
-SECTION_SEP2 = ", Ln. "
+STANDARD_FEATURES = "dialect title text end".strip().split(),
 
-WRITING = "cld"
-WRITING_DIR = "ltr"
-
-FONT_NAME = "CharisSIL-R"
-FONT = "CharisSIL-R.otf"
-FONTW = "CharisSIL-R.woff"
-
-TEXT_FORMATS = {
-    "layout-orig-full": "layoutOrigFull",
-    "layout-orig-lite": "word#layoutOrigLite",
-    "layout-trans-full": "word#layoutTransFull",
-    "layout-trans-fuzzy": "word#layoutTransFuzzy",
-    "layout-trans-lite": "word#layoutTransLite",
-}
-
-BROWSE_NAV_LEVEL = 2
-BROWSE_CONTENT_PRETTY = False
-
-VERSE_TYPES = None
-
-LEX = None
-
-TRANSFORM = None
-
-CHILD_TYPE = dict(
-    word="letter",
-    stress="word",
-    inton="stress",
-    sentence="inton",
-    paragraph="sentence",
-    line="paragraph",
-    text="line",
-    dialect="text",
+DATA_DISPLAY = dict(
+    noneValues={None, "NA", "none", "unknown"},
+    sectionSep1=", ",
+    sectionSep2=", Ln. ",
+    writing="cld",
+    writingDir="ltr",
+    fontName="CharisSIL-R",
+    font="CharisSIL-R.otf",
+    fontw="CharisSIL-R.woff",
+    textFormats={
+        "layout-orig-full": "layoutOrigFull",
+        "layout-orig-lite": "word#layoutOrigLite",
+        "layout-trans-full": "word#layoutTransFull",
+        "layout-trans-fuzzy": "word#layoutTransFuzzy",
+        "layout-trans-lite": "word#layoutTransLite",
+    },
+    browseNavLevel=2,
+    browseContentPretty=False,
 )
-
-SUPER_TYPE = None
 
 TYPE_DISPLAY = dict(
     dialect=dict(
         template="{dialect}",
-        bareFeatures="",
-        features="",
+        children="text",
         level=3, flow="col", wrap=False, stretch=False,
     ),
     text=dict(
         template="{text_id}",
-        bareFeatures="informant",
+        featuresBare="informant",
         features="title place",
+        children="line",
         level=3, flow="col", wrap=False, strectch=False,
     ),
     paragraph=dict(
         template="{number}",
-        bareFeatures="",
-        features="",
+        children="sentence",
         level=3, flow="col", wrap=False, strectch=True,
     ),
     line=dict(
         template="{number}",
-        bareFeatures="",
-        features="",
+        children="paragraph",
         level=2, flow="row", wrap=True, strectch=True,
     ),
     sentence=dict(
         template="",
-        bareFeatures="",
-        features="",
+        children="inton",
+        condense=True,
         level=2, flow="row", wrap=True, strectch=True,
     ),
     subsentence=dict(
         template="",
-        bareFeatures="",
-        features="",
         level=2, flow="row", wrap=True, strectch=True,
     ),
     inton=dict(
         template="",
-        bareFeatures="",
-        features="",
+        children="stress",
         level=1, flow="row", wrap=True, strectch=True,
     ),
     stress=dict(
         template="",
-        bareFeatures="",
-        features="",
+        children="word",
+        base=True,
         level=1, flow="row", wrap=True, strectch=True,
     ),
     word=dict(
         template=True,
-        bareFeatures="gloss",
+        featuresBare="gloss",
         features="gloss",
+        children="letter",
         level=1, flow="row", wrap=True, strectch=True,
     ),
     letter=dict(
         template=True,
-        bareFeatures="",
-        features="",
         level=0, flow="col", wrap=False, strectch=False,
     ),
 )

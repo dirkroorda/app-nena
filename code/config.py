@@ -36,17 +36,13 @@ EXAMPLE_SECTION = (
 )
 EXAMPLE_SECTION_TEXT = "Barwar, The Monk and the Angel, 1"
 
-STANDARD_FEATURES = "dialect title text end".strip().split(),
+STANDARD_FEATURES = ("dialect title text end".strip().split(),)
 
 DATA_DISPLAY = dict(
     noneValues={None, "NA", "none", "unknown"},
     sectionSep1=", ",
     sectionSep2=", Ln. ",
     writing="cld",
-    writingDir="ltr",
-    fontName="CharisSIL-R",
-    font="CharisSIL-R.otf",
-    fontw="CharisSIL-R.woff",
     textFormats={
         "layout-orig-full": "layoutOrigFull",
         "layout-orig-lite": "word#layoutOrigLite",
@@ -54,70 +50,20 @@ DATA_DISPLAY = dict(
         "layout-trans-fuzzy": "word#layoutTransFuzzy",
         "layout-trans-lite": "word#layoutTransLite",
     },
-    browseNavLevel=2,
-    browseContentPretty=False,
 )
 
 TYPE_DISPLAY = dict(
-    dialect=dict(
-        template="{dialect}",
-        children="text",
-        level=3, flow="col", wrap=False, stretch=False,
-    ),
-    text=dict(
-        template="{text_id}",
-        featuresBare="informant",
-        features="title place",
-        children="line",
-        level=3, flow="col", wrap=False, strectch=False,
-    ),
-    paragraph=dict(
-        template="{number}",
-        children="sentence",
-        level=3, flow="col", wrap=False, strectch=True,
-    ),
-    line=dict(
-        template="{number}",
-        children="paragraph",
-        level=2, flow="row", wrap=True, strectch=True,
-    ),
-    sentence=dict(
-        template="",
-        children="inton",
-        condense=True,
-        level=2, flow="row", wrap=True, strectch=True,
-    ),
-    subsentence=dict(
-        template="",
-        level=2, flow="row", wrap=True, strectch=True,
-    ),
-    inton=dict(
-        template="",
-        children="stress",
-        level=1, flow="row", wrap=True, strectch=True,
-    ),
-    stress=dict(
-        template="",
-        children="word",
-        base=True,
-        level=1, flow="row", wrap=True, strectch=True,
-    ),
-    word=dict(
-        template=True,
-        featuresBare="gloss",
-        features="gloss",
-        children="letter",
-        level=1, flow="row", wrap=True, strectch=True,
-    ),
-    letter=dict(
-        template=True,
-        level=0, flow="col", wrap=False, strectch=False,
-    ),
+    text=dict(featuresBare="informant", features="title place",),
+    paragraph=dict(template="{number}", children="sentence",),
+    line=dict(children="paragraph",),
+    sentence=dict(children="inton", condense=True,),
+    subsentence=dict(children="inton",),
+    inton=dict(wrap=False,),
+    stress=dict(base=True, wrap=False,),
+    word=dict(featuresBare="gloss", features="gloss", wrap=False,),
 )
 
-INTERFACE_DEFAULTS = dict(
-    showFeatures=False,
-)
+INTERFACE_DEFAULTS = dict(showFeatures=False,)
 
 
 def deliver():

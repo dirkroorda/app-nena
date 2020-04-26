@@ -1,31 +1,19 @@
 import re
 
 from tf.core.helpers import htmlEsc
-from tf.applib.api import setupApi
-
-
-def notice(app):
-    if int(app.api.TF.version.split(".")[0]) <= 7:
-        print(
-            f"""
-Your Text-Fabric is outdated.
-It cannot load this version of the TF app `{app.appName}`.
-Recommendation: upgrade Text-Fabric to version 8.
-Hint:
-
-    pip3 install --upgrade text-fabric
-
-"""
-        )
+from tf.applib.app import App
 
 
 speakerRe = re.compile(r"""«([^»]+)»""", re.S)
 
 
-class TfApp:
+def speakerRepl(match):
+    return f"""<span class="speaker">{htmlEsc(match.group(1))}</span>"""
+
+
+class TfApp(App):
     def __init__(app, *args, **kwargs):
-        setupApi(app, *args, **kwargs)
-        notice(app)
+        super().__init__(*args, **kwargs)
 
     def fmt_layoutOrigFull(app, n):
         return app._wrapHtml(n, "text-orig-full")
@@ -51,7 +39,3 @@ class TfApp:
         material = T.text(n, fmt=fmt, descend=False if nType == "letter" else None)
         material = speakerRe.sub(speakerRepl, material)
         return material
-
-
-def speakerRepl(match):
-    return f"""<span class="speaker">{htmlEsc(match.group(1))}</span>"""

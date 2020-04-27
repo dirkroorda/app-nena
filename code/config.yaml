@@ -13,7 +13,6 @@ dataDisplay:
     layout-trans-full: word#layoutTransFull
     layout-trans-fuzzy: word#layoutTransFuzzy
     layout-trans-lite: word#layoutTransLite
-  writing: cld
 docs:
   charText: NENA transcription script
   charUrl: '{docBase}/transcription{docExt}'
@@ -54,3 +53,4 @@ typeDisplay:
     features: gloss
     featuresBare: gloss
     wrap: false
+writing: cld

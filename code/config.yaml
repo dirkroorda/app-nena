@@ -17,7 +17,7 @@ docs:
   charText: NENA transcription script
   charUrl: '{docBase}/transcription{docExt}'
   docPage: features.md
-  featureBase: '{docBase}/features{docExt}#{feature}'
+  featureBase: '{docBase}/features{docExt}#<feature>'
   featurePage: ''
   webBase: '{urlGh}/{org}/nena_corpus/blob/master/nena'
   webHint: Show this title in the NENA repository
@@ -37,7 +37,7 @@ typeDisplay:
     children: paragraph
   paragraph:
     children: sentence
-    template: '{number}'
+    label: '{number}'
   sentence:
     children: inton
     condense: true

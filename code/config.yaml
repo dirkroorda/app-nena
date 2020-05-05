@@ -31,26 +31,28 @@ provenanceSpec:
   repo: nena_tf
   version: '0.02'
 typeDisplay:
+  dialect:
+    label: '{dialect}'
   inton:
     wrap: false
   line:
-    children: paragraph
-  paragraph:
-    children: sentence
-    label: '{number}'
-  sentence:
-    children: inton
+    # children: sentence
     condense: true
+    label: '{number}'
+  paragraph:
+    # children: sentence
+    label: '{number}'
   stress:
     base: true
     wrap: false
-  subsentence:
-    children: inton
   text:
+    label: '{text_id}'
     features: title place
     featuresBare: informant
   word:
     features: gloss
-    featuresBare: gloss
+    featuresBare: lemma
     wrap: false
+  subsentence:
+    chunkOf: sentence
 writing: cld

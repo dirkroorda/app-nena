@@ -8,20 +8,22 @@ dataDisplay:
   sectionSep1: ', '
   sectionSep2: ', Ln. '
   textFormats:
-    layout-orig-full: layoutOrigFull
-    layout-orig-lite: word#layoutOrigLite
-    layout-trans-full: word#layoutTransFull
-    layout-trans-fuzzy: word#layoutTransFuzzy
-    layout-trans-lite: word#layoutTransLite
+    word#layout-orig-full:
+      method: layoutOrigFull
+    word#layout-orig-lite:
+      method: layoutOrigLite
+    word#layout-trans-full:
+      method: layoutTransFull
+    word#layout-trans-fuzzy:
+      method: layoutTransFuzzy
+    word#layout-trans-lite:
+      method: layoutTransLite
 docs:
   charText: NENA transcription script
   charUrl: '{docBase}/transcription{docExt}'
   docPage: features.md
   featureBase: '{docBase}/features{docExt}#<feature>'
   featurePage: ''
-  webBase: '{urlGh}/{org}/nena_corpus/blob/master/nena'
-  webHint: Show this title in the NENA repository
-  webUrl: '{version}/<1>/<2>.nena'
 interfaceDefaults:
   showFeatures: false
 provenanceSpec:
@@ -30,17 +32,18 @@ provenanceSpec:
   org: CambridgeSemiticsLab
   repo: nena_tf
   version: '0.02'
+  webBase: '{urlGh}/{org}/nena_corpus/blob/master/nena'
+  webHint: Show this title in the NENA repository
+  webUrl: '{version}/<1>/<2>.nena'
 typeDisplay:
   dialect:
     label: '{dialect}'
   inton:
     wrap: false
   line:
-    # children: sentence
     condense: true
     label: '{number}'
   paragraph:
-    # children: sentence
     label: '{number}'
   stress:
     base: true
@@ -55,4 +58,7 @@ typeDisplay:
     wrap: false
   subsentence:
     chunkOf: sentence
+    children:
+      - inton
+      - stress
 writing: cld

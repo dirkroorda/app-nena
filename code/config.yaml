@@ -24,8 +24,6 @@ docs:
   docPage: features.md
   featureBase: '{docBase}/features{docExt}#<feature>'
   featurePage: ''
-interfaceDefaults:
-  showFeatures: false
 provenanceSpec:
   corpus: Northeastern Neo-Aramaic Text Corpus
   doi: 10.5281/zenodo.3250721

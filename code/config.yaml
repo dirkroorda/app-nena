@@ -7,6 +7,7 @@ dataDisplay:
   - NA
   sectionSep1: ', '
   sectionSep2: ', Ln. '
+  showVerseInTuple: true
   textFormats:
     word#layout-orig-full:
       method: layoutOrigFull

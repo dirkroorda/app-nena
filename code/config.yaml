@@ -33,7 +33,7 @@ provenanceSpec:
   version: '0.02'
   webBase: '{urlGh}/{org}/nena_corpus/blob/master/nena'
   webHint: Show this title in the NENA repository
-  webUrl: '{version}/<1>/<2>.nena'
+  webUrl: '{webBase}/{version}/<1>/<2>.nena'
 typeDisplay:
   dialect:
     label: '{dialect}'

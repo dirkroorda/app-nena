@@ -1,4 +1,4 @@
-apiVersion: 2
+apiVersion: 3
 dataDisplay:
   noneValues:
   - none
@@ -40,7 +40,6 @@ typeDisplay:
   inton:
     wrap: false
   line:
-    condense: true
     label: '{number}'
   paragraph:
     label: '{number}'

@@ -1,7 +1,7 @@
 import types
 
 from tf.core.helpers import htmlEsc
-from tf.applib.app import App
+from tf.advanced.app import App
 
 
 def fmt_layoutOrigFull(app, n, **kwargs):

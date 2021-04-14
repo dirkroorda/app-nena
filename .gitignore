@@ -49,6 +49,7 @@ Thumbs.db
 #####################
 site/
 _site/
+_local/
 _themes/
 build/
 _build/

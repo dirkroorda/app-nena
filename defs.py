@@ -3,9 +3,8 @@ import os
 GH = os.path.expanduser("~/github")
 ORG = "annotation"
 REPO = "app-nena"
-LAYERED = "layered"
-REL = f"{LAYERED}/ship"
-INPUT = f"{GH}/{ORG}/{REPO}/{LAYERED}"
+REL = "site"
+INPUT = f"{GH}/{ORG}/{REPO}"
 OUTPUT = f"{GH}/{ORG}/{REPO}/{REL}"
 
 JS_DIR = f"{OUTPUT}/js"

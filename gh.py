@@ -9,6 +9,7 @@ import unicodedata
 
 REMOTE = "origin"
 BRANCH = "gh-pages"
+SITE = "site"
 
 # COPIED FROM MKDOCS AND MODIFIED
 
@@ -115,7 +116,7 @@ def _gitpath(fname):
     return "/".join(norm.split(os.path.sep))
 
 
-def _ghp_import(rel):
+def _ghp_import():
     if not _try_rebase(REMOTE, BRANCH):
         print("Failed to rebase %s branch.", BRANCH)
 
@@ -126,11 +127,11 @@ def _ghp_import(rel):
         kwargs["universal_newlines"] = False
     pipe = Popen(cmd, **kwargs)
     _start_commit(pipe, BRANCH, "docs update")
-    for path, _, fnames in os.walk(rel):
+    for path, _, fnames in os.walk(SITE):
         for fn in fnames:
             fpath = os.path.join(path, fn)
             fpath = _normalize_path(fpath)
-            gpath = _gitpath(os.path.relpath(fpath, start=rel))
+            gpath = _gitpath(os.path.relpath(fpath, start=SITE))
             _add_file(pipe, fpath, gpath)
     _add_nojekyll(pipe)
     _write(pipe, _enc("\n"))
@@ -147,8 +148,8 @@ def _ghp_import(rel):
     return result, _dec(err)
 
 
-def deploy(org, repo, rel):
-    (result, error) = _ghp_import(rel)
+def deploy(org, repo):
+    (result, error) = _ghp_import()
     if not result:
         print("Failed to deploy to GitHub with error: \n%s", error)
         raise SystemExit(1)
@@ -161,7 +162,6 @@ def deploy(org, repo, rel):
 
 ORG = "annotation"
 REPO = "app-nena"
-REL = "layered/ship"
 
 
-deploy(ORG, REPO, REL)
+deploy(ORG, REPO)

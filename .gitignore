@@ -21,7 +21,6 @@ dev
 *.iso
 *.jar
 *.rar
-*.zip
 
 # Logs and databases #
 ######################

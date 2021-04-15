@@ -36,6 +36,7 @@ export class GuiProvider {
     const {
       Config: {
         ntypesR,
+        appVersion,
         description,
         urls,
         captions: { title },
@@ -45,11 +46,15 @@ export class GuiProvider {
     $("head>title").html(title)
     $("#title").html(title)
     $("#description").html(description)
+    $("#appversion").html(appVersion.replace(/@/, " @ "))
 
-    for (const [kind, [linkHref, linkTitle]] of Object.entries(urls)) {
+    for (const [kind, [linkText, linkHref, linkTitle]] of Object.entries(urls)) {
       const elem = $(`#${kind}link`)
       elem.attr("title", linkTitle)
       elem.attr("href", linkHref)
+      if (linkText != null) {
+        elem.html(linkText)
+      }
     }
 
     $("go").html(SEARCH.dirty)

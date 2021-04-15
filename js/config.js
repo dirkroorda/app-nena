@@ -16,13 +16,17 @@ export class ConfigProvider {
      */
 
     const {
-      defs: { org, repo, name, description, urls, captions },
+      defs: { appVersion, org, repo, name, description, urls, captions },
       levels,
       containerType, simpleBase,
       ntypes, ntypesinit, ntypessize,
       utypeOf, dtypeOf,
       layers, visible,
     } = configData
+
+    /* the version stamp of this app
+     */
+    this.appVersion = appVersion
 
     /* the Github organization of the app
      */

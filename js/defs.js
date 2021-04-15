@@ -11,8 +11,8 @@ export const MAXINPUT = 1000
 export const DEFAULTJOB = "search"
 
 export const BUTTON = {
-  nodeseq: { on: "nodes start at 1", off: "nodes as in TF" },
-  autoexec: { on: "auto search", off: "press to search" },
+  nodeseq: { on: "nodes start at 1", off: "nodes as in text-fabric" },
+  autoexec: { on: "auto search", off: "use button to search" },
   exec: { no: " ", on: "⚫️", off: "🔴" },
   visible: { on: "🔵", off: "⚪️" },
   expand: {

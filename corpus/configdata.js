@@ -5,22 +5,42 @@ const configData = {
   "name": "nena",
   "urls": {
    "corpus": [
+    null,
     "https://nena.ames.cam.ac.uk",
     "North-Eastern Neo-Aramaic Data Project website"
    ],
    "maker": [
+    null,
     "https://dans.knaw.nl/en/front-page?set_language=en",
     "DANS = Data Archiving and Networked Services"
    ],
    "tf": [
-    "https://annotation.github.io/text-fabric/tf/",
+    null,
+    "https://{ORG}.github.io/text-fabric/tf/",
     "Text-Fabric documentation website"
    ],
+   "appdoc": [
+    "about layered search",
+    "https://annotation.github.io/text-fabric/tf/about/layeredsearch.html",
+    "Powered by Text-Fabric data"
+   ],
+   "datadoc": [
+    "data (feature) documentation",
+    "https://github.com/CambridgeSemiticsLab/nena_tf/blob/master/docs/features.md",
+    "Powered by Text-Fabric data"
+   ],
+   "data": [
+    "based on text-fabric data version alpha",
+    "https://github.com/CambridgeSemiticsLab/nena_tf/tree/master/tf/alpha",
+    "Powered by Text-Fabric data"
+   ],
    "source": [
-    "https://github.com/annotation/app-nena",
+    null,
+    "https://github.com/{ORG}/{REPO}",
     "source code in Github repository"
    ],
    "package": [
+    null,
     "https://annotation.github.io/app-nena/nena.zip",
     "zip file for offline use"
    ]
@@ -28,7 +48,8 @@ const configData = {
   "captions": {
    "title": "NENA phono search"
   },
-  "description": "\n    <p>Phonetic search interface for the\n       <a href=\"https://nena.ames.cam.ac.uk/\" target=\"_blank\">Northeastern Neo-Aramaic Database</a>.\n    </p>\n    <p>Based on <a href=\"https://github.com/CambridgeSemiticsLab/nena_tf\" target=\"_blank\">NENA data in Text-Fabric format</a>.</p>\n    <p>See the\n    <a href=\"https://github.com/CambridgeSemiticsLab/nena_tf/blob/master/docs/features.md\" target=\"_blank\">data documentation</a>.</p>\n    <p>This is a standalone app. You download it to your computer, and then it works without\n    connection to the internet.</p>\n    <p>This web app is by:</p>\n    <ul>\n    <li> <a href=\"https://www.ames.cam.ac.uk/people/professor-geoffrey-khan\" target=\"_blank\">Geoffrey Khan</a> (initiator)\n    <li> <a href=\"https://www.linkedin.com/in/cody-kingham-1135018a\" target=\"_blank\">Cody Kingham</a> (corpus developer)\n    <li> <a href=\"https://pure.knaw.nl/portal/en/persons/dirk-roorda\" target=\"_blank\">Dirk Roorda</a> (software developer)\n    </ul>\n    "
+  "description": "\n    <p>Phonetic search interface for the\n       <a href=\"https://nena.ames.cam.ac.uk/\" target=\"_blank\">Northeastern Neo-Aramaic Database</a>.\n    </p>\n    <p>This is a standalone app. You download it to your computer, and then it works without\n    connection to the internet.</p>\n    <p>This web app is by:</p>\n    <ul>\n    <li> <a href=\"https://www.ames.cam.ac.uk/people/professor-geoffrey-khan\" target=\"_blank\">Geoffrey Khan</a> (initiator)\n    <li> <a href=\"https://www.linkedin.com/in/cody-kingham-1135018a\" target=\"_blank\">Cody Kingham</a> (corpus developer)\n    <li> <a href=\"https://pure.knaw.nl/portal/en/persons/dirk-roorda\" target=\"_blank\">Dirk Roorda</a> (software developer)\n    </ul>\n    ",
+  "appVersion": "0007@2021-04-15T18:01:13"
  },
  "containerType": "sentence",
  "simpleBase": false,

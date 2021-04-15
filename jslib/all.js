@@ -12,8 +12,8 @@ const QUWINDOW = 10
 const MAXINPUT = 1000
 const DEFAULTJOB = "search"
 const BUTTON = {
-  nodeseq: { on: "nodes start at 1", off: "nodes as in TF" },
-  autoexec: { on: "auto search", off: "press to search" },
+  nodeseq: { on: "nodes start at 1", off: "nodes as in text-fabric" },
+  autoexec: { on: "auto search", off: "use button to search" },
   exec: { no: " ", on: "⚫️", off: "🔴" },
   visible: { on: "🔵", off: "⚪️" },
   expand: {
@@ -239,13 +239,14 @@ class ConfigProvider {
   }
   init() {
     const {
-      defs: { org, repo, name, description, urls, captions },
+      defs: { appVersion, org, repo, name, description, urls, captions },
       levels,
       containerType, simpleBase,
       ntypes, ntypesinit, ntypessize,
       utypeOf, dtypeOf,
       layers, visible,
     } = configData
+    this.appVersion = appVersion
     this.org = org
     this.repo = repo
     this.name = name
@@ -532,6 +533,7 @@ class GuiProvider {
     const {
       Config: {
         ntypesR,
+        appVersion,
         description,
         urls,
         captions: { title },
@@ -541,10 +543,14 @@ class GuiProvider {
     $("head>title").html(title)
     $("#title").html(title)
     $("#description").html(description)
-    for (const [kind, [linkHref, linkTitle]] of Object.entries(urls)) {
+    $("#appversion").html(appVersion.replace(/@/, " @ "))
+    for (const [kind, [linkText, linkHref, linkTitle]] of Object.entries(urls)) {
       const elem = $(`#${kind}link`)
       elem.attr("title", linkTitle)
       elem.attr("href", linkHref)
+      if (linkText != null) {
+        elem.html(linkText)
+      }
     }
     $("go").html(SEARCH.dirty)
     const querybody = $("#querybody")

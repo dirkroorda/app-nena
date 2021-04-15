@@ -5,23 +5,23 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link rel="shortcut icon" href="favicon.ico">
 		<title></title>
-		<link rel="stylesheet" href="css/app.css"/>
-		<script defer src="jslib/jquery.js"></script>
-		<script defer src="data/configdata.js"></script>
-    <script defer src="jslib/all.js"/></script>
-		<script defer src="data/corpusdata.js"></script>
+		<link rel="stylesheet" href="css/app.css?v=0002"/>
+		<script defer src="jslib/jquery.js?v=0002"></script>
+		<script defer src="corpus/configdata.js?v=0002"></script>
+    <script defer src="jslib/all.js?v=0002"/></script>
+		<script defer src="corpus/corpusdata.js?v=0002"></script>
 	</head>
 	<body>
     <div class="page">
       <div class="leftcol">
         <div class="progress" id="progress">
           Javascript has not yet kicked in.<br>
-          Downloading corpus ...<br>
+          Loading corpus ...<br>
         </div>
         <a
            id="corpuslink" href="#" target="_blank"
            title="to the website of the corpus"
-           class="logo"
+           class="logo right"
         ><img alt="corpus logo" id="logo" src="png/logo.png"></a>
         <details>
           <summary id="title"></summary>
@@ -29,16 +29,13 @@
           <a
              id="makerlink" href="#" target="_blank"
              title="to the website of the maker"
-             class="logo"
+             class="logo right"
           ><img alt="maker logo" id="logo" src="png/maker.png"></a>
           <a
              id="tflink" href="#" target="_blank"
              title="to the website of Text-Fabric"
-             class="logo"
+             class="logo right"
           ><img alt="Text-Fabric logo" id="logo" src="png/tf.png"></a>
-          <p>License: free to use, free to modify:
-            <a href="https://mit-license.org" target="_blank">MIT</a>.
-          </p>
           <details>
             <summary><i>guide</i></summary>
             <div>
@@ -49,9 +46,32 @@
               <p>The patterns you specify must be valid <i>regular expressions</i>
               according to the JavaScript language. Here is a 
               <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet" target="_blank">cheatsheet</a>.</p>
-              <p>Here is more
+              <p>More documentation:
               <a href="https://annotation.github.io/text-fabric/tf/about/layeredsearch.html" target="_blank">background</a>
               on layered search.</p>
+            </div>
+          </details>
+          <details>
+            <summary><i>colofon</i></summary>
+            <div>
+              <p>This is a static web page.
+              You can
+              <a
+                title="download zip file"
+                id="packagelink" href="#" target="_blank"
+              >download</a>
+              it, unzip it, and use it offline double clicking the file <i>local.html</i> inside.
+              </p>
+              <p>Source code on 
+              <a
+                id="sourcelink" href="#" target="_blank"
+                title="to the source code"
+                class="logo"
+              ><img alt="GitHUb logo" id="ghlogo" src="png/github.png"></a>
+              </p>
+              <p>License: free to use, free to modify:
+                <a href="https://mit-license.org" target="_blank">MIT</a>.
+              </p>
             </div>
           </details>
         </details>

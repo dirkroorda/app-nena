@@ -3,7 +3,7 @@
 /* global corpusData */
 
 
-const DEBUG = true
+const DEBUG = false
 const BOOL = "boolean"
 const NUMBER = "number"
 const STRING = "string"
@@ -239,12 +239,15 @@ class ConfigProvider {
   }
   init() {
     const {
-      name, description, levels, urls, captions,
+      defs: { org, repo, name, description, urls, captions },
+      levels,
       containerType, simpleBase,
       ntypes, ntypesinit, ntypessize,
       utypeOf, dtypeOf,
       layers, visible,
     } = configData
+    this.org = org
+    this.repo = repo
     this.name = name
     this.description = description
     this.levels = levels
@@ -537,12 +540,12 @@ class GuiProvider {
     } = this
     $("head>title").html(title)
     $("#title").html(title)
+    $("#description").html(description)
     for (const [kind, [linkHref, linkTitle]] of Object.entries(urls)) {
       const elem = $(`#${kind}link`)
       elem.attr("title", linkTitle)
       elem.attr("href", linkHref)
     }
-    $("#description").html(description)
     $("go").html(SEARCH.dirty)
     const querybody = $("#querybody")
     const html = []
@@ -929,22 +932,22 @@ class GuiProvider {
     const max2p = $("#max2p")
     const maxa = $("#maxa")
     slider.off("change").change(() => {
-      const { focusPos } = State.getj
+      const { focusPos } = State.getj()
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(slider.val() - 1),
       })
       Search.displayResults()
     })
     setter.off("change").change(() => {
-      const { focusPos } = State.getj
+      const { focusPos } = State.getj()
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(setter.val() - 1),
       })
       Search.displayResults()
     })
     minp.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -953,8 +956,8 @@ class GuiProvider {
       Search.displayResults()
     })
     min2p.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -963,16 +966,16 @@ class GuiProvider {
       Search.displayResults()
     })
     mina.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({ prevFocusPos: focusPos, focusPos: 0 })
       Search.displayResults()
     })
     maxp.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -981,8 +984,8 @@ class GuiProvider {
       Search.displayResults()
     })
     max2p.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -991,8 +994,8 @@ class GuiProvider {
       Search.displayResults()
     })
     maxa.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({

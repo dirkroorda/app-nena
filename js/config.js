@@ -16,14 +16,23 @@ export class ConfigProvider {
      */
 
     const {
-      name, description, levels, urls, captions,
+      defs: { org, repo, name, description, urls, captions },
+      levels,
       containerType, simpleBase,
       ntypes, ntypesinit, ntypessize,
       utypeOf, dtypeOf,
       layers, visible,
     } = configData
 
-    /* the name of the app
+    /* the Github organization of the app
+     */
+    this.org = org
+
+    /* the Github organization of the app
+     */
+    this.repo = repo
+
+    /* the Github repo of the app
      */
     this.name = name
 
@@ -35,12 +44,11 @@ export class ConfigProvider {
      */
     this.levels = levels
 
-    /* several kinds of urls: for corpus, maker, tf
+    /* several kinds of urls: for corpus, maker, tf, source, package
      * For each kind, there is a pair consisting of the href and the title of the url
      */
     this.urls = urls
     /* Captions for several elements
-     * - title
      */
     this.captions = captions
 

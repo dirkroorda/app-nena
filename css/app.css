@@ -83,7 +83,7 @@ div.rightcol {
   text-align: left;
 }
 
-.logo {
+.logo.right {
   float: right;
 }
 .logo>img {

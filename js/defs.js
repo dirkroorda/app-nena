@@ -1,4 +1,4 @@
-export const DEBUG = true
+export const DEBUG = false
 
 export const BOOL = "boolean"
 export const NUMBER = "number"

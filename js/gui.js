@@ -31,7 +31,7 @@ export class GuiProvider {
    */
 
   build() {
-    /* fill in title and description
+    /* fill in title and description and colofon
      */
     const {
       Config: {
@@ -44,6 +44,7 @@ export class GuiProvider {
     } = this
     $("head>title").html(title)
     $("#title").html(title)
+    $("#description").html(description)
 
     for (const [kind, [linkHref, linkTitle]] of Object.entries(urls)) {
       const elem = $(`#${kind}link`)
@@ -51,7 +52,6 @@ export class GuiProvider {
       elem.attr("href", linkHref)
     }
 
-    $("#description").html(description)
     $("go").html(SEARCH.dirty)
 
     /* Generate all search controls
@@ -552,22 +552,22 @@ export class GuiProvider {
     const maxa = $("#maxa")
 
     slider.off("change").change(() => {
-      const { focusPos } = State.getj
+      const { focusPos } = State.getj()
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(slider.val() - 1),
       })
       Search.displayResults()
     })
     setter.off("change").change(() => {
-      const { focusPos } = State.getj
+      const { focusPos } = State.getj()
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(setter.val() - 1),
       })
       Search.displayResults()
     })
     minp.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -576,8 +576,8 @@ export class GuiProvider {
       Search.displayResults()
     })
     min2p.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -586,16 +586,16 @@ export class GuiProvider {
       Search.displayResults()
     })
     mina.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({ prevFocusPos: focusPos, focusPos: 0 })
       Search.displayResults()
     })
     maxp.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -604,8 +604,8 @@ export class GuiProvider {
       Search.displayResults()
     })
     max2p.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({
@@ -614,8 +614,8 @@ export class GuiProvider {
       Search.displayResults()
     })
     maxa.off("click").click(() => {
-      const { focusPos } = State.getj
-      if (focusPos == null) {
+      const { focusPos } = State.getj()
+      if (focusPos == -2) {
         return
       }
       State.setj({

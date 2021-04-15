@@ -578,7 +578,7 @@ class GuiProvider {
     for (const nType of ntypesR) {
       const total = ntypessize[nType]
       html.push(`
-  <tr>
+  <tr class="stat" ntype="${nType}">
     <td><span class="statlabel">${nType}</span></td>
     <td class="stat"><span class="stattotal">${total}</span></td>
     <td class="stat"><span class="statresult" ntype="${nType}"></span></td>
@@ -1116,6 +1116,10 @@ class GuiProvider {
     }
     this.setButton("ctype", ``, false)
     this.setButton("ctype", `[ntype="${containerType}"]`, true)
+    const statRows = $(`tr.stat`)
+    const statContainer = $(`tr.stat[ntype="${containerType}"]`)
+    statRows.removeClass("focus")
+    statContainer.addClass("focus")
   }
   applyResults(run) {
     // const { State, Search } = this
@@ -1305,6 +1309,10 @@ class MemProvider {
 
 
 class SearchProvider {
+  constructor() {
+    this.getAcro = /[^0-9]/g
+    this.tabNl = /[\n\t]/g
+  }
   deps({ Log, Disk, State, Gui, Config, Corpus }) {
     this.Log = Log
     this.Disk = Disk
@@ -1559,7 +1567,8 @@ class SearchProvider {
     }
     return dest
   }
-  getHLText(iPositions, matches, text, valueMap) {
+  getHLText(iPositions, matches, text, valueMap, tip) {
+    const { getAcro } = this
     const hasMap = valueMap != null
     const spans = []
     let str = ""
@@ -1578,8 +1587,8 @@ class SearchProvider {
         spans[spans.length - 1][1] += ch
       }
     }
-    const tip = hasMap ? valueMap[str] : null
-    return { spans, tip }
+    const tipStr = (hasMap && tip) ? valueMap[str.replaceAll(getAcro, "")] : null
+    return { spans, tipStr }
   }
   getLayers(nType, layers, visibleLayers, includeNodes) {
     const { [nType]: definedLayers = {} } = layers
@@ -1608,16 +1617,18 @@ class SearchProvider {
         const num = nodeseq ? node - ntypesinit[nType] + 1 : node
         return `<span class="n">${num}</span>`
       }
-      const { [nType]: { [layer]: { pos: posKey, valueMap } } } = layers
+      const { [nType]: { [layer]: { pos: posKey, valueMap, tip } } } = layers
       const { [nType]: { [layer]: text } } = texts
       const { [nType]: { [posKey]: iPos } } = iPositions
       const nodeIPositions = iPos.get(node)
       const { [nType]: { matches: { [layer]: matches } = {} } } = tpResults
       const nodeMatches =
         matches == null || !matches.has(node) ? new Set() : matches.get(node)
-      const { spans, tip } = this.getHLText(nodeIPositions, nodeMatches, text, valueMap)
-      const hasTip = tip != null
-      const tipRep = (hasTip) ? ` title="${tip}"` : ""
+      const { spans, tipStr } = this.getHLText(
+        nodeIPositions, nodeMatches, text, valueMap, tip,
+      )
+      const hasTip = tipStr != null
+      const tipRep = (hasTip) ? ` title="${tipStr}"` : ""
       const html = []
       const multiple = spans.length > 1 || hasTip
       if (multiple) {
@@ -1752,7 +1763,7 @@ class SearchProvider {
       for (const layer of exportLayers) {
         const tpLayer = `${nType}-${layer}`
         headFields.push(tpLayer)
-        const { [layer]: { pos: posKey, valueMap } } = tpLayerInfo
+        const { [layer]: { pos: posKey, valueMap, tip } } = tpLayerInfo
         const { [layer]: text } = tpTexts
         const { [posKey]: iPos } = tpIPositions
         const { [layer]: lrMatches } = matches
@@ -1764,19 +1775,20 @@ class SearchProvider {
             lrMatches == null || !lrMatches.has(node)
               ? new Set()
               : lrMatches.get(node)
-          const { spans, tip } = this.getHLText(
-            nodeIPositions, nodeMatches, text, valueMap,
+          const { spans, tipStr } = this.getHLText(
+            nodeIPositions, nodeMatches, text, valueMap, tip
           )
-          const tipRep = (tip == null) ? "" : `(=${tip})`
+          const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
           let piece = ""
           for (const [hl, val] of spans) {
             piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
           }
-          fields.set(tpLayer, piece)
+          fields.set(tpLayer, piece.replaceAll(this.tabNl, " "))
         }
       }
     }
-    const headLine = `node\t${headFields.join("\t")}\n`
+    const firstField = nodeseq ? "seqno" : "node"
+    const headLine = `${firstField}\t${headFields.join("\t")}\n`
     const lines = [headLine]
     for (let i = 0; i < ntypes.length; i++) {
       const nType = ntypes[i]

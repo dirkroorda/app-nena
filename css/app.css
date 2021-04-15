@@ -24,6 +24,12 @@ input {
 button {
   font-size: medium;
 }
+.a-l {
+  text-align: left;
+}
+.a-r {
+  text-align: right;
+}
 
 /* PAGE DIVISION INTO COLUMNS */
 
@@ -302,7 +308,23 @@ button.medium {
   padding: 0.5rem;
 }
 
-.stat {
+#statsbody td, #statshead th {
+  border-style: solid;
+  border-color: var(--white);
+  border: 0.2rem solid var(--white);
+  border-width: 2px 0;
+  padding: 0.1rem 0.5rem;
+}
+#statshead th {
+  font-style: italic;
+}
+
+#statsbody tr.focus > td {
+  border-bottom-color: var(--focus-back);
+  border-top-color: var(--focus-back);
+  background-color: var(--stats-back);
+}
+td.stat {
   padding-left: 1rem;
   text-align: right;
 }
@@ -355,9 +377,12 @@ button.medium {
 #total {
   text-align: left;
   color: var(--ctlinp-fore);
-  background-color: var(--white);
   font-weight: bold;
 }
+#totalw {
+  background-color: var(--stats-back);
+}
+
 /* navigation buttons */
 .upnav, .downnav {
   margin-top: 1rem;
@@ -493,6 +518,7 @@ button.small.active, button.medium.active {
   --unhl-border:      hsla(  0,   0%,  70%, 1    ); 
   --unhl-fore:        hsla(  0,   0%,  30%, 1    ); 
   --unhl-back:        hsla(  0,   0%,  95%, 1    ); 
+  --stats-back:       hsla(240, 100%,  95%, 1    ); 
   --result-border:    hsla(  0,   0%,  70%, 1    ); 
   --focus-fore:       hsla(240, 100%, 100%, 1    ); 
   --focus-back:       hsla(240, 100%,  60%, 1    ); 

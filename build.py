@@ -40,7 +40,7 @@ commit: commit repo and publish on Github Pages
 ship  : increase version and commit repo and publish on Github Pages
         performs all build steps, including version bump
 
-For ship you need to pass a commit message.
+For commit and ship you need to pass a commit message.
 """
 
 VERSION_CONFIG = dict(
@@ -71,6 +71,7 @@ def readArgs():
     args = sys.argv[1:]
     if not len(args) or args[0] in {"-h", "--help", "help"}:
         console(HELP)
+        console(f"Wrong arguments: «{' '.join(args)}»")
         return (False, None, [])
     arg = args[0]
     if arg not in {
@@ -84,8 +85,9 @@ def readArgs():
         "ship",
     }:
         console(HELP)
+        console(f"Wrong arguments: «{' '.join(args)}»")
         return (False, None, [])
-    if arg in {"ship"}:
+    if arg in {"commit", "ship"}:
         if len(args) < 2:
             console("Provide a commit message")
             return (False, None, [])
@@ -110,7 +112,7 @@ def main():
     elif task == "app":
         app()
     elif task == "commit":
-        commit()
+        commit(msg)
     elif task == "ship":
         ship(msg)
 
@@ -119,6 +121,7 @@ def commit(msg):
     run(["git", "add", "--all", "."])
     run(["git", "commit", "-m", msg])
     run(["git", "push", "origin", "master"])
+    run(["python3", "gh.py"])
 
 
 def ship(msg):
@@ -128,7 +131,6 @@ def ship(msg):
     makeCorpus()
     app()
     commit(msg)
-    run(["python3", "gh.py"])
 
 
 def zipApp():

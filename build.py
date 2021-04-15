@@ -30,15 +30,15 @@ command:
 --help
 help  : print help and exit
 
-serve : serve search app locally
-v     : show current version
-p     : production: set debug = false
-config: build config file
-corpus: build corpus files
-app   : build the search app
-commit: commit repo and publish on Github Pages
-ship  : increase version and commit repo and publish on Github Pages
-        performs all build steps, including version bump
+serve          : serve search app locally
+v              : show current version
+debug [on|off] : production: set debug = false
+config         : build config file
+corpus         : build corpus files
+app            : build the search app
+commit         : commit repo and publish on Github Pages
+ship           : increase version and commit repo and publish on Github Pages
+                 performs all build steps, including version bump
 
 For commit and ship you need to pass a commit message.
 """
@@ -77,7 +77,7 @@ def readArgs():
     if arg not in {
         "serve",
         "v",
-        "p",
+        "debug",
         "config",
         "corpus",
         "app",
@@ -92,6 +92,11 @@ def readArgs():
             console("Provide a commit message")
             return (False, None, [])
         return (arg, args[1], args[2:])
+    if arg in {"debug"}:
+        if len(args) < 2 or args[1] not in {"on", "off"}:
+            console("say on or off")
+            return (False, None, [])
+        return (arg, args[1], args[2:])
     return (arg, None, [])
 
 
@@ -103,8 +108,8 @@ def main():
         serve()
     elif task == "v":
         showVersion()
-    elif task == "p":
-        removeDebug()
+    elif task == "debug":
+        adjustDebug(msg)
     elif task == "config":
         makeConfig()
     elif task == "corpus":
@@ -126,7 +131,7 @@ def commit(msg):
 
 def ship(msg):
     adjustVersion()
-    removeDebug()
+    adjustDebug(msg)
     makeConfig()
     makeCorpus()
     app()
@@ -253,9 +258,9 @@ def adjustVersion():
     console(f"Version went from `{currentVersion}` to `{newVersion}`")
 
 
-def replaceDebug(mask):
+def replaceDebug(mask, value):
     def subVersion(match):
-        return mask.format("false")
+        return mask.format(value)
 
     return subVersion
 
@@ -289,18 +294,20 @@ def showDebug():
         console(f'{debug} (according to {source})')
 
 
-def removeDebug():
+def adjustDebug(onoff):
     showDebug()
+
+    newValue = "true" if onoff == "on" else "false"
 
     for (key, c) in DEBUG_CONFIG.items():
         console(f'Adjusting debug in {c["file"]}')
         with open(c["file"]) as fh:
             text = fh.read()
-        text = c["re"].sub(replaceDebug(c["mask"]), text)
+        text = c["re"].sub(replaceDebug(c["mask"], newValue), text)
         with open(c["file"], "w") as fh:
             fh.write(text)
 
-    console("Debug set to false")
+    console(f"Debug set to {newValue}")
     showDebug()
 
 

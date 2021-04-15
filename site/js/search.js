@@ -20,6 +20,11 @@ export class SearchProvider {
  *    - make navigation controls for moving the focus through the table
  */
 
+  constructor() {
+    this.getAcro = /[^0-9]/g
+    this.tabNl = /[\n\t]/g
+  }
+
   deps({ Log, Disk, State, Gui, Config, Corpus }) {
     this.Log = Log
     this.Disk = Disk
@@ -433,13 +438,15 @@ export class SearchProvider {
     return dest
   }
 
-  getHLText(iPositions, matches, text, valueMap) {
+  getHLText(iPositions, matches, text, valueMap, tip) {
     /* get highlighted text for a node
      * The results of matching a pattern against a text are highlighted within that text
      * returns a sequence of spans, where a span is an array of postions plus a boolean
      * that indicated whether the span is highlighted or not.
      * Used by display() and tabular() below
      */
+    const { getAcro } = this
+
     const hasMap = valueMap != null
 
     const spans = []
@@ -460,8 +467,14 @@ export class SearchProvider {
         spans[spans.length - 1][1] += ch
       }
     }
-    const tip = hasMap ? valueMap[str] : null
-    return { spans, tip }
+    /* the str that we get back from the node, may contain after-node material
+     * and hence is not necessarily a value that we can feed to the valueMap.
+     * However, the values that we need for this purpose are purely numeric
+     * or the empty string
+     */
+
+    const tipStr = (hasMap && tip) ? valueMap[str.replaceAll(getAcro, "")] : null
+    return { spans, tipStr }
   }
 
   getLayers(nType, layers, visibleLayers, includeNodes) {
@@ -509,7 +522,7 @@ export class SearchProvider {
         const num = nodeseq ? node - ntypesinit[nType] + 1 : node
         return `<span class="n">${num}</span>`
       }
-      const { [nType]: { [layer]: { pos: posKey, valueMap } } } = layers
+      const { [nType]: { [layer]: { pos: posKey, valueMap, tip } } } = layers
       const { [nType]: { [layer]: text } } = texts
       const { [nType]: { [posKey]: iPos } } = iPositions
       const nodeIPositions = iPos.get(node)
@@ -517,9 +530,11 @@ export class SearchProvider {
       const nodeMatches =
         matches == null || !matches.has(node) ? new Set() : matches.get(node)
 
-      const { spans, tip } = this.getHLText(nodeIPositions, nodeMatches, text, valueMap)
-      const hasTip = tip != null
-      const tipRep = (hasTip) ? ` title="${tip}"` : ""
+      const { spans, tipStr } = this.getHLText(
+        nodeIPositions, nodeMatches, text, valueMap, tip,
+      )
+      const hasTip = tipStr != null
+      const tipRep = (hasTip) ? ` title="${tipStr}"` : ""
 
       const html = []
       const multiple = spans.length > 1 || hasTip
@@ -701,7 +716,7 @@ export class SearchProvider {
         const tpLayer = `${nType}-${layer}`
         headFields.push(tpLayer)
 
-        const { [layer]: { pos: posKey, valueMap } } = tpLayerInfo
+        const { [layer]: { pos: posKey, valueMap, tip } } = tpLayerInfo
         const { [layer]: text } = tpTexts
         const { [posKey]: iPos } = tpIPositions
         const { [layer]: lrMatches } = matches
@@ -715,21 +730,22 @@ export class SearchProvider {
             lrMatches == null || !lrMatches.has(node)
               ? new Set()
               : lrMatches.get(node)
-          const { spans, tip } = this.getHLText(
-            nodeIPositions, nodeMatches, text, valueMap,
+          const { spans, tipStr } = this.getHLText(
+            nodeIPositions, nodeMatches, text, valueMap, tip
           )
-          const tipRep = (tip == null) ? "" : `(=${tip})`
+          const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
 
           let piece = ""
           for (const [hl, val] of spans) {
             piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
           }
-          fields.set(tpLayer, piece)
+          fields.set(tpLayer, piece.replaceAll(this.tabNl, " "))
         }
       }
     }
 
-    const headLine = `node\t${headFields.join("\t")}\n`
+    const firstField = nodeseq ? "seqno" : "node"
+    const headLine = `${firstField}\t${headFields.join("\t")}\n`
     const lines = [headLine]
 
     for (let i = 0; i < ntypes.length; i++) {

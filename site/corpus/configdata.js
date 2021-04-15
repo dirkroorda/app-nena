@@ -129,6 +129,7 @@ const configData = {
      "21": "K./T.|K./T.",
      "0": ""
     },
+    "tip": true,
     "pos": "lang",
     "pattern": "",
     "description": "language, indicated by a number"
@@ -174,30 +175,35 @@ const configData = {
      "37": "Leya ʾOraha",
      "0": ""
     },
+    "tip": true,
     "pos": "speaker",
     "pattern": "",
     "description": "speaker, indicated by a number"
    },
    "text": {
     "valueMap": null,
+    "tip": false,
     "pos": "text",
     "pattern": "",
     "description": "text precise, complete, uses non-ascii: <code>maqəlbə̀nna</code>"
    },
    "full": {
     "valueMap": null,
+    "tip": false,
     "pos": "full",
     "pattern": "",
     "description": "text representation: <code>maq9lb9`nna</code>"
    },
    "fuzzy": {
     "valueMap": null,
+    "tip": false,
     "pos": "fuzzy",
     "pattern": "mute",
     "description": "text representation: <code>maqilbinna</code>"
    },
    "lite": {
     "valueMap": null,
+    "tip": false,
     "pos": "lite",
     "pattern": "",
     "description": "text representation: <code>maq9lb9nna</code>"
@@ -214,28 +220,29 @@ const configData = {
      "i": "INTJ",
      "pp": "PREP",
      "v": "VERB",
-     "n|pt": "NOUN|PART",
-     "n|n": "NOUN|NOUN",
-     "pn|pt": "PRON|PART",
-     "pt|pn": "PART|PRON",
-     "m|n": "MODI|NOUN",
-     "m|pn": "MODI|PRON",
-     "pt|n": "PART|NOUN",
-     "ab|n": "ADVB|NOUN",
-     "n|ab": "NOUN|ADVB",
-     "n|aj": "NOUN|ADJV",
-     "aj|aj": "ADJV|ADJV",
-     "aj|n": "ADJV|NOUN",
-     "nr|nr": "NUMR|NUMR",
-     "aj|ab": "ADJV|ADVB",
-     "n|intj": "NOUN|INTJ",
-     "n|n|n": "NOUN|NOUN|NOUN",
-     "pt|pt|pt": "PART|PART|PART",
-     "aj|n|n": "ADJV|NOUN|NOUN",
-     "aj|n|n|n": "ADJV|NOUN|NOUN|NOUN",
-     "n|n|n|n": "NOUN|NOUN|NOUN|NOUN",
+     "n_pt": "NOUN|PART",
+     "n_n": "NOUN|NOUN",
+     "pn_pt": "PRON|PART",
+     "pt_pn": "PART|PRON",
+     "m_n": "MODI|NOUN",
+     "m_pn": "MODI|PRON",
+     "pt_n": "PART|NOUN",
+     "ab_n": "ADVB|NOUN",
+     "n_ab": "NOUN|ADVB",
+     "n_aj": "NOUN|ADJV",
+     "aj_aj": "ADJV|ADJV",
+     "aj_n": "ADJV|NOUN",
+     "nr_nr": "NUMR|NUMR",
+     "aj_ab": "ADJV|ADVB",
+     "n_intj": "NOUN|INTJ",
+     "n_n_n": "NOUN|NOUN|NOUN",
+     "pt_pt_pt": "PART|PART|PART",
+     "aj_n_n": "ADJV|NOUN|NOUN",
+     "aj_n_n_n": "ADJV|NOUN|NOUN|NOUN",
+     "n_n_n_n": "NOUN|NOUN|NOUN|NOUN",
      "z": ""
     },
+    "tip": false,
     "pos": "pos",
     "pattern": "",
     "description": "part-of-speech"
@@ -246,6 +253,7 @@ const configData = {
      "C": "consonant",
      "z": ""
     },
+    "tip": false,
     "pos": "cls",
     "pattern": "",
     "description": "phonetic class: <code>CVCVCCVCCV</code>"
@@ -260,6 +268,7 @@ const configData = {
      "X": "emphatic",
      "z": ""
     },
+    "tip": false,
     "pos": "cls",
     "pattern": "",
     "description": "phonation: <code>PzzzPVzPPz</code>"
@@ -276,6 +285,7 @@ const configData = {
      "H": "laryngeal",
      "z": ""
     },
+    "tip": false,
     "pos": "cls",
     "pattern": "",
     "description": "phonation: <code>BzXzDBzDDz</code>"
@@ -290,6 +300,7 @@ const configData = {
      "S": "sibilant",
      "z": ""
     },
+    "tip": false,
     "pos": "cls",
     "pattern": "",
     "description": "phonation: <code>NzAzLAzNNz</code>"
@@ -298,6 +309,7 @@ const configData = {
   "line": {
    "number": {
     "valueMap": null,
+    "tip": false,
     "pos": "number",
     "pattern": "",
     "description": "line number"
@@ -306,24 +318,28 @@ const configData = {
   "text": {
    "title": {
     "valueMap": null,
+    "tip": false,
     "pos": "title",
     "pattern": "A",
     "description": "title of a text"
    },
    "dialect": {
     "valueMap": null,
+    "tip": false,
     "pos": "dialect",
     "pattern": "",
     "description": "dialect of a text <code>Barwar Urmi_C</code>"
    },
    "tid": {
     "valueMap": null,
+    "tip": false,
     "pos": "tid",
     "pattern": "",
     "description": "id of a text"
    },
    "place": {
     "valueMap": null,
+    "tip": false,
     "pos": "place",
     "pattern": "Dure",
     "description": "place of a text"

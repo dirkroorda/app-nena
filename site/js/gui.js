@@ -99,7 +99,7 @@ export class GuiProvider {
     for (const nType of ntypesR) {
       const total = ntypessize[nType]
       html.push(`
-  <tr>
+  <tr class="stat" ntype="${nType}">
     <td><span class="statlabel">${nType}</span></td>
     <td class="stat"><span class="stattotal">${total}</span></td>
     <td class="stat"><span class="statresult" ntype="${nType}"></span></td>
@@ -773,6 +773,14 @@ export class GuiProvider {
     }
     this.setButton("ctype", ``, false)
     this.setButton("ctype", `[ntype="${containerType}"]`, true)
+
+    /* also mark the corresponding row in the statistics table
+     */
+
+    const statRows = $(`tr.stat`)
+    const statContainer = $(`tr.stat[ntype="${containerType}"]`)
+    statRows.removeClass("focus")
+    statContainer.addClass("focus")
   }
 
   applyResults(run) {

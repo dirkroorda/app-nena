@@ -11,3 +11,9 @@ This is the
 app for the
 [Northeastern Neo-Aramaic Corpus](https://github.com/CambridgeSemiticsLab/nena_corpus).
 
+There is also a search interface for the NENA corpus.
+It is online, but it works on your computer, in the browser.
+
+Just click
+[nena-search](https://annotation.github.io/app-nena/)
+and of you go.

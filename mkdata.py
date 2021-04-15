@@ -158,6 +158,8 @@ def checkSettings(api, baseLevel):
         "NOUN|NOUN|NOUN|NOUN": "n|n|n|n",
     }
 
+    AFTER_DEFAULT = "/"
+
     SETTINGS = dict(
         word=dict(
             word=dict(
@@ -165,6 +167,8 @@ def checkSettings(api, baseLevel):
                 layers=dict(
                     lang=dict(
                         feature="lang",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_LANG,
                         map=MAP_LANG,
                         default=0,
@@ -173,6 +177,8 @@ def checkSettings(api, baseLevel):
                     ),
                     speaker=dict(
                         feature="speaker",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_SPEAKER,
                         map=MAP_SPEAKER,
                         default=0,
@@ -181,6 +187,8 @@ def checkSettings(api, baseLevel):
                     ),
                     text=dict(
                         feature="text",
+                        afterFeature="text_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_TEXT,
                         map=None,
                         default=CH_ABSENT,
@@ -189,6 +197,8 @@ def checkSettings(api, baseLevel):
                     ),
                     full=dict(
                         feature="full",
+                        afterFeature="full_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_FULL,
                         map=None,
                         default=CH_ABSENT,
@@ -197,6 +207,8 @@ def checkSettings(api, baseLevel):
                     ),
                     fuzzy=dict(
                         feature="fuzzy",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_FUZZY,
                         map=None,
                         default=CH_ABSENT,
@@ -206,6 +218,8 @@ def checkSettings(api, baseLevel):
                     ),
                     lite=dict(
                         feature="lite",
+                        afterFeature="lite_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_LITE,
                         map=None,
                         default=CH_ABSENT,
@@ -214,6 +228,8 @@ def checkSettings(api, baseLevel):
                     ),
                     pos=dict(
                         feature="pos",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_POS,
                         map=MAP_POS,
                         default=PH_ABSENT,
@@ -222,6 +238,8 @@ def checkSettings(api, baseLevel):
                     ),
                     cls=dict(
                         feature="phonetic_class",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_CLS,
                         descend="letter",
                         map=MAP_CLS,
@@ -231,6 +249,8 @@ def checkSettings(api, baseLevel):
                     ),
                     voice=dict(
                         feature="phonation",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_VOICE,
                         descend="letter",
                         map=MAP_VOICE,
@@ -240,6 +260,8 @@ def checkSettings(api, baseLevel):
                     ),
                     place=dict(
                         feature="phonetic_place",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_PLACE,
                         descend="letter",
                         map=MAP_PLACE,
@@ -249,6 +271,8 @@ def checkSettings(api, baseLevel):
                     ),
                     manner=dict(
                         feature="phonetic_manner",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_MANNER,
                         descend="letter",
                         map=MAP_MANNER,
@@ -257,8 +281,6 @@ def checkSettings(api, baseLevel):
                         visible=False,
                     ),
                 ),
-                afterFeature="full_end",
-                afterDefault="/",
             ),
             sentence=dict(
                 description=DESC_L_SENTENCE,
@@ -327,6 +349,8 @@ def checkSettings(api, baseLevel):
                 layers=dict(
                     text=dict(
                         feature="text",
+                        afterFeature="text_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_TEXT,
                         map=None,
                         default=CH_ABSENT,
@@ -343,6 +367,8 @@ def checkSettings(api, baseLevel):
                     ),
                     fuzzy=dict(
                         feature="fuzzy",
+                        afterFeature="full_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_FUZZY,
                         map=None,
                         default=CH_ABSENT,
@@ -352,6 +378,8 @@ def checkSettings(api, baseLevel):
                     ),
                     lite=dict(
                         feature="lite",
+                        afterFeature="lite_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_LITE,
                         map=None,
                         default=CH_ABSENT,
@@ -360,6 +388,8 @@ def checkSettings(api, baseLevel):
                     ),
                     pos=dict(
                         feature="pos",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_POS,
                         map=MAP_POS,
                         default=PH_ABSENT,
@@ -368,6 +398,8 @@ def checkSettings(api, baseLevel):
                     ),
                     cls=dict(
                         feature="phonetic_class",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_CLS,
                         map=MAP_CLS,
                         default=PH_ABSENT,
@@ -376,6 +408,8 @@ def checkSettings(api, baseLevel):
                     ),
                     voice=dict(
                         feature="phonation",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_VOICE,
                         map=MAP_VOICE,
                         default=PH_ABSENT,
@@ -384,6 +418,8 @@ def checkSettings(api, baseLevel):
                     ),
                     place=dict(
                         feature="phonetic_place",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_PLACE,
                         map=MAP_PLACE,
                         default=PH_ABSENT,
@@ -392,6 +428,8 @@ def checkSettings(api, baseLevel):
                     ),
                     manner=dict(
                         feature="phonetic_manner",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_MANNER,
                         map=MAP_MANNER,
                         default=PH_ABSENT,
@@ -405,6 +443,8 @@ def checkSettings(api, baseLevel):
                 layers=dict(
                     lang=dict(
                         feature="lang",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_LANG,
                         map=MAP_LANG,
                         default=0,
@@ -413,6 +453,8 @@ def checkSettings(api, baseLevel):
                     ),
                     speaker=dict(
                         feature="speaker",
+                        afterFeature="fuzzy_end",
+                        afterDefault=AFTER_DEFAULT,
                         description=DESC_SPEAKER,
                         map=MAP_SPEAKER,
                         default=0,
@@ -420,8 +462,6 @@ def checkSettings(api, baseLevel):
                         visible=False,
                     ),
                 ),
-                afterFeature="full_end",
-                afterDefault="/",
             ),
             sentence=dict(
                 description=DESC_L_SENTENCE,
@@ -681,17 +721,21 @@ def record(api, baseLevel):
             info = theseLayers[name]
             descend = info.get("descend", False)
             ascend = info.get("ascend", False)
+            feature = info.get("feature", None)
+            afterFeature = info.get("afterFeature", None)
+            afterDefault = info.get("afterDefault", None)
             vMap = info["map"]
             default = info["default"]
             pos = info["pos"]
             if descend:
                 value = ""
                 for n in L.d(node, otype=descend):
-                    val = Fs(info["feature"]).v(n)
+                    val = Fs(feature).v(n)
                     if vMap:
                         val = vMap.get(val, default)
                     else:
                         val = val or default
+
                     value += str(val)
             else:
                 refNode = L.u(node, otype=ascend)[0] if ascend else node
@@ -700,7 +744,13 @@ def record(api, baseLevel):
                     value = vMap.get(value, default)
                 else:
                     value = value or default
-                value = str(value)
+
+            afterVal = ""
+            if afterFeature is not None:
+                afterVal = Fs(afterFeature).v(node)
+                if not afterVal and afterDefault:
+                    afterVal = afterDefault
+            value = f"{value}{afterVal}"
 
             if pos is None:
                 recorders[nType][name].add(value)
@@ -804,16 +854,12 @@ def record(api, baseLevel):
 
                             addAfterValue(letter)
                             endNode(letter)
-
                     addAfterValue(word)
                     endNode(word)
-
                 addAfterValue(sent)
                 endNode(sent)
-
             addAfterValue(line)
             endNode(line)
-
         addAfterValue(text)
         endNode(text)
 

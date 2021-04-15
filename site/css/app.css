@@ -77,6 +77,10 @@ div.rightcol {
   background-color: var(--initializing);
 }
 
+#titledetails {
+  margin-top: 1rem;
+}
+
 #title {
   font-weight: bold;
   font-size: large;

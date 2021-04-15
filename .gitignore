@@ -47,7 +47,6 @@ Thumbs.db
 
 # Build directories #
 #####################
-site/
 _site/
 _local/
 _themes/

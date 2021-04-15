@@ -22,6 +22,8 @@ from defs import JS_DIR, JS_DEFS, JS_APP, JS_DEST, HTML_IN, HTML_NORMAL, HTML_FI
 
 
 def bundleApp():
+    with open("lsversion.txt") as fh:
+        version = int(fh.read().strip().lstrip("0"), base=16)
 
     commentRe = re.compile(r"""[ \t]*/\*.*?\*/[ \t]*""", re.S)
     importRe = re.compile(r'''import\s+\{.*?\}\s+from\s+"[^"]*\.js"''', re.S)
@@ -73,14 +75,18 @@ def bundleApp():
     print(f"Combined js file written to {JS_DEST}")
 
     with open(HTML_IN) as fh:
-        htmlTemplate = fh.read()
+        template = fh.read()
+        htmlNormal = template.replace("«js»", '''type="module" src="js/app.js«v»"''')
+        htmlNormal = htmlNormal.replace("«v»", f"?v={version}")
+        htmlLocal = template.replace("«js»", '''defer src="jslib/all.js«v»"''')
+        htmlLocal = htmlLocal.replace("«v»", f"?v={version}")
 
     with open(HTML_NORMAL, "w") as fh:
-        fh.write(htmlTemplate.replace("«»", '''type="module" src="js/app.js"'''))
+        fh.write(htmlNormal)
     print(f"html file written to {HTML_NORMAL}")
 
     with open(HTML_FILE, "w") as fh:
-        fh.write(htmlTemplate.replace("«»", '''defer src="jslib/all.js"'''))
+        fh.write(htmlLocal)
     print(f"html file (for use with file://) written to {HTML_FILE}")
 
 

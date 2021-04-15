@@ -3,11 +3,13 @@ import os
 import re
 import webbrowser
 
+from datetime import datetime as dt
 from subprocess import run, Popen, PIPE
 from time import sleep
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from defs import (
+    APP_VERSION,
     NAME,
     OUTPUT,
     JS_DIR,
@@ -32,6 +34,7 @@ help  : print help and exit
 
 serve          : serve search app locally
 v              : show current version
+i              : increase version
 debug [on|off] : production: set debug = false
 config         : build config file
 corpus         : build corpus files
@@ -45,9 +48,9 @@ For commit and ship you need to pass a commit message.
 
 VERSION_CONFIG = dict(
     setup=dict(
-        file="lsversion.txt",
-        re=re.compile(r"""version\s*=\s*['"]([^'"]*)['"]"""),
-        mask="version='{}'",
+        file="defs.py",
+        re=re.compile(r"""APP_VERSION\s*=\s*['"]([^'"]*)['"]"""),
+        mask='''APP_VERSION = "{}"''',
     ),
 )
 
@@ -77,6 +80,7 @@ def readArgs():
     if arg not in {
         "serve",
         "v",
+        "i",
         "debug",
         "config",
         "corpus",
@@ -108,10 +112,12 @@ def main():
         serve()
     elif task == "v":
         showVersion()
+    elif task == "i":
+        adjustVersion()
     elif task == "debug":
         adjustDebug(msg)
     elif task == "config":
-        makeConfig()
+        makeConfig(APP_VERSION)
     elif task == "corpus":
         makeCorpus()
     elif task == "app":
@@ -130,9 +136,9 @@ def commit(msg):
 
 
 def ship(msg):
-    adjustVersion()
+    newVersion = adjustVersion()
     adjustDebug(msg)
-    makeConfig()
+    makeConfig(newVersion)
     makeCorpus()
     app()
     commit(msg)
@@ -193,8 +199,10 @@ def serve():
 
 
 def incVersion(version):
-    v = int(version.lstrip("0"), base=16)
-    return f"{v + 1:>04x}"
+    parts = version.split('@', 1)
+    v = int(parts[0].lstrip("0"), base=16)
+    now = dt.utcnow().isoformat(timespec="seconds")
+    return f"{v + 1:>04x}@{now}"
 
 
 def replaceVersion(mask):
@@ -256,6 +264,7 @@ def adjustVersion():
             fh.write(text)
 
     console(f"Version went from `{currentVersion}` to `{newVersion}`")
+    return newVersion
 
 
 def replaceDebug(mask, value):

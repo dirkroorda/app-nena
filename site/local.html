@@ -5,11 +5,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link rel="shortcut icon" href="favicon.ico">
 		<title></title>
-		<link rel="stylesheet" href="css/app.css?v=0004"/>
-		<script defer src="jslib/jquery.js?v=0004"></script>
-		<script defer src="corpus/configdata.js?v=0004"></script>
-    <script defer src="jslib/all.js?v=0004"/></script>
-		<script defer src="corpus/corpusdata.js?v=0004"></script>
+		<link rel="stylesheet" href="css/app.css?v=0007@2021-04-15T18:01:13"/>
+		<script defer src="jslib/jquery.js?v=0007@2021-04-15T18:01:13"></script>
+		<script defer src="corpus/configdata.js?v=0007@2021-04-15T18:01:13"></script>
+    <script defer src="jslib/all.js?v=0007@2021-04-15T18:01:13"/></script>
+		<script defer src="corpus/corpusdata.js?v=0007@2021-04-15T18:01:13"></script>
 	</head>
 	<body>
     <div class="page">
@@ -36,7 +36,7 @@
              title="to the website of Text-Fabric"
              class="logo right"
           ><img alt="Text-Fabric logo" id="logo" src="png/tf.png"></a>
-          <details>
+          <details open>
             <summary><i>guide</i></summary>
             <div>
               <p>This is a <i>layered</i> search interface.</p>
@@ -46,9 +46,6 @@
               <p>The patterns you specify must be valid <i>regular expressions</i>
               according to the JavaScript language. Here is a 
               <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet" target="_blank">cheatsheet</a>.</p>
-              <p>More documentation:
-              <a href="https://annotation.github.io/text-fabric/tf/about/layeredsearch.html" target="_blank">background</a>
-              on layered search.</p>
             </div>
           </details>
           <details>
@@ -146,6 +143,29 @@
             <div id="settings">
             </div>
           </div>
+        </div>
+        <div id="provenance">
+          <table>
+            <tbody>
+
+              <tr>
+                <td>help</td>
+                <td><a id="appdoclink" href="#" target="_blank"></a></td>
+              </tr>
+              <tr>
+                <td>docs</td>
+                <td><a id="datadoclink" target="_blank" href="#"></a> </td>
+              </tr>
+              <tr>
+                <td>data version</td>
+                <td><a id="datalink" target="_blank" href="#"></a> </td>
+              </tr>
+              <tr>
+                <td>app version</td>
+                <td><span id="appversion"></span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       </form>

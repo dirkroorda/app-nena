@@ -6,7 +6,17 @@ from tf.fabric import Fabric
 from tf.convert.recorder import Recorder
 from tf.core.helpers import specFromRanges, rangesFromSet
 
-from defs import ORG, REPO, TF_LOCATION, TF_VERSION, NAME, JS_CORPUS_DIR
+from defs import (
+    ORG,
+    REPO,
+    TF_LOCATION,
+    TF_VERSION,
+    TF_DATA_URL,
+    DATA_DOC_URL,
+    APP_DOC_URL,
+    NAME,
+    JS_CORPUS_DIR,
+)
 
 
 CH_ABSENT = "¿"
@@ -14,7 +24,7 @@ BASE_LEVEL = "word"
 # BASE_LEVEL = "letter"
 
 
-def checkSettings(api, baseLevel):
+def checkSettings(api, baseLevel, appVersion):
     F = api.F
 
     PH_ABSENT = "z"
@@ -23,24 +33,44 @@ def checkSettings(api, baseLevel):
 
     URLS = dict(
         corpus=(
+            None,
             "https://nena.ames.cam.ac.uk",
             "North-Eastern Neo-Aramaic Data Project website",
         ),
         maker=(
+            None,
             "https://dans.knaw.nl/en/front-page?set_language=en",
             "DANS = Data Archiving and Networked Services",
         ),
         tf=(
-            "https://annotation.github.io/text-fabric/tf/",
+            None,
+            "https://{ORG}.github.io/text-fabric/tf/",
             "Text-Fabric documentation website",
         ),
+        appdoc=(
+            "about layered search",
+            APP_DOC_URL,
+            "Powered by Text-Fabric data",
+        ),
+        datadoc=(
+            "data (feature) documentation",
+            DATA_DOC_URL,
+            "Powered by Text-Fabric data",
+        ),
+        data=(
+            f"based on text-fabric data version {TF_VERSION}",
+            TF_DATA_URL,
+            "Powered by Text-Fabric data",
+        ),
         source=(
-            "https://github.com/annotation/app-nena",
-            "source code in Github repository"
+            None,
+            "https://github.com/{ORG}/{REPO}",
+            "source code in Github repository",
         ),
         package=(
+            None,
             f"https://{ORG}.github.io/{REPO}/{NAME}.zip",
-            "zip file for offline use"
+            "zip file for offline use",
         ),
     )
 
@@ -52,9 +82,6 @@ def checkSettings(api, baseLevel):
     <p>Phonetic search interface for the
        <a href="https://nena.ames.cam.ac.uk/" target="_blank">Northeastern Neo-Aramaic Database</a>.
     </p>
-    <p>Based on <a href="https://github.com/CambridgeSemiticsLab/nena_tf" target="_blank">NENA data in Text-Fabric format</a>.</p>
-    <p>See the
-    <a href="https://github.com/CambridgeSemiticsLab/nena_tf/blob/master/docs/features.md" target="_blank">data documentation</a>.</p>
     <p>This is a standalone app. You download it to your computer, and then it works without
     connection to the internet.</p>
     <p>This web app is by:</p>
@@ -546,6 +573,7 @@ def checkSettings(api, baseLevel):
             urls=URLS,
             captions=CAPTIONS,
             description=DESCRIPTION,
+            appVersion=appVersion,
         ),
         layerSettings=layerSettings,
         typeSeq=typeSeq,
@@ -626,10 +654,10 @@ def invertMap(map):
     return None if map is None else {v: k for (k, v) in map.items()}
 
 
-def getConfig(api, baseLevel):
+def getConfig(api, baseLevel, appVersion):
     C = api.C
 
-    settings = checkSettings(api, baseLevel)
+    settings = checkSettings(api, baseLevel, appVersion)
     typeSeq = settings["typeSeq"]
     layerSettings = settings["layerSettings"]
 
@@ -686,7 +714,7 @@ def record(api, baseLevel):
 
     TF.indent(reset=True)
     TF.info("preparing ... ")
-    settings = checkSettings(api, baseLevel)
+    settings = checkSettings(api, baseLevel, None)
     layerSettings = settings["layerSettings"]
     typesLower = settings["typesLower"]
     letterLevel = baseLevel == "letter"
@@ -917,9 +945,9 @@ def dumpCorpus(api, data):
     TF.info(f"Data written to file {fileNameData}")
 
 
-def makeConfig():
+def makeConfig(appVersion):
     api = loadTf()
-    config = getConfig(api, BASE_LEVEL)
+    config = getConfig(api, BASE_LEVEL, appVersion)
     dumpConfig(api, config)
 
 

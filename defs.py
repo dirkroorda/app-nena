@@ -1,11 +1,19 @@
 import os
 
+APP_VERSION = "0007@2021-04-15T18:01:13"
+
 NAME = "nena"
 GH = os.path.expanduser("~/github")
+GH_URL = "https://github.com"
 ORG = "annotation"
 REPO = "app-nena"
-TF_LOCATION = f"{GH}/CambridgeSemiticsLab/nena_tf/tf"
+TF_ORG = "CambridgeSemiticsLab"
+TF_REPO = "nena_tf"
+TF_LOCATION = f"{GH}/{TF_ORG}/{TF_REPO}/tf"
 TF_VERSION = "alpha"
+TF_DATA_URL = f"{GH_URL}/{TF_ORG}/{TF_REPO}/tree/master/tf/{TF_VERSION}"
+DATA_DOC_URL = f"{GH_URL}/{TF_ORG}/{TF_REPO}/blob/master/docs/features.md"
+APP_DOC_URL = f"https://{ORG}.github.io/text-fabric/tf/about/layeredsearch.html"
 REL = "site"
 INPUT = f"{GH}/{ORG}/{REPO}"
 OUTPUT = f"{GH}/{ORG}/{REPO}/{REL}"

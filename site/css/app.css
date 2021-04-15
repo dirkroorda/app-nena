@@ -17,6 +17,10 @@ table {
   border-spacing: 0;
 }
 
+details, details:focus, summary, summary.focus {
+  outline: none;
+}
+
 input {
   border-radius: 3px;
 }
@@ -103,12 +107,15 @@ div.rightcol {
 
 /* main division of right column */
 
-#query, #results, #jobs {
-  border: 0.15rem solid var(--panel-border);
+#query, #results, #jobs, #provenance {
   border-radius: 0.5rem;
   width: 100%;
   padding: 0.5rem 0.2rem;
   margin: 1rem 0.2rem;
+}
+
+#query, #jobs, #provenance {
+  border: 0.15rem solid var(--panel-border);
 }
 
 /* secondary division of parts of right column */
@@ -281,6 +288,9 @@ button.medium {
 /* left column results section */
 
 /* big search execution button and progress indicator */
+#results {
+  border: 0.25rem solid var(--pfocus-back);
+}
 #execute {
   display: flex;
   flex-flow: row nowrap;
@@ -340,6 +350,18 @@ td.stat {
   font-family: monospace;
   font-style: italic;
   font-weight: bold;
+}
+
+#provenance {
+  margin-top: 4rem;
+  padding: 1rem 3rem;
+}
+#provenance td {
+  font-size: small;
+  color: var(--provenance-fore)
+}
+#provenance td a {
+  text-decoration: none;
 }
 
 /* MID COLUMN */
@@ -527,4 +549,5 @@ button.small.active, button.medium.active {
   --panel-border:     hsla(  0,   0%,  80%, 1    ); 
   --node-fore:        hsla(240,  70%,  20%, 1    ); 
   --node-back:        hsla(240,  50%,  95%, 1    ); 
+	--provenance-fore:  hsla(  0,   0%,  50%, 1    );
 }

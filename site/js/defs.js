@@ -30,6 +30,7 @@ export const SEARCH = {
   dirty: "fetch results",
   exe: "fetching ...",
   done: "up to date",
+  failed: "failed",
 }
 
 export const TIP = {

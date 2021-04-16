@@ -246,8 +246,8 @@ button.medium {
 }
 /* malformed regexes receive error formatting */
 .error {
-  color: var(--error-fore);
-  background-color: var(--error-back);
+  color: var(--error-fore) ! important;
+  background-color: var(--error-back) ! important;
 }
 .pattern.error {
   color: var(--cntinp-fore);

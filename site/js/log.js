@@ -45,24 +45,28 @@ export class LogProvider {
     console.log(msg)
   }
 
-  clearError(box, ebox) {
+  clearError(ebox, box) {
     /* Clear error formatting in specified locations
      * See placeError
      */
-    box.removeClass("error")
     ebox.html("")
     ebox.hide()
+    if (box != null) {
+      box.removeClass("error")
+    }
   }
 
-  placeError(box, ebox, msg) {
+  placeError(ebox, msg, box) {
     /* Draw an error on the interface
      * The error is drawn in element ebox,
      * and the element box receives error formatting
      */
     console.error(msg)
-    box.addClass("error")
     ebox.show()
     ebox.html(msg)
+    if (box != null) {
+      box.addClass("error")
+    }
   }
 
   error(msg) {

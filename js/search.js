@@ -463,12 +463,14 @@ export class SearchProvider {
 
     const dest = []
 
-    for (const d of down.get(u)) {
-      resultTypeMap.set(d, dType)
-      if (dTypeIndex == 0) {
-        dest.push(d)
-      } else {
-        dest.push([d, this.getDescendants(d, dTypeIndex, resultTypeMap)])
+    if (down.has(u)) {
+      for (const d of down.get(u)) {
+        resultTypeMap.set(d, dType)
+        if (dTypeIndex == 0) {
+          dest.push(d)
+        } else {
+          dest.push([d, this.getDescendants(d, dTypeIndex, resultTypeMap)])
+        }
       }
     }
     return dest

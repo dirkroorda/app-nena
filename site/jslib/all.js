@@ -1602,12 +1602,14 @@ class SearchProvider {
     const dType = dtypeOf[uType]
     const dTypeIndex = uTypeIndex - 1
     const dest = []
-    for (const d of down.get(u)) {
-      resultTypeMap.set(d, dType)
-      if (dTypeIndex == 0) {
-        dest.push(d)
-      } else {
-        dest.push([d, this.getDescendants(d, dTypeIndex, resultTypeMap)])
+    if (down.has(u)) {
+      for (const d of down.get(u)) {
+        resultTypeMap.set(d, dType)
+        if (dTypeIndex == 0) {
+          dest.push(d)
+        } else {
+          dest.push([d, this.getDescendants(d, dTypeIndex, resultTypeMap)])
+        }
       }
     }
     return dest

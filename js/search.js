@@ -76,6 +76,7 @@ export class SearchProvider {
     const output = $(`#resultsbody,#resultshead`)
     const go = $("#go")
     const expr = $("#exportr")
+    const runerror = $("#runerror")
 
     Log.progress(`executing query`)
     go.html(SEARCH.exe)
@@ -86,13 +87,48 @@ export class SearchProvider {
      */
     await new Promise(r => setTimeout(r, 50))
 
-    this.gather()
-    const stats = this.weed()
-    Gui.placeStatResults(stats)
-    this.composeResults(false)
-    this.displayResults()
+    const errors = []
 
-    go.html(SEARCH.done)
+    try {
+      this.gather()
+    }
+    catch (error) {
+      errors.push(error)
+    }
+
+    if (errors.length == 0) {
+      try {
+        const stats = this.weed()
+        Gui.placeStatResults(stats)
+      }
+      catch (error) {
+        errors.push(error)
+      }
+    }
+    if (errors.length == 0) {
+      try {
+        this.composeResults(false)
+      }
+      catch (error) {
+        errors.push(error)
+      }
+    }
+    if (errors.length == 0) {
+      try {
+        this.displayResults()
+      }
+      catch (error) {
+        errors.push(error)
+      }
+    }
+
+    if (errors.length > 0) {
+      Log.placeError(runerror, errors.map(e => `${e}`).join("<br>"), go)
+    }
+    else {
+      Log.clearError(runerror, go)
+    }
+    go.html(SEARCH[(errors.length == 0) ? "done" : "failed"])
     expr.addClass("active")
     output.removeClass("waiting")
     go.removeClass("waiting")
@@ -150,16 +186,16 @@ export class SearchProvider {
       for (const [layer, lrInfo] of Object.entries(tpInfo)) {
         const box = $(`[kind="pattern"][ntype="${nType}"][layer="${layer}"]`)
         const ebox = $(`[kind="error"][ntype="${nType}"][layer="${layer}"]`)
-        Log.clearError(box, ebox)
+        Log.clearError(ebox, box)
         const { [layer]: { pattern, flags, exec } } = tpQuery
         if (!exec || pattern.length == 0) {
           continue
         }
         if (pattern.length > MAXINPUT) {
           Log.placeError(
-            box,
             ebox,
-            `pattern must be less than ${MAXINPUT} characters long`
+            `pattern must be less than ${MAXINPUT} characters long`,
+            box,
           )
           continue
         }
@@ -169,7 +205,7 @@ export class SearchProvider {
         try {
           regex = new RegExp(pattern, `g${flagString}`)
         } catch (error) {
-          Log.placeError(box, ebox, `"${pattern}": ${error}`)
+          Log.placeError(ebox, `"${pattern}": ${error}`, box)
           continue
         }
         const { posFromNode, nodeSet } = this.doSearch(nType, layer, lrInfo, regex)

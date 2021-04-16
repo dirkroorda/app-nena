@@ -49,7 +49,7 @@ const configData = {
    "title": "NENA phono search"
   },
   "description": "\n    <p>Phonetic search interface for the\n       <a href=\"https://nena.ames.cam.ac.uk/\" target=\"_blank\">Northeastern Neo-Aramaic Database</a>.\n    </p>\n    <p>This is a standalone app. You download it to your computer, and then it works without\n    connection to the internet.</p>\n    <p>This web app is by:</p>\n    <ul>\n    <li> <a href=\"https://www.ames.cam.ac.uk/people/professor-geoffrey-khan\" target=\"_blank\">Geoffrey Khan</a> (initiator)\n    <li> <a href=\"https://www.linkedin.com/in/cody-kingham-1135018a\" target=\"_blank\">Cody Kingham</a> (corpus developer)\n    <li> <a href=\"https://pure.knaw.nl/portal/en/persons/dirk-roorda\" target=\"_blank\">Dirk Roorda</a> (software developer)\n    </ul>\n    ",
-  "appVersion": "0008@2021-04-16T05:58:46"
+  "appVersion": "0009@2021-04-16T12:29:42"
  },
  "containerType": "sentence",
  "simpleBase": false,

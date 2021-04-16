@@ -99,8 +99,8 @@ def checkSettings(api, baseLevel, appVersion):
     DESC_POS = "part-of-speech"
     DESC_CLS = "phonetic class: <code>CVCVCCVCCV</code>"
     DESC_VOICE = "phonation: <code>PzzzPVzPPz</code>"
-    DESC_PLACE = "phonation: <code>BzXzDBzDDz</code>"
-    DESC_MANNER = "phonation: <code>NzAzLAzNNz</code>"
+    DESC_PLACE = "phonetic place: <code>BzXzDBzDDz</code>"
+    DESC_MANNER = "phonetic manner: <code>NzAzLAzNNz</code>"
 
     DESC_LANG = "language, indicated by a number"
     DESC_SPEAKER = "speaker, indicated by a number"

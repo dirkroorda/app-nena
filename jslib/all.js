@@ -1777,6 +1777,136 @@ class SearchProvider {
     resultsbody.html(html)
     Gui.applyFocus()
   }
+  tabularNew() {
+    const {
+      Config: { simpleBase, layers, ntypesI, ntypesinit },
+      Corpus: { texts, iPositions },
+      State,
+    } = this
+    const { resultTypeMap, tpResults, resultsComposed } = State.gets()
+    const {
+      settings: { nodeseq },
+      visibleLayers, focusPos, prevFocusPos,
+    } = State.getj()
+    if (tpResults == null) {
+      State.sets({ resultsComposed: null })
+      return
+    }
+    const genValueHtml = (nType, layer, node) => {
+      if (layer == "_") {
+        const num = nodeseq ? node - ntypesinit[nType] + 1 : node
+        return `<span class="n">${num}</span>`
+      }
+      const { [nType]: { [layer]: { pos: posKey, valueMap, tip } } } = layers
+      const { [nType]: { [layer]: text } } = texts
+      const { [nType]: { [posKey]: iPos } } = iPositions
+      const nodeIPositions = iPos.get(node)
+      const { [nType]: { matches: { [layer]: matches } = {} } } = tpResults
+      const nodeMatches =
+        matches == null || !matches.has(node) ? new Set() : matches.get(node)
+      const { spans, tipStr } = this.getHLText(
+        nodeIPositions, nodeMatches, text, valueMap, tip,
+      )
+      const hasTip = tipStr != null
+      const tipRep = (hasTip) ? ` title="${tipStr}"` : ""
+      const html = []
+      const multiple = spans.length > 1 || hasTip
+      if (multiple) {
+        html.push(`<span${tipRep}>`)
+      }
+      for (const [hl, val] of spans) {
+        const hlRep = hl ? ` class="hl"` : ""
+        html.push(`<span${hlRep}>${val}</span>`)
+      }
+      if (multiple) {
+        html.push(`</span>`)
+      }
+      return html.join("")
+    }
+    const genNodeHtml = node => {
+      const [n, children] = typeof node === NUMBER ? [node, []] : node
+      const nType = resultTypeMap.get(n)
+      const { [nType]: { nodes } = {} } = tpResults
+      const tpLayers = this.getLayers(nType, layers, visibleLayers, true)
+      const nLayers = tpLayers.length
+      const hasLayers = nLayers > 0
+      const hasSingleLayer = nLayers == 1
+      const hasChildren = children.length > 0
+      if (!hasLayers && !hasChildren) {
+        return ""
+      }
+      const hlClass =
+        simpleBase && ntypesI.get(nType) == 0 ? "" : nodes.has(n) ? " hlh" : "o"
+      const hlRep = hlClass == "" ? "" : ` class="${hlClass}"`
+      const lrRep = hasSingleLayer ? "" : ` m`
+      const hdRep = hasChildren ? "h" : ""
+      const html = []
+      html.push(`<span${hlRep}>`)
+      if (hasLayers) {
+        html.push(`<span class="${hdRep}${lrRep}">`)
+        for (const layer of tpLayers) {
+          html.push(`${genValueHtml(nType, layer, n)}`)
+        }
+        html.push(`</span>`)
+      }
+      if (hasChildren) {
+        html.push(`<span>`)
+        for (const ch of children) {
+          html.push(genNodeHtml(ch))
+        }
+        html.push(`</span>`)
+      }
+      html.push(`</span>`)
+      return html.join("")
+    }
+    const genAncestorsHtml = ancestors => {
+      const html = ancestors.map(anc => genNodeHtml(anc))
+      return html.join(" ")
+    }
+    const genResHtml = (cn, descendants) => {
+      const html = []
+      html.push(`${genNodeHtml(cn)} `)
+      for (const desc of descendants) {
+        html.push(genNodeHtml(desc))
+      }
+      return html.join("")
+    }
+    const genResultHtml = (i, result) => {
+      const isFocus = i == focusPos
+      const isPrevFocus = i == prevFocusPos
+      const { ancestors, cn, descendants } = result
+      const ancRep = genAncestorsHtml(ancestors)
+      const resRep = genResHtml(cn, descendants)
+      const focusCls = isFocus
+        ? ` class="focus"`
+        : isPrevFocus
+        ? ` class="pfocus"`
+        : ""
+      return `
+  <tr${focusCls}>
+    <th>${i + 1}</th>
+    <td>${ancRep}</td>
+    <td>${resRep}</td>
+  </tr>
+    `
+    }
+    const genResultsHtml = () => {
+      if (resultsComposed == null) {
+        return ""
+      }
+      const startPos = Math.max((focusPos || 0) - 2 * QUWINDOW, 0)
+      const endPos = Math.min(
+        startPos + 4 * QUWINDOW + 1,
+        resultsComposed.length - 1
+      )
+      const html = []
+      for (let i = startPos; i <= endPos; i++) {
+        html.push(genResultHtml(i, resultsComposed[i], i == focusPos))
+      }
+      return html.join("")
+    }
+    return genResultsHtml()
+  }
   tabular() {
     const {
       Config: { layers, ntypes, ntypesinit },

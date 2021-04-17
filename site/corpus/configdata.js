@@ -16,7 +16,7 @@ const configData = {
    ],
    "tf": [
     null,
-    "https://{ORG}.github.io/text-fabric/tf/",
+    "https://annotation.github.io/text-fabric/tf/",
     "Text-Fabric documentation website"
    ],
    "appdoc": [
@@ -36,7 +36,7 @@ const configData = {
    ],
    "source": [
     null,
-    "https://github.com/{ORG}/{REPO}",
+    "https://github.com/annotation/app-nena",
     "source code in Github repository"
    ],
    "package": [
@@ -49,7 +49,7 @@ const configData = {
    "title": "NENA phono search"
   },
   "description": "\n    <p>Phonetic search interface for the\n       <a href=\"https://nena.ames.cam.ac.uk/\" target=\"_blank\">Northeastern Neo-Aramaic Database</a>.\n    </p>\n    <p>This is a standalone app. You download it to your computer, and then it works without\n    connection to the internet.</p>\n    <p>This web app is by:</p>\n    <ul>\n    <li> <a href=\"https://www.ames.cam.ac.uk/people/professor-geoffrey-khan\" target=\"_blank\">Geoffrey Khan</a> (initiator)\n    <li> <a href=\"https://www.linkedin.com/in/cody-kingham-1135018a\" target=\"_blank\">Cody Kingham</a> (corpus developer)\n    <li> <a href=\"https://pure.knaw.nl/portal/en/persons/dirk-roorda\" target=\"_blank\">Dirk Roorda</a> (software developer)\n    </ul>\n    ",
-  "appVersion": "000a@2021-04-16T12:41:32"
+  "appVersion": "000b@2021-04-17T09:30:36"
  },
  "containerType": "sentence",
  "simpleBase": false,

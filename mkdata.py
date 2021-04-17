@@ -44,7 +44,7 @@ def checkSettings(api, baseLevel, appVersion):
         ),
         tf=(
             None,
-            "https://{ORG}.github.io/text-fabric/tf/",
+            f"https://{ORG}.github.io/text-fabric/tf/",
             "Text-Fabric documentation website",
         ),
         appdoc=(
@@ -64,7 +64,7 @@ def checkSettings(api, baseLevel, appVersion):
         ),
         source=(
             None,
-            "https://github.com/{ORG}/{REPO}",
+            f"https://github.com/{ORG}/{REPO}",
             "source code in Github repository",
         ),
         package=(

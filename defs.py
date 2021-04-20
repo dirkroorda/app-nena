@@ -1,6 +1,6 @@
 import os
 
-APP_VERSION = "000c@2021-04-20T09:08:16"
+APP_VERSION = "000d@2021-04-20T10:33:21"
 
 NAME = "nena"
 GH = os.path.expanduser("~/github")
@@ -102,6 +102,11 @@ URLS = dict(
     ),
     issue=(
         "Feature requests, bugs, feedback",
+        ISSUE_URL,
+        "report issues",
+    ),
+    issue2=(
+        "Report an issue",
         ISSUE_URL,
         "report issues",
     ),

@@ -149,7 +149,7 @@ div.rightcol {
   margin-bottom: 1rem;
   padding: 0.5rem;
 }
-button.medium {
+button.medium, a.medium {
   border-radius: 0.5rem;
   color: var(--inactive-fore);
   background-color: var(--inactive-back);
@@ -356,12 +356,17 @@ td.stat {
   margin-top: 4rem;
   padding: 1rem 3rem;
 }
-#provenance td {
+#provenance td, #provenance p {
   font-size: small;
-  color: var(--provenance-fore)
+  color: var(--provenance-fore);
 }
-#provenance td a {
+#provenance td a, #provenance p a {
   text-decoration: none;
+}
+#appversion {
+  font-family: monospace;
+  font-size: medium;
+  color: var(--black);
 }
 
 /* MID COLUMN */
@@ -411,7 +416,7 @@ td.stat {
   margin-bottom: 1rem;
   height: 1rem;
 }
-button.small {
+button.small, a.small {
   border-radius: 0.4rem;
   color: var(--inactive-fore);
   background-color: var(--inactive-back);
@@ -421,7 +426,7 @@ button.small {
   padding: 0.05rem;
   border-width: 0;
 }
-button.small.active, button.medium.active {
+button.small.active, button.medium.active, a.medium.active, a.small.active {
   color: var(--button-fore);
   background-color: var(--button-back);
 }

@@ -48,15 +48,6 @@ export class GuiProvider {
     $("#description").html(description)
     $("#appversion").html(appVersion.replace(/@/, " @ "))
 
-    for (const [kind, [linkText, linkHref, linkTitle]] of Object.entries(urls)) {
-      const elem = $(`#${kind}link`)
-      elem.attr("title", linkTitle)
-      elem.attr("href", linkHref)
-      if (linkText != null) {
-        elem.html(linkText)
-      }
-    }
-
     $("go").html(SEARCH.dirty)
 
     /* Generate all search controls
@@ -75,6 +66,17 @@ export class GuiProvider {
 
     this.placeStatTotals()
     this.placeSettings()
+
+    for (const [kind, [linkText, linkHref, linkTitle]] of Object.entries(urls)) {
+      const elem = $(`#${kind}link`)
+      elem.attr("target", "_blank")
+      elem.attr("title", linkTitle)
+      elem.attr("href", linkHref)
+      if (linkText != null) {
+        elem.html(linkText)
+      }
+    }
+
   }
 
   placeSettings() {
@@ -373,7 +375,7 @@ export class GuiProvider {
     const handleQuery = e => {
       e.preventDefault()
       go.off("click")
-      Search.runQuery()
+      Search.runQuery({ allSteps: true })
       State.setj({ dirty: false })
       this.clearBrowserState()
       go.click(handleQuery)
@@ -394,7 +396,7 @@ export class GuiProvider {
         State.setj({ settings: { [name]: !isOn } })
         this.applySettings(name)
         if (name == "nodeseq") {
-          Search.displayResults()
+          Search.runQuery({ display: [] })
         }
       }
       this.clearBrowserState()
@@ -425,8 +427,8 @@ export class GuiProvider {
         return
       }
       State.setj({ containerType: nType })
-      Search.composeResults(true)
-      Search.displayResults()
+      Search.runQuery({ compose: [true] })
+      Search.runQuery({ display: [] })
       this.applyContainer(nType)
       this.clearBrowserState()
     })
@@ -443,7 +445,7 @@ export class GuiProvider {
 
       const { settings: { autoexec } } = State.getj()
       if (autoexec) {
-        Search.runQuery()
+        Search.runQuery({ allSteps: true })
       }
       this.applyExec(nType, layer)
       this.clearBrowserState()
@@ -465,7 +467,7 @@ export class GuiProvider {
 
       const { settings: { autoexec } } = State.getj()
       if (autoexec) {
-        Search.runQuery()
+        Search.runQuery({ allSteps: true })
       }
       this.setButton(name, `[ntype="${nType}"][layer="${layer}"]`, !isOn)
       this.clearBrowserState()
@@ -486,7 +488,7 @@ export class GuiProvider {
 
         const { settings: { autoexec } } = State.getj()
         if (autoexec) {
-          Search.runQuery()
+          Search.runQuery({ allSteps: true })
         }
         this.setButton("exec", `[ntype="${nType}"][layer="${layer}"]`, !isOn, true)
       }
@@ -505,7 +507,7 @@ export class GuiProvider {
       this.setButton(
         "visible", `[ntype="${nType}"][layer="${layer}"]`, !isOn, true,
       )
-      Search.displayResults()
+      Search.runQuery({ display: [] })
       this.clearBrowserState()
     })
 
@@ -561,14 +563,14 @@ export class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(slider.val() - 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     setter.off("change").change(() => {
       const { focusPos } = State.getj()
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(setter.val() - 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     minp.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -578,7 +580,7 @@ export class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos - 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     min2p.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -588,7 +590,7 @@ export class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos - QUWINDOW),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     mina.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -596,7 +598,7 @@ export class GuiProvider {
         return
       }
       State.setj({ prevFocusPos: focusPos, focusPos: 0 })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     maxp.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -606,7 +608,7 @@ export class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos + 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     max2p.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -616,7 +618,7 @@ export class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos + QUWINDOW),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     maxa.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -626,7 +628,7 @@ export class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(-1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
   }
 
@@ -799,7 +801,7 @@ export class GuiProvider {
     const { Search } = this
 
     if (run) {
-      Search.runQuery()
+      Search.runQuery({ allSteps: true })
     }
   }
 

@@ -1,6 +1,6 @@
 /*eslint-env jquery*/
 
-import { SEARCH, MAXINPUT, NUMBER, QUWINDOW } from "./defs.js"
+import { SEARCH, MAXINPUT, NUMBER, QUWINDOW, RESULTCOL } from "./defs.js"
 
 export class SearchProvider {
 /* SEARCH EXECUTION
@@ -35,7 +35,7 @@ export class SearchProvider {
     this.tell = Log.tell
   }
 
-  async runQuery() {
+  async runQuery({ allSteps, gather, weed, compose: composeArg, display } = {}) {
     /* Performs a complete query
      * The individual substeps each check whether there is something to do
      */
@@ -89,41 +89,57 @@ export class SearchProvider {
 
     const errors = []
 
-    try {
-      this.gather()
-    }
-    catch (error) {
-      errors.push(error)
+    if (allSteps || gather) {
+      try {
+        this.gather()
+      }
+      catch (error) {
+        errors.push({ where: "gather", error })
+        Log.error(error)
+      }
     }
 
     if (errors.length == 0) {
-      try {
-        const stats = this.weed()
-        Gui.placeStatResults(stats)
-      }
-      catch (error) {
-        errors.push(error)
-      }
-    }
-    if (errors.length == 0) {
-      try {
-        this.composeResults(false)
-      }
-      catch (error) {
-        errors.push(error)
+      if (allSteps || weed) {
+        try {
+          const stats = this.weed()
+          Gui.placeStatResults(stats)
+        }
+        catch (error) {
+          errors.push({ where: "weed", error })
+          Log.error(error)
+        }
       }
     }
     if (errors.length == 0) {
-      try {
-        this.displayResults()
+      if (allSteps || composeArg !== undefined) {
+        try {
+          this.composeResults(allSteps ? false : composeArg)
+        }
+        catch (error) {
+          errors.push({ where: "compose", error })
+          Log.error(error)
+        }
       }
-      catch (error) {
-        errors.push(error)
+    }
+    if (errors.length == 0) {
+      if (allSteps || display) {
+        try {
+          this.displayResults()
+        }
+        catch (error) {
+          errors.push({ where: "display", error })
+          Log.error(error)
+        }
       }
     }
 
     if (errors.length > 0) {
-      Log.placeError(runerror, errors.map(e => `${e}`).join("<br>"), go)
+      Log.placeError(
+        runerror,
+        errors.map(({ where, error }) => `${where}: ${error}`).join("<br>"),
+        go,
+      )
     }
     else {
       Log.clearError(runerror, go)
@@ -358,12 +374,18 @@ export class SearchProvider {
   composeResults(recomputeFocus) {
     /* divided search results into chunks by containerType
      * The results are organized by the nodes that have containerType as node type.
-     * Each result will have three parts:
-     *   ancestor nodes: result nodes of higher types that contain the container node
-     *   container node: one node of the containerType
-     *   descendant nodes: all descendants of the container node
+     * Each result is an object with as keys a nodetype and as values some
+     * results in that node type.
+     * If the node type is higher than or equal than the container type, the
+     * results are just nodes.
+     * If the node type is one lower than the container type, the results are
+     * pairs [d, descendants], where d is the nodem, and descendants is a nested array
+     * of the descendants of d.
+     * Nodes lower than this will not make it into the levels, because they are
+     * subsumed in the descendants of the children of the container node.
+     *
      * The result at the position that has currently focus on the interface,
-     * is marked by means of a class
+     * is marked by means of a class.
      *
      * recomputeFocus = true:
      * If we do a new compose because the user has changed the container type
@@ -404,23 +426,34 @@ export class SearchProvider {
          */
         resultTypeMap.set(cn, containerType)
 
+        const levels = { [containerType]: [cn] }
+
         let un = cn
         let uType = containerType
-
-        const ancestors = []
 
         while (up.has(un)) {
           un = up.get(un)
           uType = utypeOf[uType]
           resultTypeMap.set(un, uType)
-          ancestors.unshift(un)
+          if (levels[uType] === undefined) {
+            levels[uType] = []
+          }
+          levels[uType].push(un)
         }
 
         /* collect the down nodes
          */
         const descendants = this.getDescendants(cn, ntypesI.get(containerType))
+        for (const desc of descendants) {
+          const d = (typeof desc === NUMBER) ? desc : desc[0]
+          const dType = resultTypeMap.get(d)
+          if (levels[dType] === undefined) {
+            levels[dType] = []
+          }
+          levels[dType].push(desc)
+        }
 
-        resultsComposed.push({ cn, ancestors, descendants })
+        resultsComposed.push(levels)
       }
     }
     const nResults = resultsComposed == null ? 0 : resultsComposed.length
@@ -515,11 +548,45 @@ export class SearchProvider {
     return { spans, tipStr }
   }
 
-  getLayers(nType, layers, visibleLayers, includeNodes) {
-    const { [nType]: definedLayers = {} } = layers
-    const { [nType]: tpVisible } = visibleLayers
-    const nodeLayer = includeNodes ? ["_"] : []
-    return nodeLayer.concat(Object.keys(definedLayers)).filter(x => tpVisible[x])
+  getLayersPerType() {
+    const { Config: { ntypesR, ntypesI, layers }, State } = this
+    const { containerType, visibleLayers } = State.getj()
+    const containerIndex = ntypesI.get(containerType)
+
+    const layersPerType = new Map()
+
+    for (const nType of ntypesR) {
+      const { [nType]: definedLayers = {} } = layers
+      const { [nType]: tpVisible = {} } = visibleLayers
+      const nodeLayer = ["_"]
+      const tpLayers = nodeLayer.concat(Object.keys(definedLayers))
+        .filter(x => tpVisible[x])
+
+      layersPerType.set(nType, tpLayers)
+    }
+
+    const visibleTypes = ntypesR.filter(x => layersPerType.get(x).length > 0)
+
+    const contextTypes = visibleTypes.filter(x => ntypesI.get(x) > containerIndex)
+    const rowUnitTypes = visibleTypes.filter(x => ntypesI.get(x) == containerIndex)
+    const contentTypes = ntypesR.filter(x => ntypesI.get(x) < containerIndex)
+    const firstContentTypes = (contentTypes.length == 0) ? [] : [contentTypes[0]]
+    const cols = contextTypes.concat(rowUnitTypes).concat(firstContentTypes)
+
+    const layersContent = []
+    for (const cnType of contentTypes) {
+      layersContent.push(...layersPerType.get(cnType))
+    }
+
+    return {
+      contextTypes,
+      rowUnitTypes,
+      contentTypes,
+      upperTypes: contextTypes.concat(rowUnitTypes),
+      cols,
+      layersPerType,
+      layersContent,
+    }
   }
 
   displayResults() {
@@ -528,10 +595,10 @@ export class SearchProvider {
      * We only display a limited amount of results around the focus position,
      * but the user can move the focus position in various ways.
      * Per result this is visible:
-     *   Ancestor nodes are rendered highlighted
+     *   Context nodes are rendered highlighted
      *   The container nodes themselves are rendered as single nodes
      *     if they have content, otherwise they are left out
-     *   The descendants of the container node are rendered with
+     *   The children of the container node are rendered with
      *   all of descendants (recursively),
      *     where the descendants that have results are highlighted.
      */
@@ -543,15 +610,22 @@ export class SearchProvider {
     } = this
 
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const {
-      settings: { nodeseq },
-      visibleLayers, focusPos, prevFocusPos,
-    } = State.getj()
+    const { settings: { nodeseq }, focusPos, prevFocusPos } = State.getj()
 
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
       return
     }
+
+    const {
+      upperTypes, contentTypes,
+      cols, layersPerType, layersContent,
+    } = this.getLayersPerType()
+
+    const colsRep = cols.map(x => `<th>${x}</th>`)
+    const header = `<tr><th>${RESULTCOL}</th>${colsRep.join("")}</tr>`
+    const resultshead = $("#resultshead")
+    resultshead.html(header)
 
     const genValueHtml = (nType, layer, node) => {
       /* generates the html for a layer of node, including the result highlighting
@@ -595,7 +669,7 @@ export class SearchProvider {
       const [n, children] = typeof node === NUMBER ? [node, []] : node
       const nType = resultTypeMap.get(n)
       const { [nType]: { nodes } = {} } = tpResults
-      const tpLayers = this.getLayers(nType, layers, visibleLayers, true)
+      const tpLayers = layersPerType.get(nType)
       const nLayers = tpLayers.length
       const hasLayers = nLayers > 0
       const hasSingleLayer = nLayers == 1
@@ -635,32 +709,26 @@ export class SearchProvider {
       return html.join("")
     }
 
-    const genAncestorsHtml = ancestors => {
-      /* generates the html for the ancestor nodes of a result
-       */
-      const html = ancestors.map(anc => genNodeHtml(anc))
-      return html.join(" ")
-    }
-
-    const genResHtml = (cn, descendants) => {
-      /* generates the html for the container node and descendant nodes of a result
-       */
-      const html = []
-      html.push(`${genNodeHtml(cn)} `)
-      for (const desc of descendants) {
-        html.push(genNodeHtml(desc))
-      }
-      return html.join("")
-    }
-
     const genResultHtml = (i, result) => {
       /* generates the html for a single result
        */
       const isFocus = i == focusPos
       const isPrevFocus = i == prevFocusPos
-      const { ancestors, cn, descendants } = result
-      const ancRep = genAncestorsHtml(ancestors)
-      const resRep = genResHtml(cn, descendants)
+      const typeNodes = []
+      for (const nType of upperTypes) {
+        typeNodes.push(
+          `<td>${(result[nType] ?? []).map(x => genNodeHtml(x)).join(" ")}</td>`
+        )
+      }
+      if (contentTypes.length > 0) {
+        if (layersContent.length > 0) {
+          const nType = contentTypes[0]
+          typeNodes.push(
+            `<td>${(result[nType] ?? []).map(x => genNodeHtml(x)).join(" ")}</td>`
+          )
+        }
+      }
+      const typeRep = typeNodes.join("\n")
       const focusCls = isFocus
         ? ` class="focus"`
         : isPrevFocus
@@ -670,8 +738,7 @@ export class SearchProvider {
       return `
   <tr${focusCls}>
     <th>${i + 1}</th>
-    <td>${ancRep}</td>
-    <td>${resRep}</td>
+    ${typeRep}
   </tr>
     `
     }
@@ -683,6 +750,7 @@ export class SearchProvider {
       if (resultsComposed == null) {
         return ""
       }
+
       const startPos = Math.max((focusPos || 0) - 2 * QUWINDOW, 0)
       const endPos = Math.min(
         startPos + 4 * QUWINDOW + 1,
@@ -690,7 +758,7 @@ export class SearchProvider {
       )
       const html = []
       for (let i = startPos; i <= endPos; i++) {
-        html.push(genResultHtml(i, resultsComposed[i], i == focusPos))
+        html.push(genResultHtml(i, resultsComposed[i]))
       }
       return html.join("")
     }
@@ -703,57 +771,48 @@ export class SearchProvider {
 
   /* RESULTS EXPORT
    * Exports the current results to a tsv file
-   * All result nodes will be exported in a table
-   * with one node per row:
-   * the first column is the node number, the second one is the node type
-   * and the layers are the remaining columns
-   *
-   * N.B. So we do not export composed results, but raw result nodes.
+   * All results will be exported, not only the ones that are displayed
+   * on the screen.
+   * One result per row, with the same information per result that is currently active:
+   * the same row-unit, the same visibility of layers and node numbers.
    *
    * The resulting tsv is written in UTF-16-LE encoding for optimal interoperability
    * with Excel
    */
 
-  /* RESULTS EXPORT
-   * Exports the current results to a tsv file
-   * All result nodes will be exported in a table
-   * with one node per row:
-   * the first column is the node number, the second one is the node type
-   * and the layers are the remaining columns
-   *
-   * N.B. So we do not export composed results, but raw result nodes.
-   *
-   * The resulting tsv is written in UTF-16-LE encoding for optimal interoperability
-   * with Excel
-   */
-
-  tabularNew() {
-    /* new tsv export, closely analogous to how the results are displayed on screen
+  tabular() {
+    /* tsv export, closely analogous to how the results are displayed on screen
     */
 
     const {
-      Config: { simpleBase, layers, ntypesI, ntypesinit },
+      Config: { layers, ntypesinit },
       Corpus: { texts, iPositions },
       State,
+      tabNl,
     } = this
 
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const {
-      settings: { nodeseq },
-      visibleLayers, focusPos, prevFocusPos,
-    } = State.getj()
+    const { settings: { nodeseq } } = State.getj()
 
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
       return
     }
 
-    const genValueHtml = (nType, layer, node) => {
-      /* generates the html for a layer of node, including the result highlighting
+    const {
+      upperTypes, contentTypes,
+      cols, layersPerType,
+    } = this.getLayersPerType()
+
+    const colsRep = cols.map(x => `${x}\t`)
+    const header = `${RESULTCOL}\t${colsRep.join("")}\n`
+
+    const genValueTsv = (nType, layer, node) => {
+      /* generates the value for a layer of node, including the result highlighting
        */
+
       if (layer == "_") {
-        const num = nodeseq ? node - ntypesinit[nType] + 1 : node
-        return `<span class="n">${num}</span>`
+        return `${nodeseq ? node - ntypesinit[nType] + 1 : node} `
       }
       const { [nType]: { [layer]: { pos: posKey, valueMap, tip } } } = layers
       const { [nType]: { [layer]: text } } = texts
@@ -766,240 +825,163 @@ export class SearchProvider {
       const { spans, tipStr } = this.getHLText(
         nodeIPositions, nodeMatches, text, valueMap, tip,
       )
-      const hasTip = tipStr != null
-      const tipRep = (hasTip) ? ` title="${tipStr}"` : ""
+      const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
 
-      const html = []
-      const multiple = spans.length > 1 || hasTip
-      if (multiple) {
-        html.push(`<span${tipRep}>`)
-      }
+      let piece = ""
+
       for (const [hl, val] of spans) {
-        const hlRep = hl ? ` class="hl"` : ""
-        html.push(`<span${hlRep}>${val}</span>`)
+        piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
       }
-      if (multiple) {
-        html.push(`</span>`)
-      }
-      return html.join("")
+      piece = piece.replaceAll(tabNl, " ")
+      return piece
     }
 
-    const genNodeHtml = node => {
+    const genNodeTsv = (node, stack) => {
       /* generates the html for a node, including all layers and highlighting
        */
       const [n, children] = typeof node === NUMBER ? [node, []] : node
       const nType = resultTypeMap.get(n)
-      const { [nType]: { nodes } = {} } = tpResults
-      const tpLayers = this.getLayers(nType, layers, visibleLayers, true)
-      const nLayers = tpLayers.length
-      const hasLayers = nLayers > 0
-      const hasSingleLayer = nLayers == 1
-      const hasChildren = children.length > 0
-      if (!hasLayers && !hasChildren) {
-        return ""
+      const tpLayers = layersPerType.get(nType)
+
+      const newStack = [
+        ...stack ?? [],
+        ...tpLayers.map(lr => genValueTsv(nType, lr, n)),
+      ]
+
+      let tsv
+      if (children.length == 0) {
+        tsv = newStack
       }
+      else {
+        const tsvs = []
+        let first = true
 
-      const hlClass =
-        simpleBase && ntypesI.get(nType) == 0 ? "" : nodes.has(n) ? " hlh" : "o"
-
-      const hlRep = hlClass == "" ? "" : ` class="${hlClass}"`
-      const lrRep = hasSingleLayer ? "" : ` m`
-      const hdRep = hasChildren ? "h" : ""
-
-      const html = []
-      html.push(`<span${hlRep}>`)
-
-      if (hasLayers) {
-        html.push(`<span class="${hdRep}${lrRep}">`)
-        for (const layer of tpLayers) {
-          html.push(`${genValueHtml(nType, layer, n)}`)
-        }
-        html.push(`</span>`)
-      }
-
-      if (hasChildren) {
-        html.push(`<span>`)
         for (const ch of children) {
-          html.push(genNodeHtml(ch))
-        }
-        html.push(`</span>`)
-      }
-
-      html.push(`</span>`)
-
-      return html.join("")
-    }
-
-    const genAncestorsHtml = ancestors => {
-      /* generates the html for the ancestor nodes of a result
-       */
-      const html = ancestors.map(anc => genNodeHtml(anc))
-      return html.join(" ")
-    }
-
-    const genResHtml = (cn, descendants) => {
-      /* generates the html for the container node and descendant nodes of a result
-       */
-      const html = []
-      html.push(`${genNodeHtml(cn)} `)
-      for (const desc of descendants) {
-        html.push(genNodeHtml(desc))
-      }
-      return html.join("")
-    }
-
-    const genResultHtml = (i, result) => {
-      /* generates the html for a single result
-       */
-      const isFocus = i == focusPos
-      const isPrevFocus = i == prevFocusPos
-      const { ancestors, cn, descendants } = result
-      const ancRep = genAncestorsHtml(ancestors)
-      const resRep = genResHtml(cn, descendants)
-      const focusCls = isFocus
-        ? ` class="focus"`
-        : isPrevFocus
-        ? ` class="pfocus"`
-        : ""
-
-      return `
-  <tr${focusCls}>
-    <th>${i + 1}</th>
-    <td>${ancRep}</td>
-    <td>${resRep}</td>
-  </tr>
-    `
-    }
-
-    const genResultsHtml = () => {
-      /* generates the html for all relevant results around a focus position in the
-       * table of results
-       */
-      if (resultsComposed == null) {
-        return ""
-      }
-      const startPos = Math.max((focusPos || 0) - 2 * QUWINDOW, 0)
-      const endPos = Math.min(
-        startPos + 4 * QUWINDOW + 1,
-        resultsComposed.length - 1
-      )
-      const html = []
-      for (let i = startPos; i <= endPos; i++) {
-        html.push(genResultHtml(i, resultsComposed[i], i == focusPos))
-      }
-      return html.join("")
-    }
-
-    return genResultsHtml()
-  }
-
-  tabular() {
-    const {
-      Config: { layers, ntypes, ntypesinit },
-      Corpus: { texts, iPositions }, State,
-    } = this
-
-    const { settings: { nodeseq } } = State.getj()
-
-    const { tpResults } = State.gets()
-    if (tpResults == null) {
-      return null
-    }
-    const { visibleLayers } = State.getj()
-
-    const headFields = ["type"]
-    const nodeFields = new Map()
-
-    for (let i = 0; i < ntypes.length; i++) {
-      const nType = ntypes[i]
-      const { [nType]: { matches, nodes } } = tpResults
-
-      if (nodes == null) {
-        continue
-      }
-
-      const { [nType]: tpLayerInfo } = layers
-      const { [nType]: tpTexts } = texts
-      const { [nType]: tpIPositions } = iPositions
-
-      const exportLayers = this.getLayers(nType, layers, visibleLayers, false)
-      for (const node of nodes) {
-        if (!nodeFields.has(node)) {
-          nodeFields.set(node, new Map())
-        }
-        const fields = nodeFields.get(node)
-        fields.set("type", nType)
-      }
-      for (const layer of exportLayers) {
-        const tpLayer = `${nType}-${layer}`
-        headFields.push(tpLayer)
-
-        const { [layer]: { pos: posKey, valueMap, tip } } = tpLayerInfo
-        const { [layer]: text } = tpTexts
-        const { [posKey]: iPos } = tpIPositions
-        const { [layer]: lrMatches } = matches
-
-        for (const node of nodes) {
-          const fields = nodeFields.get(node)
-          fields.set("type", nType)
-
-          const nodeIPositions = iPos.get(node)
-          const nodeMatches =
-            lrMatches == null || !lrMatches.has(node)
-              ? new Set()
-              : lrMatches.get(node)
-          const { spans, tipStr } = this.getHLText(
-            nodeIPositions, nodeMatches, text, valueMap, tip
-          )
-          const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
-
-          let piece = ""
-          for (const [hl, val] of spans) {
-            piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
+          tsvs.push(genNodeTsv(ch, newStack))
+          if (first) {
+            first = false
+            newStack.fill("")
           }
-          fields.set(tpLayer, piece.replaceAll(this.tabNl, " "))
         }
+        tsv = zip(tsvs)
       }
+      return tsv
     }
 
-    const firstField = nodeseq ? "seqno" : "node"
-    const headLine = `${firstField}\t${headFields.join("\t")}\n`
-    const lines = [headLine]
-
-    for (let i = 0; i < ntypes.length; i++) {
-      const nType = ntypes[i]
-      const { [nType]: { nodes } } = tpResults
-      if (nodes == null) {
-        continue
+    const zip = tsvs => {
+      const maxLen = Math.max(...tsvs.map(x => x.length))
+      const stack = []
+      for (let i = 0; i < maxLen; i++) {
+        stack[i] = tsvs.map(x => (i < x.length) ? x[i] : "").join("")
       }
-
-      const sortedNodes = [...nodes].sort()
-
-      for (const node of sortedNodes) {
-        const num = nodeseq ? node - ntypesinit[nType] + 1 : node
-        const line = [`${num}`]
-        const fields = nodeFields.has(node) ? nodeFields.get(node) : new Map()
-
-        for (const headField of headFields) {
-          line.push(fields.has(headField) ? fields.get(headField) : "")
-        }
-        lines.push(`${line.join("\t")}\n`)
-      }
+      return stack
     }
 
-    return lines
+    const genResultTsv = (s, result) => {
+      /* generates the tsv for a single result
+       */
+      const typeNodes = []
+      for (const nType of upperTypes) {
+        typeNodes.push([false, (result[nType] ?? []).map(x => genNodeTsv(x))])
+      }
+      for (const nType of contentTypes) {
+        typeNodes.push([true, (result[nType] ?? []).map(x => genNodeTsv(x))])
+      }
+      const tsv = []
+      const maxLines = Math.max(
+        ...typeNodes.map(
+          x => Math.max(...x[1].map(y => y.length))
+        )
+      )
+      for (let i = 0; i < maxLines; i++) {
+        const line = [`${s + 1}`]
+        for (const [separate, chunks] of typeNodes) {
+          line.push("\t")
+          let first = true
+          let sep = ""
+          for (const chunk of chunks) {
+            if (sep) {
+              line.push(sep)
+            }
+            line.push((i < chunk.length) ? chunk[i] : "")
+            if (first) {
+              first = false
+              if (separate) {
+                sep = "\t"
+              }
+            }
+          }
+        }
+        tsv.push(`${line.join("")}\n`)
+      }
+      return tsv
+    }
+
+    /* generates the html for all relevant results around a focus position in the
+     * table of results
+     */
+    if (resultsComposed == null) {
+      return ""
+    }
+    const tsv = []
+    for (let i = 0; i < resultsComposed.length; i++) {
+      const rows = genResultTsv(i, resultsComposed[i])
+      for (let j = 0; j < rows.length; j++) {
+        tsv.push(rows[j])
+      }
+    }
+    return header + tsv.join("")
   }
 
-  saveResults() {
+  async saveResults() {
     /* save job results to file
      * The file will be offered to the user as a download
      */
-    const { Disk, State } = this
+    const { Log, Disk, State } = this
 
     const { jobName } = State.gets()
-    const lines = this.tabular()
-    const text = lines.join("")
-    Disk.download(text, jobName, "tsv", true)
-  }
 
+    const expr = $("#exportr")
+    const runerror = $("#runerror")
+
+    Log.progress(`exporting results`)
+    expr.addClass("waiting")
+
+    await new Promise(r => setTimeout(r, 50))
+
+    const errors = []
+
+    let text
+
+    try {
+      text = this.tabular()
+    }
+    catch (error) {
+      errors.push({ where: "tabular", error })
+      Log.error(error)
+    }
+    if (errors.length == 0) {
+      try {
+        Disk.download(text, jobName, "tsv", true)
+      }
+      catch (error) {
+        errors.push({ where: "download", error })
+        Log.error(error)
+      }
+    }
+
+    if (errors.length > 0) {
+      Log.placeError(
+        runerror,
+        errors.map(({ where, error }) => `${where}: ${error}`).join("<br>"),
+        expr,
+      )
+    }
+    else {
+      Log.clearError(runerror, expr)
+    }
+    expr.addClass("active")
+    expr.removeClass("waiting")
+    Log.progress(`done export`)
+  }
 }

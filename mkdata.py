@@ -11,12 +11,10 @@ from defs import (
     REPO,
     TF_LOCATION,
     TF_VERSION,
-    TF_DATA_URL,
-    DATA_DOC_URL,
-    APP_DOC_URL,
     NAME,
     JS_CORPUS_DIR,
 )
+from defs import URLS
 
 
 CH_ABSENT = "¿"
@@ -31,65 +29,20 @@ def checkSettings(api, baseLevel, appVersion):
 
     SIMPLE_BASE = dict(letter=True, word=False)
 
-    URLS = dict(
-        corpus=(
-            None,
-            "https://nena.ames.cam.ac.uk",
-            "North-Eastern Neo-Aramaic Data Project website",
-        ),
-        maker=(
-            None,
-            "https://dans.knaw.nl/en/front-page?set_language=en",
-            "DANS = Data Archiving and Networked Services",
-        ),
-        tf=(
-            None,
-            f"https://{ORG}.github.io/text-fabric/tf/",
-            "Text-Fabric documentation website",
-        ),
-        appdoc=(
-            "about layered search",
-            APP_DOC_URL,
-            "Powered by Text-Fabric data",
-        ),
-        datadoc=(
-            "data (feature) documentation",
-            DATA_DOC_URL,
-            "Powered by Text-Fabric data",
-        ),
-        data=(
-            f"based on text-fabric data version {TF_VERSION}",
-            TF_DATA_URL,
-            "Powered by Text-Fabric data",
-        ),
-        source=(
-            None,
-            f"https://github.com/{ORG}/{REPO}",
-            "source code in Github repository",
-        ),
-        package=(
-            None,
-            f"https://{ORG}.github.io/{REPO}/{NAME}.zip",
-            "zip file for offline use",
-        ),
-    )
-
     CAPTIONS = dict(
         title="NENA phono search",
     )
 
     DESCRIPTION = """
-    <p>Phonetic search interface for the
-       <a href="https://nena.ames.cam.ac.uk/" target="_blank">Northeastern Neo-Aramaic Database</a>.
-    </p>
-    <p>This is a standalone app. You download it to your computer, and then it works without
-    connection to the internet.</p>
-    <p>This web app is by:</p>
-    <ul>
-    <li> <a href="https://www.ames.cam.ac.uk/people/professor-geoffrey-khan" target="_blank">Geoffrey Khan</a> (initiator)
-    <li> <a href="https://www.linkedin.com/in/cody-kingham-1135018a" target="_blank">Cody Kingham</a> (corpus developer)
-    <li> <a href="https://pure.knaw.nl/portal/en/persons/dirk-roorda" target="_blank">Dirk Roorda</a> (software developer)
-    </ul>
+<p>Phonetic search interface for the <a id="corpus2link" href="#"></a>.</p>
+<p>This is a standalone app. You download it to your computer, and then it works without
+connection to the internet.</p>
+<p>This web app is by:</p>
+<ul>
+    <li><a id="author3link" href="#"></a> (initiator)
+    <li><a id="author2link" href="#"></a> (corpus developer)
+    <li><a id="authorlink" href="#"></a> (software developer)
+</ul>
     """
 
     DESC_TEXT = "text precise, complete, uses non-ascii: <code>maqəlbə̀nna</code>"

@@ -11,6 +11,7 @@ const OBJECT = "object"
 const QUWINDOW = 10
 const MAXINPUT = 1000
 const DEFAULTJOB = "search"
+const RESULTCOL = "nr"
 const BUTTON = {
   nodeseq: { on: "nodes start at 1", off: "nodes as in text-fabric" },
   autoexec: { on: "auto search", off: "use button to search" },
@@ -549,14 +550,6 @@ class GuiProvider {
     $("#title").html(title)
     $("#description").html(description)
     $("#appversion").html(appVersion.replace(/@/, " @ "))
-    for (const [kind, [linkText, linkHref, linkTitle]] of Object.entries(urls)) {
-      const elem = $(`#${kind}link`)
-      elem.attr("title", linkTitle)
-      elem.attr("href", linkHref)
-      if (linkText != null) {
-        elem.html(linkText)
-      }
-    }
     $("go").html(SEARCH.dirty)
     const querybody = $("#querybody")
     const html = []
@@ -568,6 +561,15 @@ class GuiProvider {
     querybody.html(html.join(""))
     this.placeStatTotals()
     this.placeSettings()
+    for (const [kind, [linkText, linkHref, linkTitle]] of Object.entries(urls)) {
+      const elem = $(`#${kind}link`)
+      elem.attr("target", "_blank")
+      elem.attr("title", linkTitle)
+      elem.attr("href", linkHref)
+      if (linkText != null) {
+        elem.html(linkText)
+      }
+    }
   }
   placeSettings() {
     const { State } = this
@@ -794,7 +796,7 @@ class GuiProvider {
     const handleQuery = e => {
       e.preventDefault()
       go.off("click")
-      Search.runQuery()
+      Search.runQuery({ allSteps: true })
       State.setj({ dirty: false })
       this.clearBrowserState()
       go.click(handleQuery)
@@ -811,7 +813,7 @@ class GuiProvider {
         State.setj({ settings: { [name]: !isOn } })
         this.applySettings(name)
         if (name == "nodeseq") {
-          Search.displayResults()
+          Search.runQuery({ display: [] })
         }
       }
       this.clearBrowserState()
@@ -839,8 +841,8 @@ class GuiProvider {
         return
       }
       State.setj({ containerType: nType })
-      Search.composeResults(true)
-      Search.displayResults()
+      Search.runQuery({ compose: [true] })
+      Search.runQuery({ display: [] })
       this.applyContainer(nType)
       this.clearBrowserState()
     })
@@ -854,7 +856,7 @@ class GuiProvider {
       State.setj({ query: { [nType]: { [layer]: { pattern } } } })
       const { settings: { autoexec } } = State.getj()
       if (autoexec) {
-        Search.runQuery()
+        Search.runQuery({ allSteps: true })
       }
       this.applyExec(nType, layer)
       this.clearBrowserState()
@@ -873,7 +875,7 @@ class GuiProvider {
       State.setj({ query: { [nType]: { [layer]: { flags: { [name]: !isOn } } } } })
       const { settings: { autoexec } } = State.getj()
       if (autoexec) {
-        Search.runQuery()
+        Search.runQuery({ allSteps: true })
       }
       this.setButton(name, `[ntype="${nType}"][layer="${layer}"]`, !isOn)
       this.clearBrowserState()
@@ -891,7 +893,7 @@ class GuiProvider {
         State.setj({ query: { [nType]: { [layer]: { exec: !isOn } } } })
         const { settings: { autoexec } } = State.getj()
         if (autoexec) {
-          Search.runQuery()
+          Search.runQuery({ allSteps: true })
         }
         this.setButton("exec", `[ntype="${nType}"][layer="${layer}"]`, !isOn, true)
       }
@@ -908,7 +910,7 @@ class GuiProvider {
       this.setButton(
         "visible", `[ntype="${nType}"][layer="${layer}"]`, !isOn, true,
       )
-      Search.displayResults()
+      Search.runQuery({ display: [] })
       this.clearBrowserState()
     })
     this.activateResults()
@@ -947,14 +949,14 @@ class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(slider.val() - 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     setter.off("change").change(() => {
       const { focusPos } = State.getj()
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(setter.val() - 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     minp.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -964,7 +966,7 @@ class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos - 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     min2p.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -974,7 +976,7 @@ class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos - QUWINDOW),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     mina.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -982,7 +984,7 @@ class GuiProvider {
         return
       }
       State.setj({ prevFocusPos: focusPos, focusPos: 0 })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     maxp.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -992,7 +994,7 @@ class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos + 1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     max2p.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -1002,7 +1004,7 @@ class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(focusPos + QUWINDOW),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
     maxa.off("click").click(() => {
       const { focusPos } = State.getj()
@@ -1012,7 +1014,7 @@ class GuiProvider {
       State.setj({
         prevFocusPos: focusPos, focusPos: this.checkFocus(-1),
       })
-      Search.displayResults()
+      Search.runQuery({ display: [] })
     })
   }
   apply(run) {
@@ -1136,7 +1138,7 @@ class GuiProvider {
     // const { State, Search } = this
     const { Search } = this
     if (run) {
-      Search.runQuery()
+      Search.runQuery({ allSteps: true })
     }
   }
   applyFocus() {
@@ -1333,7 +1335,7 @@ class SearchProvider {
     this.Corpus = Corpus
     this.tell = Log.tell
   }
-  async runQuery() {
+  async runQuery({ allSteps, gather, weed, compose: composeArg, display } = {}) {
     const { Log, Gui } = this
     const output = $(`#resultsbody,#resultshead`)
     const go = $("#go")
@@ -1346,39 +1348,55 @@ class SearchProvider {
     output.addClass("waiting")
     await new Promise(r => setTimeout(r, 50))
     const errors = []
-    try {
-      this.gather()
-    }
-    catch (error) {
-      errors.push(error)
-    }
-    if (errors.length == 0) {
+    if (allSteps || gather) {
       try {
-        const stats = this.weed()
-        Gui.placeStatResults(stats)
+        this.gather()
       }
       catch (error) {
-        errors.push(error)
+        errors.push({ where: "gather", error })
+        Log.error(error)
       }
     }
     if (errors.length == 0) {
-      try {
-        this.composeResults(false)
-      }
-      catch (error) {
-        errors.push(error)
+      if (allSteps || weed) {
+        try {
+          const stats = this.weed()
+          Gui.placeStatResults(stats)
+        }
+        catch (error) {
+          errors.push({ where: "weed", error })
+          Log.error(error)
+        }
       }
     }
     if (errors.length == 0) {
-      try {
-        this.displayResults()
+      if (allSteps || composeArg !== undefined) {
+        try {
+          this.composeResults(allSteps ? false : composeArg)
+        }
+        catch (error) {
+          errors.push({ where: "compose", error })
+          Log.error(error)
+        }
       }
-      catch (error) {
-        errors.push(error)
+    }
+    if (errors.length == 0) {
+      if (allSteps || display) {
+        try {
+          this.displayResults()
+        }
+        catch (error) {
+          errors.push({ where: "display", error })
+          Log.error(error)
+        }
       }
     }
     if (errors.length > 0) {
-      Log.placeError(runerror, errors.map(e => `${e}`).join("<br>"), go)
+      Log.placeError(
+        runerror,
+        errors.map(({ where, error }) => `${where}: ${error}`).join("<br>"),
+        go,
+      )
     }
     else {
       Log.clearError(runerror, go)
@@ -1562,17 +1580,28 @@ class SearchProvider {
     if (containerNodes) {
       for (const cn of containerNodes) {
         resultTypeMap.set(cn, containerType)
+        const levels = { [containerType]: [cn] }
         let un = cn
         let uType = containerType
-        const ancestors = []
         while (up.has(un)) {
           un = up.get(un)
           uType = utypeOf[uType]
           resultTypeMap.set(un, uType)
-          ancestors.unshift(un)
+          if (levels[uType] === undefined) {
+            levels[uType] = []
+          }
+          levels[uType].push(un)
         }
         const descendants = this.getDescendants(cn, ntypesI.get(containerType))
-        resultsComposed.push({ cn, ancestors, descendants })
+        for (const desc of descendants) {
+          const d = (typeof desc === NUMBER) ? desc : desc[0]
+          const dType = resultTypeMap.get(d)
+          if (levels[dType] === undefined) {
+            levels[dType] = []
+          }
+          levels[dType].push(desc)
+        }
+        resultsComposed.push(levels)
       }
     }
     const nResults = resultsComposed == null ? 0 : resultsComposed.length
@@ -1637,11 +1666,38 @@ class SearchProvider {
     const tipStr = (hasMap && tip) ? valueMap[str.replaceAll(getAcro, "")] : null
     return { spans, tipStr }
   }
-  getLayers(nType, layers, visibleLayers, includeNodes) {
-    const { [nType]: definedLayers = {} } = layers
-    const { [nType]: tpVisible } = visibleLayers
-    const nodeLayer = includeNodes ? ["_"] : []
-    return nodeLayer.concat(Object.keys(definedLayers)).filter(x => tpVisible[x])
+  getLayersPerType() {
+    const { Config: { ntypesR, ntypesI, layers }, State } = this
+    const { containerType, visibleLayers } = State.getj()
+    const containerIndex = ntypesI.get(containerType)
+    const layersPerType = new Map()
+    for (const nType of ntypesR) {
+      const { [nType]: definedLayers = {} } = layers
+      const { [nType]: tpVisible = {} } = visibleLayers
+      const nodeLayer = ["_"]
+      const tpLayers = nodeLayer.concat(Object.keys(definedLayers))
+        .filter(x => tpVisible[x])
+      layersPerType.set(nType, tpLayers)
+    }
+    const visibleTypes = ntypesR.filter(x => layersPerType.get(x).length > 0)
+    const contextTypes = visibleTypes.filter(x => ntypesI.get(x) > containerIndex)
+    const rowUnitTypes = visibleTypes.filter(x => ntypesI.get(x) == containerIndex)
+    const contentTypes = ntypesR.filter(x => ntypesI.get(x) < containerIndex)
+    const firstContentTypes = (contentTypes.length == 0) ? [] : [contentTypes[0]]
+    const cols = contextTypes.concat(rowUnitTypes).concat(firstContentTypes)
+    const layersContent = []
+    for (const cnType of contentTypes) {
+      layersContent.push(...layersPerType.get(cnType))
+    }
+    return {
+      contextTypes,
+      rowUnitTypes,
+      contentTypes,
+      upperTypes: contextTypes.concat(rowUnitTypes),
+      cols,
+      layersPerType,
+      layersContent,
+    }
   }
   displayResults() {
     const {
@@ -1651,14 +1707,19 @@ class SearchProvider {
       Gui,
     } = this
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const {
-      settings: { nodeseq },
-      visibleLayers, focusPos, prevFocusPos,
-    } = State.getj()
+    const { settings: { nodeseq }, focusPos, prevFocusPos } = State.getj()
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
       return
     }
+    const {
+      upperTypes, contentTypes,
+      cols, layersPerType, layersContent,
+    } = this.getLayersPerType()
+    const colsRep = cols.map(x => `<th>${x}</th>`)
+    const header = `<tr><th>${RESULTCOL}</th>${colsRep.join("")}</tr>`
+    const resultshead = $("#resultshead")
+    resultshead.html(header)
     const genValueHtml = (nType, layer, node) => {
       if (layer == "_") {
         const num = nodeseq ? node - ntypesinit[nType] + 1 : node
@@ -1694,7 +1755,7 @@ class SearchProvider {
       const [n, children] = typeof node === NUMBER ? [node, []] : node
       const nType = resultTypeMap.get(n)
       const { [nType]: { nodes } = {} } = tpResults
-      const tpLayers = this.getLayers(nType, layers, visibleLayers, true)
+      const tpLayers = layersPerType.get(nType)
       const nLayers = tpLayers.length
       const hasLayers = nLayers > 0
       const hasSingleLayer = nLayers == 1
@@ -1726,24 +1787,24 @@ class SearchProvider {
       html.push(`</span>`)
       return html.join("")
     }
-    const genAncestorsHtml = ancestors => {
-      const html = ancestors.map(anc => genNodeHtml(anc))
-      return html.join(" ")
-    }
-    const genResHtml = (cn, descendants) => {
-      const html = []
-      html.push(`${genNodeHtml(cn)} `)
-      for (const desc of descendants) {
-        html.push(genNodeHtml(desc))
-      }
-      return html.join("")
-    }
     const genResultHtml = (i, result) => {
       const isFocus = i == focusPos
       const isPrevFocus = i == prevFocusPos
-      const { ancestors, cn, descendants } = result
-      const ancRep = genAncestorsHtml(ancestors)
-      const resRep = genResHtml(cn, descendants)
+      const typeNodes = []
+      for (const nType of upperTypes) {
+        typeNodes.push(
+          `<td>${(result[nType] ?? []).map(x => genNodeHtml(x)).join(" ")}</td>`
+        )
+      }
+      if (contentTypes.length > 0) {
+        if (layersContent.length > 0) {
+          const nType = contentTypes[0]
+          typeNodes.push(
+            `<td>${(result[nType] ?? []).map(x => genNodeHtml(x)).join(" ")}</td>`
+          )
+        }
+      }
+      const typeRep = typeNodes.join("\n")
       const focusCls = isFocus
         ? ` class="focus"`
         : isPrevFocus
@@ -1752,8 +1813,7 @@ class SearchProvider {
       return `
   <tr${focusCls}>
     <th>${i + 1}</th>
-    <td>${ancRep}</td>
-    <td>${resRep}</td>
+    ${typeRep}
   </tr>
     `
     }
@@ -1768,7 +1828,7 @@ class SearchProvider {
       )
       const html = []
       for (let i = startPos; i <= endPos; i++) {
-        html.push(genResultHtml(i, resultsComposed[i], i == focusPos))
+        html.push(genResultHtml(i, resultsComposed[i]))
       }
       return html.join("")
     }
@@ -1777,25 +1837,28 @@ class SearchProvider {
     resultsbody.html(html)
     Gui.applyFocus()
   }
-  tabularNew() {
+  tabular() {
     const {
-      Config: { simpleBase, layers, ntypesI, ntypesinit },
+      Config: { layers, ntypesinit },
       Corpus: { texts, iPositions },
       State,
+      tabNl,
     } = this
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const {
-      settings: { nodeseq },
-      visibleLayers, focusPos, prevFocusPos,
-    } = State.getj()
+    const { settings: { nodeseq } } = State.getj()
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
       return
     }
-    const genValueHtml = (nType, layer, node) => {
+    const {
+      upperTypes, contentTypes,
+      cols, layersPerType,
+    } = this.getLayersPerType()
+    const colsRep = cols.map(x => `${x}\t`)
+    const header = `${RESULTCOL}\t${colsRep.join("")}\n`
+    const genValueTsv = (nType, layer, node) => {
       if (layer == "_") {
-        const num = nodeseq ? node - ntypesinit[nType] + 1 : node
-        return `<span class="n">${num}</span>`
+        return `${nodeseq ? node - ntypesinit[nType] + 1 : node} `
       }
       const { [nType]: { [layer]: { pos: posKey, valueMap, tip } } } = layers
       const { [nType]: { [layer]: text } } = texts
@@ -1807,191 +1870,136 @@ class SearchProvider {
       const { spans, tipStr } = this.getHLText(
         nodeIPositions, nodeMatches, text, valueMap, tip,
       )
-      const hasTip = tipStr != null
-      const tipRep = (hasTip) ? ` title="${tipStr}"` : ""
-      const html = []
-      const multiple = spans.length > 1 || hasTip
-      if (multiple) {
-        html.push(`<span${tipRep}>`)
-      }
+      const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
+      let piece = ""
       for (const [hl, val] of spans) {
-        const hlRep = hl ? ` class="hl"` : ""
-        html.push(`<span${hlRep}>${val}</span>`)
+        piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
       }
-      if (multiple) {
-        html.push(`</span>`)
-      }
-      return html.join("")
+      piece = piece.replaceAll(tabNl, " ")
+      return piece
     }
-    const genNodeHtml = node => {
+    const genNodeTsv = (node, stack) => {
       const [n, children] = typeof node === NUMBER ? [node, []] : node
       const nType = resultTypeMap.get(n)
-      const { [nType]: { nodes } = {} } = tpResults
-      const tpLayers = this.getLayers(nType, layers, visibleLayers, true)
-      const nLayers = tpLayers.length
-      const hasLayers = nLayers > 0
-      const hasSingleLayer = nLayers == 1
-      const hasChildren = children.length > 0
-      if (!hasLayers && !hasChildren) {
-        return ""
+      const tpLayers = layersPerType.get(nType)
+      const newStack = [
+        ...stack ?? [],
+        ...tpLayers.map(lr => genValueTsv(nType, lr, n)),
+      ]
+      let tsv
+      if (children.length == 0) {
+        tsv = newStack
       }
-      const hlClass =
-        simpleBase && ntypesI.get(nType) == 0 ? "" : nodes.has(n) ? " hlh" : "o"
-      const hlRep = hlClass == "" ? "" : ` class="${hlClass}"`
-      const lrRep = hasSingleLayer ? "" : ` m`
-      const hdRep = hasChildren ? "h" : ""
-      const html = []
-      html.push(`<span${hlRep}>`)
-      if (hasLayers) {
-        html.push(`<span class="${hdRep}${lrRep}">`)
-        for (const layer of tpLayers) {
-          html.push(`${genValueHtml(nType, layer, n)}`)
-        }
-        html.push(`</span>`)
-      }
-      if (hasChildren) {
-        html.push(`<span>`)
+      else {
+        const tsvs = []
+        let first = true
         for (const ch of children) {
-          html.push(genNodeHtml(ch))
-        }
-        html.push(`</span>`)
-      }
-      html.push(`</span>`)
-      return html.join("")
-    }
-    const genAncestorsHtml = ancestors => {
-      const html = ancestors.map(anc => genNodeHtml(anc))
-      return html.join(" ")
-    }
-    const genResHtml = (cn, descendants) => {
-      const html = []
-      html.push(`${genNodeHtml(cn)} `)
-      for (const desc of descendants) {
-        html.push(genNodeHtml(desc))
-      }
-      return html.join("")
-    }
-    const genResultHtml = (i, result) => {
-      const isFocus = i == focusPos
-      const isPrevFocus = i == prevFocusPos
-      const { ancestors, cn, descendants } = result
-      const ancRep = genAncestorsHtml(ancestors)
-      const resRep = genResHtml(cn, descendants)
-      const focusCls = isFocus
-        ? ` class="focus"`
-        : isPrevFocus
-        ? ` class="pfocus"`
-        : ""
-      return `
-  <tr${focusCls}>
-    <th>${i + 1}</th>
-    <td>${ancRep}</td>
-    <td>${resRep}</td>
-  </tr>
-    `
-    }
-    const genResultsHtml = () => {
-      if (resultsComposed == null) {
-        return ""
-      }
-      const startPos = Math.max((focusPos || 0) - 2 * QUWINDOW, 0)
-      const endPos = Math.min(
-        startPos + 4 * QUWINDOW + 1,
-        resultsComposed.length - 1
-      )
-      const html = []
-      for (let i = startPos; i <= endPos; i++) {
-        html.push(genResultHtml(i, resultsComposed[i], i == focusPos))
-      }
-      return html.join("")
-    }
-    return genResultsHtml()
-  }
-  tabular() {
-    const {
-      Config: { layers, ntypes, ntypesinit },
-      Corpus: { texts, iPositions }, State,
-    } = this
-    const { settings: { nodeseq } } = State.getj()
-    const { tpResults } = State.gets()
-    if (tpResults == null) {
-      return null
-    }
-    const { visibleLayers } = State.getj()
-    const headFields = ["type"]
-    const nodeFields = new Map()
-    for (let i = 0; i < ntypes.length; i++) {
-      const nType = ntypes[i]
-      const { [nType]: { matches, nodes } } = tpResults
-      if (nodes == null) {
-        continue
-      }
-      const { [nType]: tpLayerInfo } = layers
-      const { [nType]: tpTexts } = texts
-      const { [nType]: tpIPositions } = iPositions
-      const exportLayers = this.getLayers(nType, layers, visibleLayers, false)
-      for (const node of nodes) {
-        if (!nodeFields.has(node)) {
-          nodeFields.set(node, new Map())
-        }
-        const fields = nodeFields.get(node)
-        fields.set("type", nType)
-      }
-      for (const layer of exportLayers) {
-        const tpLayer = `${nType}-${layer}`
-        headFields.push(tpLayer)
-        const { [layer]: { pos: posKey, valueMap, tip } } = tpLayerInfo
-        const { [layer]: text } = tpTexts
-        const { [posKey]: iPos } = tpIPositions
-        const { [layer]: lrMatches } = matches
-        for (const node of nodes) {
-          const fields = nodeFields.get(node)
-          fields.set("type", nType)
-          const nodeIPositions = iPos.get(node)
-          const nodeMatches =
-            lrMatches == null || !lrMatches.has(node)
-              ? new Set()
-              : lrMatches.get(node)
-          const { spans, tipStr } = this.getHLText(
-            nodeIPositions, nodeMatches, text, valueMap, tip
-          )
-          const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
-          let piece = ""
-          for (const [hl, val] of spans) {
-            piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
+          tsvs.push(genNodeTsv(ch, newStack))
+          if (first) {
+            first = false
+            newStack.fill("")
           }
-          fields.set(tpLayer, piece.replaceAll(this.tabNl, " "))
         }
+        tsv = zip(tsvs)
+      }
+      return tsv
+    }
+    const zip = tsvs => {
+      const maxLen = Math.max(...tsvs.map(x => x.length))
+      const stack = []
+      for (let i = 0; i < maxLen; i++) {
+        stack[i] = tsvs.map(x => (i < x.length) ? x[i] : "").join("")
+      }
+      return stack
+    }
+    const genResultTsv = (s, result) => {
+      const typeNodes = []
+      for (const nType of upperTypes) {
+        typeNodes.push([false, (result[nType] ?? []).map(x => genNodeTsv(x))])
+      }
+      for (const nType of contentTypes) {
+        typeNodes.push([true, (result[nType] ?? []).map(x => genNodeTsv(x))])
+      }
+      const tsv = []
+      const maxLines = Math.max(
+        ...typeNodes.map(
+          x => Math.max(...x[1].map(y => y.length))
+        )
+      )
+      for (let i = 0; i < maxLines; i++) {
+        const line = [`${s + 1}`]
+        for (const [separate, chunks] of typeNodes) {
+          line.push("\t")
+          let first = true
+          let sep = ""
+          for (const chunk of chunks) {
+            if (sep) {
+              line.push(sep)
+            }
+            line.push((i < chunk.length) ? chunk[i] : "")
+            if (first) {
+              first = false
+              if (separate) {
+                sep = "\t"
+              }
+            }
+          }
+        }
+        tsv.push(`${line.join("")}\n`)
+      }
+      return tsv
+    }
+    if (resultsComposed == null) {
+      return ""
+    }
+    const tsv = []
+    for (let i = 0; i < resultsComposed.length; i++) {
+      const rows = genResultTsv(i, resultsComposed[i])
+      for (let j = 0; j < rows.length; j++) {
+        tsv.push(rows[j])
       }
     }
-    const firstField = nodeseq ? "seqno" : "node"
-    const headLine = `${firstField}\t${headFields.join("\t")}\n`
-    const lines = [headLine]
-    for (let i = 0; i < ntypes.length; i++) {
-      const nType = ntypes[i]
-      const { [nType]: { nodes } } = tpResults
-      if (nodes == null) {
-        continue
-      }
-      const sortedNodes = [...nodes].sort()
-      for (const node of sortedNodes) {
-        const num = nodeseq ? node - ntypesinit[nType] + 1 : node
-        const line = [`${num}`]
-        const fields = nodeFields.has(node) ? nodeFields.get(node) : new Map()
-        for (const headField of headFields) {
-          line.push(fields.has(headField) ? fields.get(headField) : "")
-        }
-        lines.push(`${line.join("\t")}\n`)
-      }
-    }
-    return lines
+    return header + tsv.join("")
   }
-  saveResults() {
-    const { Disk, State } = this
+  async saveResults() {
+    const { Log, Disk, State } = this
     const { jobName } = State.gets()
-    const lines = this.tabular()
-    const text = lines.join("")
-    Disk.download(text, jobName, "tsv", true)
+    const expr = $("#exportr")
+    const runerror = $("#runerror")
+    Log.progress(`exporting results`)
+    expr.addClass("waiting")
+    await new Promise(r => setTimeout(r, 50))
+    const errors = []
+    let text
+    try {
+      text = this.tabular()
+    }
+    catch (error) {
+      errors.push({ where: "tabular", error })
+      Log.error(error)
+    }
+    if (errors.length == 0) {
+      try {
+        Disk.download(text, jobName, "tsv", true)
+      }
+      catch (error) {
+        errors.push({ where: "download", error })
+        Log.error(error)
+      }
+    }
+    if (errors.length > 0) {
+      Log.placeError(
+        runerror,
+        errors.map(({ where, error }) => `${where}: ${error}`).join("<br>"),
+        expr,
+      )
+    }
+    else {
+      Log.clearError(runerror, expr)
+    }
+    expr.addClass("active")
+    expr.removeClass("waiting")
+    Log.progress(`done export`)
   }
 }
 

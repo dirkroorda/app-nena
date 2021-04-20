@@ -4,7 +4,22 @@ const configData = {
   "repo": "app-nena",
   "name": "nena",
   "urls": {
+   "cheatsheet": [
+    "cheatsheet",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet",
+    "cheatsheet of regular expressions"
+   ],
+   "license": [
+    "license",
+    "https://mit-license.org",
+    "MIT license"
+   ],
    "corpus": [
+    null,
+    "https://nena.ames.cam.ac.uk",
+    "North-Eastern Neo-Aramaic Data Project website"
+   ],
+   "corpus2": [
     null,
     "https://nena.ames.cam.ac.uk",
     "North-Eastern Neo-Aramaic Data Project website"
@@ -13,6 +28,21 @@ const configData = {
     null,
     "https://dans.knaw.nl/en/front-page?set_language=en",
     "DANS = Data Archiving and Networked Services"
+   ],
+   "author": [
+    "Dirk Roorda",
+    "https://pure.knaw.nl/portal/en/persons/dirk-roorda",
+    "author"
+   ],
+   "author2": [
+    "Cody Kingham",
+    "https://www.linkedin.com/in/cody-kingham-1135018a",
+    "author (second)"
+   ],
+   "author3": [
+    "Geoffrey Khan",
+    "https://www.ames.cam.ac.uk/people/professor-geoffrey-khan",
+    "author (second)"
    ],
    "tf": [
     null,
@@ -39,17 +69,24 @@ const configData = {
     "https://github.com/annotation/app-nena",
     "source code in Github repository"
    ],
+   "issue": [
+    "Feature requests, bugs, feedback",
+    "https://github.com/annotation/app-nena/issues",
+    "report issues"
+   ],
    "package": [
-    null,
-    "https://annotation.github.io/app-nena/nena.zip",
+    "download",
+    [
+     "https://annotation.github.io/app-nena/nena.zip"
+    ],
     "zip file for offline use"
    ]
   },
   "captions": {
    "title": "NENA phono search"
   },
-  "description": "\n    <p>Phonetic search interface for the\n       <a href=\"https://nena.ames.cam.ac.uk/\" target=\"_blank\">Northeastern Neo-Aramaic Database</a>.\n    </p>\n    <p>This is a standalone app. You download it to your computer, and then it works without\n    connection to the internet.</p>\n    <p>This web app is by:</p>\n    <ul>\n    <li> <a href=\"https://www.ames.cam.ac.uk/people/professor-geoffrey-khan\" target=\"_blank\">Geoffrey Khan</a> (initiator)\n    <li> <a href=\"https://www.linkedin.com/in/cody-kingham-1135018a\" target=\"_blank\">Cody Kingham</a> (corpus developer)\n    <li> <a href=\"https://pure.knaw.nl/portal/en/persons/dirk-roorda\" target=\"_blank\">Dirk Roorda</a> (software developer)\n    </ul>\n    ",
-  "appVersion": "000b@2021-04-17T09:30:36"
+  "description": "\n<p>Phonetic search interface for the <a id=\"corpus2link\" href=\"#\"></a>.</p>\n<p>This is a standalone app. You download it to your computer, and then it works without\nconnection to the internet.</p>\n<p>This web app is by:</p>\n<ul>\n    <li><a id=\"author3link\" href=\"#\"></a> (initiator)\n    <li><a id=\"author2link\" href=\"#\"></a> (corpus developer)\n    <li><a id=\"authorlink\" href=\"#\"></a> (software developer)\n</ul>\n    ",
+  "appVersion": "000c@2021-04-20T09:08:16"
  },
  "containerType": "sentence",
  "simpleBase": false,

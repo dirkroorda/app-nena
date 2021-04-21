@@ -32,7 +32,7 @@ command:
 --help
 help  : print help and exit
 
-serve          : serve search app locally
+serve [page]   : serve search page locally, default index.html
 v              : show current version
 i              : increase version
 debug [on|off] : production: set debug = false
@@ -91,6 +91,14 @@ def readArgs():
         console(HELP)
         console(f"Wrong arguments: «{' '.join(args)}»")
         return (False, None, [])
+    if arg in {"serve"}:
+        if len(args) < 2:
+            page = "index"
+            remaining = []
+        else:
+            page = args[1]
+            remaining = args[2:]
+        return (arg, page, remaining)
     if arg in {"commit", "ship"}:
         if len(args) < 2:
             console("Provide a commit message")
@@ -109,7 +117,7 @@ def main():
     if not task:
         return
     elif task == "serve":
-        serve()
+        serve(msg)
     elif task == "v":
         showVersion()
     elif task == "i":
@@ -176,14 +184,14 @@ def zipApp():
     console(f"Packaged app into {zipped}")
 
 
-def serve():
+def serve(page):
     os.chdir(OUTPUT)
 
     server = Popen(
         ["python3", "-m", "http.server"], stdout=PIPE, bufsize=1, encoding="utf-8"
     )
     sleep(1)
-    webbrowser.open("http://localhost:8000", new=2, autoraise=True)
+    webbrowser.open(f"http://localhost:8000/{page}.html", new=2, autoraise=True)
     stopped = server.poll()
     if not stopped:
         try:

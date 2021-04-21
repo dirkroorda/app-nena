@@ -163,17 +163,19 @@ export class SearchProvider {
     const posFromNode = new Map()
     const nodeSet = new Set()
     for (const match of searchResults) {
-      const hit = match[0]
-      const start = match.index
-      const end = start + hit.length
-      for (let i = start; i < end; i++) {
-        const node = pos[i]
-        if (node != null) {
-          if (!posFromNode.has(node)) {
-            posFromNode.set(node, new Set())
+      for (let group = 0; group < match.length; group++) {
+        const hit = match[group]
+        const start = match.index
+        const end = start + hit.length
+        for (let i = start; i < end; i++) {
+          const node = pos[i]
+          if (node != null) {
+            if (!posFromNode.has(node)) {
+              posFromNode.set(node, new Map())
+            }
+            posFromNode.get(node).set(i, group)
+            nodeSet.add(node)
           }
-          posFromNode.get(node).add(i)
-          nodeSet.add(node)
         }
       }
     }
@@ -236,8 +238,7 @@ export class SearchProvider {
           }
         }
       }
-      const matches = matchesByLayer || null
-      tpResults[nType] = { matches, nodes: intersection }
+      tpResults[nType] = { matches: matchesByLayer, nodes: intersection }
     }
   }
 
@@ -509,7 +510,7 @@ export class SearchProvider {
     return dest
   }
 
-  getHLText(iPositions, matches, text, valueMap, tip) {
+  getHlText(iPositions, matches, text, valueMap, tip) {
     /* get highlighted text for a node
      * The results of matching a pattern against a text are highlighted within that text
      * returns a sequence of spans, where a span is an array of postions plus a boolean
@@ -522,15 +523,15 @@ export class SearchProvider {
 
     const spans = []
     let str = ""
-    let curHl = null
+    let curHl = -2
 
     for (const i of iPositions) {
       const ch = text[i]
       if (hasMap) {
         str += ch
       }
-      const hl = matches.has(i)
-      if (curHl == null || curHl != hl) {
+      const hl = matches.get(i) ?? -1
+      if (curHl != hl) {
         const newSpan = [hl, ch]
         spans.push(newSpan)
         curHl = hl
@@ -638,11 +639,11 @@ export class SearchProvider {
       const { [nType]: { [layer]: text } } = texts
       const { [nType]: { [posKey]: iPos } } = iPositions
       const nodeIPositions = iPos.get(node)
-      const { [nType]: { matches: { [layer]: matches } = {} } } = tpResults
+      const { [nType]: { matches: { [layer]: matches } = {} } = {} } = tpResults
       const nodeMatches =
-        matches == null || !matches.has(node) ? new Set() : matches.get(node)
+        matches == null || !matches.has(node) ? new Map() : matches.get(node)
 
-      const { spans, tipStr } = this.getHLText(
+      const { spans, tipStr } = this.getHlText(
         nodeIPositions, nodeMatches, text, valueMap, tip,
       )
       const hasTip = tipStr != null
@@ -654,8 +655,9 @@ export class SearchProvider {
         html.push(`<span${tipRep}>`)
       }
       for (const [hl, val] of spans) {
-        const hlRep = hl ? ` class="hl"` : ""
-        html.push(`<span${hlRep}>${val}</span>`)
+        const hlRep = (hl >= 0) ? ` class="hl${hl}"` : ""
+        const hlTitle = (hl >= 0) ? ` title="group ${hl}"` : ""
+        html.push(`<span${hlRep}${hlTitle}>${val}</span>`)
       }
       if (multiple) {
         html.push(`</span>`)
@@ -818,11 +820,11 @@ export class SearchProvider {
       const { [nType]: { [layer]: text } } = texts
       const { [nType]: { [posKey]: iPos } } = iPositions
       const nodeIPositions = iPos.get(node)
-      const { [nType]: { matches: { [layer]: matches } = {} } } = tpResults
+      const { [nType]: { matches: { [layer]: matches } = {} } = {} } = tpResults
       const nodeMatches =
-        matches == null || !matches.has(node) ? new Set() : matches.get(node)
+        matches == null || !matches.has(node) ? new Map() : matches.get(node)
 
-      const { spans, tipStr } = this.getHLText(
+      const { spans, tipStr } = this.getHlText(
         nodeIPositions, nodeMatches, text, valueMap, tip,
       )
       const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
@@ -830,7 +832,13 @@ export class SearchProvider {
       let piece = ""
 
       for (const [hl, val] of spans) {
-        piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
+        if (hl >= 0) {
+          piece += `«${hl}=${val}»`
+        }
+        else {
+          piece += val
+        }
+        piece += tipRep
       }
       piece = piece.replaceAll(tabNl, " ")
       return piece

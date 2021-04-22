@@ -118,6 +118,7 @@ import { GuiProvider } from "./gui.js"
 import { MemProvider } from "./mem.js"
 import { DiskProvider } from "./disk.js"
 import { LogProvider } from "./log.js"
+import { FeatureProvider } from "./feature.js"
 
 class AppProvider {
 /* TOP LEVEL ORCHESTRATION
@@ -125,6 +126,10 @@ class AppProvider {
  * We take care to use an async function for the longish
  * initialization, so that we can display progress messages
  * in the mean time
+ *
+ * Feature testing
+ * We test some features for support in the current browser, and register the outcome
+ * for further use in the app.
  *
  * Document loading:
  * we take care that the user sees as much of the interface as early as possible.
@@ -159,6 +164,7 @@ class AppProvider {
      */
     this.providers = {
       Log: new LogProvider(),
+      Features: new FeatureProvider(),
       Disk: new DiskProvider(),
       Mem: new MemProvider(),
 
@@ -178,10 +184,11 @@ class AppProvider {
     */
 
     this.order = {
-      init: ["Log", "Config", "Mem", "State", "Job", "Gui"],
+      init: ["Log", "Features", "Config", "Mem", "State", "Job", "Gui"],
       later: ["Corpus", "Job", "Log"],
     }
     this.deps()
+    this.test()
   }
 
   deps() {
@@ -193,6 +200,12 @@ class AppProvider {
       Provider.deps(providers)
     }
     this.tell = Log.tell
+  }
+  test() {
+    const { providers: { Features } } = this
+    const { features } = Features
+    Features.init()
+    Features.test()
   }
 
   init() {

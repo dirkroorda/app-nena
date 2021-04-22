@@ -3,6 +3,11 @@ import {
   OBJECT, NUMBER, STRING, BOOL,
 } from "./defs.js"
 
+
+const isObject = value =>
+  value != null && typeof value === OBJECT && !Array.isArray(value)
+
+
 export class StateProvider {
 /* THE STATE
  *
@@ -29,8 +34,9 @@ export class StateProvider {
  * INITIAL STATE
  *
  * The jobState part of the data is fixed in shape.
- * The State Provider furnish a jobState that has all members and submembers present,
- * filled with default values, none of which are missing or null.
+ * The State Provider furnish a jobState that has all members and sub members present,
+ * filled with default values, none of which are undefined
+ * (null is allowed for leaf members)
  *
  * The jobState can be initialized from external, incoming data,
  * use the startj method for that.
@@ -45,7 +51,8 @@ export class StateProvider {
  * A safe merge copies leaf members of the incoming state into corresponding places
  * in the initial state, provided the path in the incoming state exists in the initial
  * state, and the type of the value in the incoming state is the same as that of
- * the corresponding value in the initial state, and the incoming value is not null.
+ * the corresponding value in the initial state,
+ * and the incoming value is not undefined.
  * If the type of the value is string, the value should be less than MAXINPUT.
  *
  * If any of these conditions are not met, the update of that value is skipped.
@@ -81,14 +88,15 @@ export class StateProvider {
  * INVARIANT:
  *
  * The jobState always has the full prescribed shape, with all members present at any
- * level, and with now leaf values null.
+ * level, and with no undefined leaf values
  */
 
   /* private members
    */
 
-  deps({ Log, Mem, Config }) {
+  deps({ Log, Features, Mem, Config }) {
     this.Log = Log
+    this.Features = Features
     this.Mem = Mem
     this.Config = Config
     this.tell = Log.tell
@@ -98,6 +106,7 @@ export class StateProvider {
     /* Make the contents for an initial, valid state, with defaults filled in
      * It can be called when certain elements of the state change.
      */
+
 
     this.data = {
       /* for each node type: { nodes, matches }
@@ -148,7 +157,10 @@ export class StateProvider {
     /* Make the contents for an initial, valid jobState, with defaults filled in
      * This is the first step in guaranteeing that the jobState has a fixed shape.
      */
-    const { Config: { ntypes, containerType, layers, visible } } = this
+    const {
+      Config: { ntypes, containerType, layers, visible },
+      Features: { features: { indices: { can } } },
+    } = this
 
     /* First set a dumb, superficial value
      */
@@ -156,13 +168,20 @@ export class StateProvider {
       /* options that affect general aspects of searching
        */
       settings: {
+
         /* whether to run search immediately after change or after button press
          */
         autoexec: true,
+
         /* whether displayed node numbers start at 1 per node type
          * or are exactly the TF node numbers
          */
         nodeseq: true,
+
+        /* whether to highlight groups with different colors
+         * only if the browser supports it
+         */
+        multihl: can ? true : null,
       },
 
 /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
@@ -302,7 +321,7 @@ export class StateProvider {
     }
     if (commit) {
       const { jobName, jobState } = data
-      Mem.setk(jobName, jobState)
+      Mem.setkl(jobName, jobState)
     }
     return this.gets()
   }
@@ -319,7 +338,7 @@ export class StateProvider {
     data.jobName = jobName
     this.startjslice(jobStateIn)
     const { jobState } = data
-    Mem.setk(jobName, jobState)
+    Mem.setkl(jobName, jobState)
   }
 
   getj() {
@@ -340,7 +359,7 @@ export class StateProvider {
      */
     const { Mem, data: { jobName, jobState } } = this
     this.merge(jobState, incoming, [])
-    Mem.setk(jobName, jobState)
+    Mem.setkl(jobName, jobState)
   }
 
   /* auxiliary functions for state operations
@@ -350,7 +369,7 @@ export class StateProvider {
     /* Merge an incoming object safely into an original object.
      * The shape of orig will not be altered
      *  1. no new keys will be introduced at any level
-     *  2. no value becomes undefined or null
+     *  2. no value becomes undefined
      *  3. no value changes type
      *  4. no value becomes too long
      *
@@ -362,59 +381,59 @@ export class StateProvider {
     const { Log } = this
     const pRep = `Merge: incoming at path "${path.join(".")}": `
 
-    if (incoming == null) {
+    if (incoming === undefined) {
       Log.error(`${pRep}undefined`)
       return
     }
-    if (!(typeof incoming === OBJECT && !Array.isArray(incoming))) {
+    if (!isObject(incoming)) {
       Log.error(`${pRep}non-object`)
       return
     }
-    for (const [inKey, inValue] of Object.entries(incoming)) {
-      const origValue = orig[inKey]
-      if (origValue === undefined) {
+    for (const [inKey, inVal] of Object.entries(incoming)) {
+      const origVal = orig[inKey]
+      if (origVal === undefined) {
         Log.error(`${pRep}unknown key ${inKey}`)
         continue
       }
-      if (inValue == null) {
+      if (inVal === undefined) {
         Log.error(`${pRep}undefined value for ${inKey}`)
         continue
       }
-      const origType = typeof origValue
-      const inType = typeof inValue
-      if (origType === NUMBER || origType === STRING || origType === BOOL) {
-        if (inType === OBJECT) {
-          const repVal = JSON.stringify(inValue)
+      const oTp = typeof origVal
+      const inTp = typeof inVal
+      if (origVal === null || oTp === NUMBER || oTp === STRING || oTp === BOOL) {
+        if (isObject(inVal)) {
+          const repVal = JSON.stringify(inVal)
           Log.error(`${pRep}object ${repVal} for ${inKey} instead of leaf value`)
           continue
         }
-        if (inType != origType) {
-          Log.error(`${pRep}type conflict ${inType}, expected ${origType} for ${inKey}`)
+        if (inVal !== null && origVal !== null && inTp != oTp) {
+          Log.error(`${pRep}type conflict ${inTp}, expected ${oTp} for ${inKey}`)
           continue
         }
-        if (inType === STRING && inValue.length > MAXINPUT) {
-          const eRep = `${inValue.length} (${inValue.substr(0, 20)} ...)`
+        if (inTp === STRING && inVal.length > MAXINPUT) {
+          const eRep = `${inVal.length} (${inVal.substr(0, 20)} ...)`
           Log.error(`${pRep}maximum length exceeded for ${inKey}: ${eRep}`)
           continue
         }
 
         /* all is well, we replace the value in orig by the incoming value
          */
-        orig[inKey] = inValue
+        orig[inKey] = inVal
         continue
       }
-      if (origType !== OBJECT) {
+      if (!isObject(inVal)) {
         Log.error(
-          `${pRep}unknown type ${inType} for ${inKey}=${inValue} instead of object`
+          `${pRep}unknown type ${inTp} for ${inKey}=${inVal} instead of object`
         )
         continue
       }
-      if (origType === OBJECT) {
-        if (inType !== OBJECT) {
-          Log.error(`${pRep}leaf value {inValue} for {inKey} instead of object`)
+      if (isObject(origVal)) {
+        if (!isObject(inVal)) {
+          Log.error(`${pRep}leaf value ${inVal} for ${inKey} instead of object`)
           continue
         }
-        this.merge(origValue, inValue, [...path, inKey])
+        this.merge(origVal, inVal, [...path, inKey])
       }
     }
   }

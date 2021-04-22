@@ -25,8 +25,9 @@ export class SearchProvider {
     this.tabNl = /[\n\t]/g
   }
 
-  deps({ Log, Disk, State, Gui, Config, Corpus }) {
+  deps({ Log, Features, Disk, State, Gui, Config, Corpus }) {
     this.Log = Log
+    this.Features = Features
     this.Disk = Disk
     this.State = State
     this.Gui = Gui
@@ -152,20 +153,40 @@ export class SearchProvider {
     Log.progress(`done query`)
   }
 
-  doSearch(nType, layer, lrInfo, regex) {
+  doSearch(nType, layer, lrInfo, regex, multiHl) {
     /* perform regular expression search for a single layer
      * return character positions and nodes that hold those positions
      */
     const { Corpus: { texts: { [nType]: { [layer]: text } }, positions } } = this
     const { pos: posKey } = lrInfo
     const { [nType]: { [posKey]: pos } } = positions
-    const searchResults = text.matchAll(regex)
     const posFromNode = new Map()
     const nodeSet = new Set()
-    for (const match of searchResults) {
-      for (let group = 0; group < match.length; group++) {
-        const hit = match[group]
-        const start = match.index
+    if (multiHl) {
+      let result
+      while ((result = regex.exec(text)) !== null) {
+        const { indices } = result
+        for (let g = 0; g < result.length; g++) {
+          const b = indices[g][0]
+          const e = indices[g][1]
+          for (let h = b; h < e; h++) {
+            const node = pos[h]
+            if (node != null) {
+              if (!posFromNode.has(node)) {
+                posFromNode.set(node, new Map())
+              }
+              posFromNode.get(node).set(h, g)
+              nodeSet.add(node)
+            }
+          }
+        }
+      }
+    }
+    else {
+      const results = text.matchAll(regex)
+      for (const result of results) {
+        const hit = result[0]
+        const start = result.index
         const end = start + hit.length
         for (let i = start; i < end; i++) {
           const node = pos[i]
@@ -173,7 +194,7 @@ export class SearchProvider {
             if (!posFromNode.has(node)) {
               posFromNode.set(node, new Map())
             }
-            posFromNode.get(node).set(i, group)
+            posFromNode.get(node).set(i, 0)
             nodeSet.add(node)
           }
         }
@@ -188,9 +209,14 @@ export class SearchProvider {
      *     the intersection of the nodesets found for each layer
      *     for each layer, a mapping of nodes to matched positions
      */
-    const { Log, Config: { ntypesR, layers }, State } = this
+    const {
+      Log,
+      Features: { features: { indices: { can } } },
+      Config: { ntypesR, layers },
+      State,
+    } = this
 
-    const { query } = State.getj()
+    const { query, settings: { multihl } } = State.getj()
 
     State.sets({ resultsComposed: [], resultTypeMap: new Map() })
     const { tpResults } = State.sets({ tpResults: {} })
@@ -217,16 +243,18 @@ export class SearchProvider {
           )
           continue
         }
+        const mhl = can && multihl
         const flagString = Object.entries(flags)
           .filter(x => x[1]).map(x => x[0]).join("")
         let regex
         try {
-          regex = new RegExp(pattern, `g${flagString}`)
+          const dFlag = mhl ? "d" : ""
+          regex = new RegExp(pattern, `g${dFlag}${flagString}`)
         } catch (error) {
           Log.placeError(ebox, `"${pattern}": ${error}`, box)
           continue
         }
-        const { posFromNode, nodeSet } = this.doSearch(nType, layer, lrInfo, regex)
+        const { posFromNode, nodeSet } = this.doSearch(nType, layer, lrInfo, regex, mhl)
         matchesByLayer[layer] = posFromNode
         if (intersection == null) {
           intersection = nodeSet
@@ -604,6 +632,7 @@ export class SearchProvider {
      *     where the descendants that have results are highlighted.
      */
     const {
+      Features: { features: { indices: { can } } },
       Config: { simpleBase, layers, ntypesI, ntypesinit },
       Corpus: { texts, iPositions },
       State,
@@ -611,12 +640,14 @@ export class SearchProvider {
     } = this
 
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const { settings: { nodeseq }, focusPos, prevFocusPos } = State.getj()
+    const { settings: { nodeseq, multihl }, focusPos, prevFocusPos } = State.getj()
 
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
       return
     }
+
+    const mhl = can && multihl
 
     const {
       upperTypes, contentTypes,
@@ -655,7 +686,8 @@ export class SearchProvider {
         html.push(`<span${tipRep}>`)
       }
       for (const [hl, val] of spans) {
-        const hlRep = (hl >= 0) ? ` class="hl${hl}"` : ""
+        const theHl = (hl == 0 && !mhl) ? "hl" : `hl${hl}`
+        const hlRep = (hl >= 0) ? ` class="${theHl}"` : ""
         const hlTitle = (hl >= 0) ? ` title="group ${hl}"` : ""
         html.push(`<span${hlRep}${hlTitle}>${val}</span>`)
       }
@@ -833,7 +865,8 @@ export class SearchProvider {
 
       for (const [hl, val] of spans) {
         if (hl >= 0) {
-          piece += `«${hl}=${val}»`
+          const hlRep = (hl == 0) ? "" : `${hl}=`
+          piece += `«${hlRep}${val}»`
         }
         else {
           piece += val

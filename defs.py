@@ -1,6 +1,6 @@
 import os
 
-APP_VERSION = "000d@2021-04-20T10:33:21"
+APP_VERSION = "000e@2021-04-22T10:22:14"
 
 NAME = "nena"
 GH = os.path.expanduser("~/github")
@@ -30,6 +30,7 @@ TF_LOCATION = f"{GH}/{TF_ORG}/{TF_REPO}/tf"
 TF_VERSION = "alpha"
 TF_DATA_URL = f"{GH_URL}/{TF_ORG}/{TF_REPO}/tree/master/tf/{TF_VERSION}"
 DATA_DOC_URL = f"{GH_URL}/{TF_ORG}/{TF_REPO}/blob/master/docs/features.md"
+WRITING_URL = f"https://{ORG}.{GH_PAGES}/text-fabric/tf/writing/neoaramaic.html"
 
 URLS = dict(
     cheatsheet=(
@@ -115,4 +116,9 @@ URLS = dict(
         PACKAGE_URL,
         "zip file for offline use",
     ),
+    writing=(
+        "alphabet",
+        WRITING_URL,
+        "characters and transliteration",
+    )
 )

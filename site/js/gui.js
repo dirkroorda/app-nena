@@ -13,7 +13,8 @@ export class GuiProvider {
  * Here we generate HTML and place it in the DOM
  */
 
-  deps({ Log, State, Job, Config, Search }) {
+  deps({ Log, Features, State, Job, Config, Search }) {
+    this.Features = Features
     this.State = State
     this.Job = Job
     this.Config = Config
@@ -80,17 +81,35 @@ export class GuiProvider {
   }
 
   placeSettings() {
-    const { State } = this
+    const { State, Features: { features: { indices: { can, support } } } } = this
     const { settings } = State.getj()
 
     const html = []
 
-    for (const name of Object.keys(settings)) {
-      html.push(`
-        <p><button
-          type="button" name="${name}" class="expand on"
-        ></button></p>
-      `)
+    for (const [name, value] of Object.entries(settings)) {
+      let useValue = value
+      if (name == "multihl") {
+        if (value == null && can) {
+          useValue = false
+          State.setj({ settings: { [name]: useValue } })
+        }
+      }
+      const bState = (useValue === null) ? "no" : value ? "on" : "off"
+      const buttonHtml = `
+        <button type="button" name="${name}" class="setting ${bState}"></button>
+      `
+      if (name == "multihl") {
+        const canRep = can ? "✅ in this browser" : "❌ in this browser"
+        html.push(
+          `<div class="setting">
+            ${buttonHtml}
+            <details><summary>${canRep}</summary><p>${support}</p></details>
+          </details>
+          `)
+      }
+      else {
+        html.push(`<p>${buttonHtml}</p>`)
+      }
     }
     const settingsplace = $("#settings")
     settingsplace.html(html.join(""))
@@ -397,6 +416,9 @@ export class GuiProvider {
         this.applySettings(name)
         if (name == "nodeseq") {
           Search.runQuery({ display: [] })
+        }
+        if (name == "multihl") {
+          Search.runQuery({ allSteps: true })
         }
       }
       this.clearBrowserState()

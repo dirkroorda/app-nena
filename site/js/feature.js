@@ -1,9 +1,31 @@
 /*eslint-env jquery*/
 
+/* --- FEATURES ---
+ *
+ * Here is a list of features to be tested: i.e. does the browser support the feature?
+ *
+ * Every feature is a separate object with
+ *
+ * - metadata: description, known support, etc
+ * - data: test data
+ * - use(): a function that uses the feature on the test data
+ * - fallback(): a function that implements a workaround or graceful degradation
+ * - can: a boolean that reports whether the use() function ran without issue
+ * - error: any error that occurred when running the use function
+ *
+ * The use() and fallback() functions should return some html that can be used
+ * in a report.
+ */
+
 const indices = {
+  /* whether RegExp supports the "d" flag and match results have the
+   * "indices" attribute
+   * See
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec
+   */
   capability: `highlight submatches with different colors`,
   missing: `only highlight the complete matches with one color`,
-  support: `✅ Chrome, ✅ Firefox, ✅ Edge, ❌ Safari`,
+  support: `✅ Chrome >90, ✅ Firefox >90, ✅ Edge > 88, ❌ Safari`,
 
   data: {
     text: "abc123-----def456",
@@ -52,6 +74,14 @@ const indices = {
   },
 
   getHlText(text, highlights) {
+    /* auxiliary function to apply highlights to a text
+     *
+     * The highlights are given as a map from character positions to
+     * highlight groups.
+     *
+     * First the text is converted to a series of spans with the same
+     * highlight, then the spans are serialized into html.
+     */
     const spans = []
     let curG = -2
 
@@ -79,30 +109,55 @@ const indices = {
 
 }
 
-export class FeatureTester {
+export class FeatureProvider {
 /* BROWSER SUPPORT FOR CERTAIN FEATURES
  *
+ * Tests for the features specified above.
  */
 
   constructor(reporting) {
-    /* create all Provider objects
+    /* incorporates the features specified above.
+     *
+     * The reporting parameter indicates whether a report
+     * of the test should be generated.
+     *
+     * If you call this class from a test page, you can set it to true.
+     * But if you use it for a quick feature test inside an app,
+     * call it with false, or leave it out.
      */
     this.reporting = reporting
     this.features = { indices }
     this.keyDetails = ["capability", "missing", "support", "miss"]
   }
 
+  deps({ Log }) {
+    this.tell = Log.tell
+  }
+
   init() {
-    const browserDest = $(`#browser`)
-    browserDest.html(`
-    <dl>
-      <dt>Browser</dt><dd>${navigator.userAgent}</dd>
-      <dt>Platform</dt><dd>${navigator.platform}</dd>
-    </dl>
-    `)
+    /* display characteristics of the current browser
+     */
+    const { reporting } = this
+    if (reporting) {
+      const browserDest = $(`#browser`)
+      browserDest.html(`
+      <dl>
+        <dt>Browser</dt><dd>${navigator.userAgent}</dd>
+        <dt>Platform</dt><dd>${navigator.platform}</dd>
+      </dl>
+      `)
+    }
   }
 
   test() {
+    /* test all known features in this browser
+     * For each feature the use() function is tried.
+     * The fallback() function is also carried out (if reporting).
+     * The can and error attributes of the feature object will be set.
+     *
+     * An app can read off the support of this browser for these features
+     * from the can attributes.
+     */
     const { features, reporting } = this
 
     let useResult = []
@@ -117,18 +172,24 @@ export class FeatureTester {
         feature.error = error
         feature.can = false
       }
-      fallbackResult = feature.fallback()
       if (reporting) {
+        fallbackResult = feature.fallback()
         this.report(name, useResult, fallbackResult)
       }
     }
     if (reporting) {
       $(`#tests`).append("<hr>")
     }
-    return features
+    this.tell(features)
   }
 
   report(name, useResult, fallbackResult) {
+    /* create a report for a feature identified by name
+     * The feature must have been tested, and the
+     * outputs of its use() and fallback() functions are
+     * passed as arguments.
+     */
+
     const { features: { [name]: details }, keyDetails } = this
     const { can, error } = details
     const testDest = $(`#tests`)

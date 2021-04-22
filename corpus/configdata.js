@@ -85,13 +85,18 @@ const configData = {
      "https://annotation.github.io/app-nena/nena.zip"
     ],
     "zip file for offline use"
+   ],
+   "writing": [
+    "alphabet",
+    "https://annotation.github.io/text-fabric/tf/writing/neoaramaic.html",
+    "characters and transliteration"
    ]
   },
   "captions": {
    "title": "NENA phono search"
   },
   "description": "\n<p>Phonetic search interface for the <a id=\"corpus2link\" href=\"#\"></a>.</p>\n<p>This is a standalone app. You download it to your computer, and then it works without\nconnection to the internet.</p>\n<p>This web app is by:</p>\n<ul>\n    <li><a id=\"author3link\" href=\"#\"></a> (initiator)\n    <li><a id=\"author2link\" href=\"#\"></a> (corpus developer)\n    <li><a id=\"authorlink\" href=\"#\"></a> (software developer)\n</ul>\n    ",
-  "appVersion": "000d@2021-04-20T10:33:21"
+  "appVersion": "000e@2021-04-22T10:22:14"
  },
  "containerType": "sentence",
  "simpleBase": false,

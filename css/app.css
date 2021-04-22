@@ -352,6 +352,30 @@ td.stat {
   font-weight: bold;
 }
 
+/* settings */
+
+button.setting {
+  width: 100%;
+  border-radius: 0.4rem;
+  padding: 0.2rem;
+  font-size: small;
+  color: var(--setting-fore);
+  background-color: var(--setting-back);
+  border-width: 0;
+}
+button.setting.no {
+  color: var(--txtbtn-off-fore);
+  background-color: var(--txtbtn-off-back);
+}
+div.setting {
+  background-color: var(--txtbtn-off-back);
+  border: 0.2rem solid var(--txtbtn-off-back);
+}
+div.setting details {
+  font-size: small;
+  margin-top: 0;
+}
+
 #provenance {
   margin-top: 4rem;
   padding: 1rem 3rem;
@@ -469,13 +493,66 @@ button.small.active, button.medium.active, a.medium.active, a.small.active {
 
 /* highlighted background (for the lowest level) */
 .hl {
+  background-color: var(--hl-back);
+}
+.hl0 {
   background-color: var(--hl0-back);
+}
+.hl1 {
+  color: var(--white);
+  background-color: var(--hl1-back);
+}
+.hl2 {
+  background-color: var(--hl2-back);
+}
+.hl3 {
+  background-color: var(--hl3-back);
+}
+.hl4 {
+  color: var(--white);
+  background-color: var(--hl4-back);
+}
+.hl5 {
+  background-color: var(--hl5-back);
+}
+.hl6 {
+  background-color: var(--hl6-back);
+}
+.hl7 {
+  color: var(--white);
+  background-color: var(--hl7-back);
+}
+.hl8 {
+  color: var(--white);
+  background-color: var(--hl8-back);
+}
+.hl9 {
+  color: var(--white);
+  background-color: var(--hl9-back);
+}
+.hl10 {
+  background-color: var(--hl10-back);
+}
+.hl11 {
+  background-color: var(--hl11-back);
+}
+.hl12 {
+  background-color: var(--hl12-back);
+}
+.hl13 {
+  background-color: var(--hl13-back);
+}
+.hl14 {
+  background-color: var(--hl14-back);
+}
+.hl15 {
+  background-color: var(--hl15-back);
 }
 /* highlighted border (for higher levels) */
 .hlh {
   border: 0.2rem solid var(--hl-border);
   color: var(--hl-fore);
-  background-color: var(--hl-back);
+  background-color: var(--hlx-back);
 }
 /* normal border when not highlighted (for higher levels) */
 .o {
@@ -524,6 +601,8 @@ button.small.active, button.medium.active, a.medium.active, a.small.active {
 	--inactive-back:    hsla(  0,   0%,  60%, 1    );
 	--button-fore:      hsla(  0,   0%, 100%, 1    );
 	--button-back:      hsla(  0,   0%,  20%, 1    );
+	--setting-fore:     hsla(  0,   0%,   0%, 1    );
+	--setting-back:     hsla(  0,   0%,  80%, 1    );
 	--ctlinp-fore:      hsla(  0,   0%,  10%, 1    );
 	--ctlinp-back:      hsla(  0,   0%,  90%, 1    );
 	--cntinp-fore:      hsla(240, 100%,  20%, 1    );
@@ -538,10 +617,9 @@ button.small.active, button.medium.active, a.medium.active, a.small.active {
 	--query-border:     hsla(  0,   0%,  90%, 1    );
 	--level-back:       hsla(  0,   0%,  90%, 1    );
 	--layer-back:       hsla(  0,   0%,  95%, 1    );
-  --hl0-back:         hsla( 58, 100%,  47%, 1    ); 
   --hl-border:        hsla( 45, 100%,  50%, 1    ); 
   --hl-fore:          hsla( 45,   0%,   0%, 1    ); 
-  --hl-back:          hsla( 45, 100%,  97%, 1    ); 
+  --hlx-back:         hsla( 45, 100%,  97%, 1    ); 
   --unhl-border:      hsla(  0,   0%,  70%, 1    ); 
   --unhl-fore:        hsla(  0,   0%,  30%, 1    ); 
   --unhl-back:        hsla(  0,   0%,  95%, 1    ); 
@@ -555,4 +633,28 @@ button.small.active, button.medium.active, a.medium.active, a.small.active {
   --node-fore:        hsla(240,  70%,  20%, 1    ); 
   --node-back:        hsla(240,  50%,  95%, 1    ); 
 	--provenance-fore:  hsla(  0,   0%,  50%, 1    );
+
+  --hl-back:          hsla( 60, 100%,  60%, 1    ); 
+
+  --hl0-back:         hsla( 60, 100%,  85%, 1    ); 
+
+  --hl1-back:         hsla(240, 100%,  50%, 1    ); 
+  --hl2-back:         hsla(  0, 100%,  50%, 1    ); 
+  --hl3-back:         hsla(120, 100%,  50%, 1    ); 
+
+  --hl4-back:         hsla(300, 100%,  50%, 1    ); 
+  --hl5-back:         hsla( 45, 100%,  50%, 1    ); 
+  --hl6-back:         hsla(180, 100%,  50%, 1    ); 
+
+  --hl7-back:         hsla(270,  50%,  50%, 1    ); 
+  --hl8-back:         hsla( 30,  50%,  50%, 1    ); 
+  --hl9-back:         hsla(150,  50%,  50%, 1    ); 
+
+  --hl10-back:        hsla(210,  80%,  70%, 1    ); 
+  --hl11-back:        hsla(330,  80%,  70%, 1    ); 
+  --hl12-back:        hsla( 50,  80%,  70%, 1    ); 
+
+  --hl13-back:        hsla(240, 100%,  85%, 1    ); 
+  --hl14-back:        hsla(  0, 100%,  85%, 1    ); 
+  --hl15-back:        hsla(120, 100%,  85%, 1    ); 
 }

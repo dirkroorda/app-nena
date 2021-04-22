@@ -15,6 +15,11 @@ const RESULTCOL = "nr"
 const BUTTON = {
   nodeseq: { on: "nodes start at 1", off: "nodes as in text-fabric" },
   autoexec: { on: "auto search", off: "use button to search" },
+  multihl: {
+    no: "cannot highlight colors per (group)",
+    on: "highlight colors per (group)",
+    off: "single highlight color",
+  },
   exec: { no: " ", on: "⚫️", off: "🔴" },
   visible: { on: "🔵", off: "⚪️" },
   expand: {
@@ -38,6 +43,10 @@ node numbers are exactly as in Text Fabric`,
   autoexec: `search automatically after each change
 OR
 only search after you hit the search button`,
+  multihl: `highlight sub matches for the parts between () with different colors
+OR
+use a single highlight color for the complete match
+N.B.: this might not be supported in your browser`,
   expand: "whether to show inactive layers",
   unit: "make this the row unit",
   exec: "whether this pattern is used in the search",
@@ -138,6 +147,154 @@ class JobProvider {
     Disk.download(text, jobName, "json", false)
   }
 }
+
+
+
+const indices = {
+  capability: `highlight submatches with different colors`,
+  missing: `only highlight the complete matches with one color`,
+  support: `✅ Chrome >90, ✅ Firefox >90, ✅ Edge > 88, ❌ Safari`,
+  data: {
+    text: "abc123-----def456",
+    pattern: "[a-z]([a-z])[a-z][0-9]([0-9])[0-9]",
+    flag: "d",
+  },
+  use() {
+    const { data: { text, pattern, flag } } = this
+    const re = new RegExp(pattern, `g${flag}`)
+    const highlights = new Map()
+    let result
+    while ((result = re.exec(text)) !== null) {
+      const { indices } = result
+      for (let g = 0; g < result.length; g++) {
+        const b = indices[g][0]
+        const e = indices[g][1]
+        for (let h = b; h < e; h++) {
+          highlights.set(h, g)
+        }
+      }
+    }
+    return `<p>${this.getHlText(text, highlights)}</p>`
+  },
+  fallback() {
+    const { data: { text, pattern } } = this
+    const re = new RegExp(pattern, `g`)
+    const highlights = new Map()
+    const results = text.matchAll(re)
+    const g = 0
+    for (const match of results) {
+      const hit = match[0]
+      const b = match.index
+      const e = b + hit.length
+      for (let h = b; h < e; h++) {
+        highlights.set(h, g)
+      }
+    }
+    return `<p>${this.getHlText(text, highlights)}</p>`
+  },
+  getHlText(text, highlights) {
+    const spans = []
+    let curG = -2
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i]
+      const g = highlights.get(i) ?? -1
+      if (curG != g) {
+        const newSpan = [g, ch]
+        spans.push(newSpan)
+        curG = g
+      } else {
+        spans[spans.length - 1][1] += ch
+      }
+    }
+    const html = []
+    for (const [g, m] of spans) {
+      const gRep = (g >= 0) ? ` class="hl${g}"` : ""
+      html.push(`<span${gRep}>${m}</span>`)
+    }
+    return html.join("")
+  },
+  can: null,
+  error: null,
+}
+class FeatureProvider {
+  constructor(reporting) {
+    this.reporting = reporting
+    this.features = { indices }
+    this.keyDetails = ["capability", "missing", "support", "miss"]
+  }
+  deps({ Log }) {
+    this.tell = Log.tell
+  }
+  init() {
+    const { reporting } = this
+    if (reporting) {
+      const browserDest = $(`#browser`)
+      browserDest.html(`
+      <dl>
+        <dt>Browser</dt><dd>${navigator.userAgent}</dd>
+        <dt>Platform</dt><dd>${navigator.platform}</dd>
+      </dl>
+      `)
+    }
+  }
+  test() {
+    const { features, reporting } = this
+    let useResult = []
+    let fallbackResult = []
+    for (const [name, feature] of Object.entries(features)) {
+      try {
+        useResult = feature.use()
+        feature.can = true
+      }
+      catch (error) {
+        feature.error = error
+        feature.can = false
+      }
+      if (reporting) {
+        fallbackResult = feature.fallback()
+        this.report(name, useResult, fallbackResult)
+      }
+    }
+    if (reporting) {
+      $(`#tests`).append("<hr>")
+    }
+    this.tell(features)
+  }
+  report(name, useResult, fallbackResult) {
+    const { features: { [name]: details }, keyDetails } = this
+    const { can, error } = details
+    const testDest = $(`#tests`)
+    const html = []
+    const canRep = can ? "✅" : "❌"
+    html.push(`<hr><h2>${canRep} ${name}</h2><dl>`)
+    for (const dt of keyDetails) {
+      const { [dt]: dd } = details
+      html.push(`<dt>${dt}</dt><dd>${dd}</dd>`)
+    }
+    html.push("</dl>")
+    if (can) {
+      html.push(`<h4>Desired output:</h4>`)
+      html.push(useResult)
+    }
+    else {
+      html.push(`<h4>Error message:</h4>`)
+      html.push(`<div class="error">${error}</div>`)
+    }
+    html.push(`<h4>Fallback output${can ? " (not needed)" : ""}:</h4>`)
+    html.push(fallbackResult)
+    testDest.append(html.join(""))
+  }
+}
+
+
+
+const Tester = new FeatureProvider(true)
+$(document).on("DOMContentLoaded", () => {
+  const Log = new LogProvider()
+  Tester.init()
+  Tester.deps({ Log })
+  Tester.test()
+})
 
 
 class DiskProvider {
@@ -360,9 +517,12 @@ class CorpusProvider {
 
 
 
+const isObject = value =>
+  value != null && typeof value === OBJECT && !Array.isArray(value)
 class StateProvider {
-  deps({ Log, Mem, Config }) {
+  deps({ Log, Features, Mem, Config }) {
     this.Log = Log
+    this.Features = Features
     this.Mem = Mem
     this.Config = Config
     this.tell = Log.tell
@@ -377,11 +537,15 @@ class StateProvider {
     }
   }
   initjslice() {
-    const { Config: { ntypes, containerType, layers, visible } } = this
+    const {
+      Config: { ntypes, containerType, layers, visible },
+      Features: { features: { indices: { can } } },
+    } = this
     const jobState = {
       settings: {
         autoexec: true,
         nodeseq: true,
+        multihl: can ? true : null,
       },
       query: {},
       dirty: false,
@@ -441,7 +605,7 @@ class StateProvider {
     }
     if (commit) {
       const { jobName, jobState } = data
-      Mem.setk(jobName, jobState)
+      Mem.setkl(jobName, jobState)
     }
     return this.gets()
   }
@@ -451,7 +615,7 @@ class StateProvider {
     data.jobName = jobName
     this.startjslice(jobStateIn)
     const { jobState } = data
-    Mem.setk(jobName, jobState)
+    Mem.setkl(jobName, jobState)
   }
   getj() {
     const { data: { jobState } } = this
@@ -460,61 +624,61 @@ class StateProvider {
   setj(incoming) {
     const { Mem, data: { jobName, jobState } } = this
     this.merge(jobState, incoming, [])
-    Mem.setk(jobName, jobState)
+    Mem.setkl(jobName, jobState)
   }
   merge(orig, incoming, path) {
     const { Log } = this
     const pRep = `Merge: incoming at path "${path.join(".")}": `
-    if (incoming == null) {
+    if (incoming === undefined) {
       Log.error(`${pRep}undefined`)
       return
     }
-    if (!(typeof incoming === OBJECT && !Array.isArray(incoming))) {
+    if (!isObject(incoming)) {
       Log.error(`${pRep}non-object`)
       return
     }
-    for (const [inKey, inValue] of Object.entries(incoming)) {
-      const origValue = orig[inKey]
-      if (origValue === undefined) {
+    for (const [inKey, inVal] of Object.entries(incoming)) {
+      const origVal = orig[inKey]
+      if (origVal === undefined) {
         Log.error(`${pRep}unknown key ${inKey}`)
         continue
       }
-      if (inValue == null) {
+      if (inVal === undefined) {
         Log.error(`${pRep}undefined value for ${inKey}`)
         continue
       }
-      const origType = typeof origValue
-      const inType = typeof inValue
-      if (origType === NUMBER || origType === STRING || origType === BOOL) {
-        if (inType === OBJECT) {
-          const repVal = JSON.stringify(inValue)
+      const oTp = typeof origVal
+      const inTp = typeof inVal
+      if (origVal === null || oTp === NUMBER || oTp === STRING || oTp === BOOL) {
+        if (isObject(inVal)) {
+          const repVal = JSON.stringify(inVal)
           Log.error(`${pRep}object ${repVal} for ${inKey} instead of leaf value`)
           continue
         }
-        if (inType != origType) {
-          Log.error(`${pRep}type conflict ${inType}, expected ${origType} for ${inKey}`)
+        if (inVal !== null && origVal !== null && inTp != oTp) {
+          Log.error(`${pRep}type conflict ${inTp}, expected ${oTp} for ${inKey}`)
           continue
         }
-        if (inType === STRING && inValue.length > MAXINPUT) {
-          const eRep = `${inValue.length} (${inValue.substr(0, 20)} ...)`
+        if (inTp === STRING && inVal.length > MAXINPUT) {
+          const eRep = `${inVal.length} (${inVal.substr(0, 20)} ...)`
           Log.error(`${pRep}maximum length exceeded for ${inKey}: ${eRep}`)
           continue
         }
-        orig[inKey] = inValue
+        orig[inKey] = inVal
         continue
       }
-      if (origType !== OBJECT) {
+      if (!isObject(inVal)) {
         Log.error(
-          `${pRep}unknown type ${inType} for ${inKey}=${inValue} instead of object`
+          `${pRep}unknown type ${inTp} for ${inKey}=${inVal} instead of object`
         )
         continue
       }
-      if (origType === OBJECT) {
-        if (inType !== OBJECT) {
-          Log.error(`${pRep}leaf value {inValue} for {inKey} instead of object`)
+      if (isObject(origVal)) {
+        if (!isObject(inVal)) {
+          Log.error(`${pRep}leaf value ${inVal} for ${inKey} instead of object`)
           continue
         }
-        this.merge(origValue, inValue, [...path, inKey])
+        this.merge(origVal, inVal, [...path, inKey])
       }
     }
   }
@@ -523,7 +687,8 @@ class StateProvider {
 
 
 class GuiProvider {
-  deps({ Log, State, Job, Config, Search }) {
+  deps({ Log, Features, State, Job, Config, Search }) {
+    this.Features = Features
     this.State = State
     this.Job = Job
     this.Config = Config
@@ -572,15 +737,33 @@ class GuiProvider {
     }
   }
   placeSettings() {
-    const { State } = this
+    const { State, Features: { features: { indices: { can, support } } } } = this
     const { settings } = State.getj()
     const html = []
-    for (const name of Object.keys(settings)) {
-      html.push(`
-        <p><button
-          type="button" name="${name}" class="expand on"
-        ></button></p>
-      `)
+    for (const [name, value] of Object.entries(settings)) {
+      let useValue = value
+      if (name == "multihl") {
+        if (value == null && can) {
+          useValue = false
+          State.setj({ settings: { [name]: useValue } })
+        }
+      }
+      const bState = (useValue === null) ? "no" : value ? "on" : "off"
+      const buttonHtml = `
+        <button type="button" name="${name}" class="setting ${bState}"></button>
+      `
+      if (name == "multihl") {
+        const canRep = can ? "✅ in this browser" : "❌ in this browser"
+        html.push(
+          `<div class="setting">
+            ${buttonHtml}
+            <details><summary>${canRep}</summary><p>${support}</p></details>
+          </details>
+          `)
+      }
+      else {
+        html.push(`<p>${buttonHtml}</p>`)
+      }
     }
     const settingsplace = $("#settings")
     settingsplace.html(html.join(""))
@@ -814,6 +997,9 @@ class GuiProvider {
         this.applySettings(name)
         if (name == "nodeseq") {
           Search.runQuery({ display: [] })
+        }
+        if (name == "multihl") {
+          Search.runQuery({ allSteps: true })
         }
       }
       this.clearBrowserState()
@@ -1326,8 +1512,9 @@ class SearchProvider {
     this.getAcro = /[^0-9]/g
     this.tabNl = /[\n\t]/g
   }
-  deps({ Log, Disk, State, Gui, Config, Corpus }) {
+  deps({ Log, Features, Disk, State, Gui, Config, Corpus }) {
     this.Log = Log
+    this.Features = Features
     this.Disk = Disk
     this.State = State
     this.Gui = Gui
@@ -1408,33 +1595,60 @@ class SearchProvider {
     $(".dirty").removeClass("dirty")
     Log.progress(`done query`)
   }
-  doSearch(nType, layer, lrInfo, regex) {
+  doSearch(nType, layer, lrInfo, regex, multiHl) {
     const { Corpus: { texts: { [nType]: { [layer]: text } }, positions } } = this
     const { pos: posKey } = lrInfo
     const { [nType]: { [posKey]: pos } } = positions
-    const searchResults = text.matchAll(regex)
     const posFromNode = new Map()
     const nodeSet = new Set()
-    for (const match of searchResults) {
-      const hit = match[0]
-      const start = match.index
-      const end = start + hit.length
-      for (let i = start; i < end; i++) {
-        const node = pos[i]
-        if (node != null) {
-          if (!posFromNode.has(node)) {
-            posFromNode.set(node, new Set())
+    if (multiHl) {
+      let result
+      while ((result = regex.exec(text)) !== null) {
+        const { indices } = result
+        for (let g = 0; g < result.length; g++) {
+          const b = indices[g][0]
+          const e = indices[g][1]
+          for (let h = b; h < e; h++) {
+            const node = pos[h]
+            if (node != null) {
+              if (!posFromNode.has(node)) {
+                posFromNode.set(node, new Map())
+              }
+              posFromNode.get(node).set(h, g)
+              nodeSet.add(node)
+            }
           }
-          posFromNode.get(node).add(i)
-          nodeSet.add(node)
+        }
+      }
+    }
+    else {
+      const results = text.matchAll(regex)
+      for (const result of results) {
+        const hit = result[0]
+        const start = result.index
+        const end = start + hit.length
+        for (let i = start; i < end; i++) {
+          const node = pos[i]
+          if (node != null) {
+            if (!posFromNode.has(node)) {
+              posFromNode.set(node, new Map())
+            }
+            posFromNode.get(node).set(i, 0)
+            nodeSet.add(node)
+          }
         }
       }
     }
     return { posFromNode, nodeSet }
   }
   gather() {
-    const { Log, Config: { ntypesR, layers }, State } = this
-    const { query } = State.getj()
+    const {
+      Log,
+      Features: { features: { indices: { can } } },
+      Config: { ntypesR, layers },
+      State,
+    } = this
+    const { query, settings: { multihl } } = State.getj()
     State.sets({ resultsComposed: [], resultTypeMap: new Map() })
     const { tpResults } = State.sets({ tpResults: {} })
     for (const nType of ntypesR) {
@@ -1458,16 +1672,18 @@ class SearchProvider {
           )
           continue
         }
+        const mhl = can && multihl
         const flagString = Object.entries(flags)
           .filter(x => x[1]).map(x => x[0]).join("")
         let regex
         try {
-          regex = new RegExp(pattern, `g${flagString}`)
+          const dFlag = mhl ? "d" : ""
+          regex = new RegExp(pattern, `g${dFlag}${flagString}`)
         } catch (error) {
           Log.placeError(ebox, `"${pattern}": ${error}`, box)
           continue
         }
-        const { posFromNode, nodeSet } = this.doSearch(nType, layer, lrInfo, regex)
+        const { posFromNode, nodeSet } = this.doSearch(nType, layer, lrInfo, regex, mhl)
         matchesByLayer[layer] = posFromNode
         if (intersection == null) {
           intersection = nodeSet
@@ -1479,8 +1695,7 @@ class SearchProvider {
           }
         }
       }
-      const matches = matchesByLayer || null
-      tpResults[nType] = { matches, nodes: intersection }
+      tpResults[nType] = { matches: matchesByLayer, nodes: intersection }
     }
   }
   weed() {
@@ -1643,19 +1858,19 @@ class SearchProvider {
     }
     return dest
   }
-  getHLText(iPositions, matches, text, valueMap, tip) {
+  getHlText(iPositions, matches, text, valueMap, tip) {
     const { getAcro } = this
     const hasMap = valueMap != null
     const spans = []
     let str = ""
-    let curHl = null
+    let curHl = -2
     for (const i of iPositions) {
       const ch = text[i]
       if (hasMap) {
         str += ch
       }
-      const hl = matches.has(i)
-      if (curHl == null || curHl != hl) {
+      const hl = matches.get(i) ?? -1
+      if (curHl != hl) {
         const newSpan = [hl, ch]
         spans.push(newSpan)
         curHl = hl
@@ -1701,17 +1916,19 @@ class SearchProvider {
   }
   displayResults() {
     const {
+      Features: { features: { indices: { can } } },
       Config: { simpleBase, layers, ntypesI, ntypesinit },
       Corpus: { texts, iPositions },
       State,
       Gui,
     } = this
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const { settings: { nodeseq }, focusPos, prevFocusPos } = State.getj()
+    const { settings: { nodeseq, multihl }, focusPos, prevFocusPos } = State.getj()
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
       return
     }
+    const mhl = can && multihl
     const {
       upperTypes, contentTypes,
       cols, layersPerType, layersContent,
@@ -1729,10 +1946,10 @@ class SearchProvider {
       const { [nType]: { [layer]: text } } = texts
       const { [nType]: { [posKey]: iPos } } = iPositions
       const nodeIPositions = iPos.get(node)
-      const { [nType]: { matches: { [layer]: matches } = {} } } = tpResults
+      const { [nType]: { matches: { [layer]: matches } = {} } = {} } = tpResults
       const nodeMatches =
-        matches == null || !matches.has(node) ? new Set() : matches.get(node)
-      const { spans, tipStr } = this.getHLText(
+        matches == null || !matches.has(node) ? new Map() : matches.get(node)
+      const { spans, tipStr } = this.getHlText(
         nodeIPositions, nodeMatches, text, valueMap, tip,
       )
       const hasTip = tipStr != null
@@ -1743,8 +1960,10 @@ class SearchProvider {
         html.push(`<span${tipRep}>`)
       }
       for (const [hl, val] of spans) {
-        const hlRep = hl ? ` class="hl"` : ""
-        html.push(`<span${hlRep}>${val}</span>`)
+        const theHl = (hl == 0 && !mhl) ? "hl" : `hl${hl}`
+        const hlRep = (hl >= 0) ? ` class="${theHl}"` : ""
+        const hlTitle = (hl >= 0) ? ` title="group ${hl}"` : ""
+        html.push(`<span${hlRep}${hlTitle}>${val}</span>`)
       }
       if (multiple) {
         html.push(`</span>`)
@@ -1864,16 +2083,23 @@ class SearchProvider {
       const { [nType]: { [layer]: text } } = texts
       const { [nType]: { [posKey]: iPos } } = iPositions
       const nodeIPositions = iPos.get(node)
-      const { [nType]: { matches: { [layer]: matches } = {} } } = tpResults
+      const { [nType]: { matches: { [layer]: matches } = {} } = {} } = tpResults
       const nodeMatches =
-        matches == null || !matches.has(node) ? new Set() : matches.get(node)
-      const { spans, tipStr } = this.getHLText(
+        matches == null || !matches.has(node) ? new Map() : matches.get(node)
+      const { spans, tipStr } = this.getHlText(
         nodeIPositions, nodeMatches, text, valueMap, tip,
       )
       const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
       let piece = ""
       for (const [hl, val] of spans) {
-        piece += `${hl ? "«" : ""}${val}${hl ? "»" : ""}${tipRep}`
+        if (hl >= 0) {
+          const hlRep = (hl == 0) ? "" : `${hl}=`
+          piece += `«${hlRep}${val}»`
+        }
+        else {
+          piece += val
+        }
+        piece += tipRep
       }
       piece = piece.replaceAll(tabNl, " ")
       return piece
@@ -2009,6 +2235,7 @@ class AppProvider {
   constructor() {
     this.providers = {
       Log: new LogProvider(),
+      Features: new FeatureProvider(),
       Disk: new DiskProvider(),
       Mem: new MemProvider(),
       State: new StateProvider(),
@@ -2019,10 +2246,11 @@ class AppProvider {
       Search: new SearchProvider(),
     }
     this.order = {
-      init: ["Log", "Config", "Mem", "State", "Job", "Gui"],
+      init: ["Log", "Features", "Config", "Mem", "State", "Job", "Gui"],
       later: ["Corpus", "Job", "Log"],
     }
     this.deps()
+    this.test()
   }
   deps() {
     const { providers, providers: { Log } } = this
@@ -2030,6 +2258,12 @@ class AppProvider {
       Provider.deps(providers)
     }
     this.tell = Log.tell
+  }
+  test() {
+    const { providers: { Features } } = this
+    const { features } = Features
+    Features.init()
+    Features.test()
   }
   init() {
     const { providers, order: { init } } = this

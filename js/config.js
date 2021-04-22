@@ -10,7 +10,6 @@ export class ConfigProvider {
     this.tell = Log.tell
   }
 
-
   init() {
     /* try to encapsulate all access to the data inside this class
      */

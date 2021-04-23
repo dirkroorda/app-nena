@@ -1,11 +1,12 @@
 import os
 
-APP_VERSION = "000e@2021-04-22T10:22:14"
+APP_VERSION = "vx10@2021-04-23T10:26:29"
 
 NAME = "nena"
 GH = os.path.expanduser("~/github")
 GH_URL = "https://github.com"
 GH_PAGES = "github.io"
+NB_TUT_URL = "https://nbviewer.jupyter.org/github/annotation/tutorials/tree/master"
 ORG = "annotation"
 REPO = "app-nena"
 REL = "site"
@@ -23,6 +24,7 @@ PACKAGE_URL = f"https://{ORG}.{GH_PAGES}/{REPO}/{NAME}.zip",
 APP_DOC_URL = f"https://{ORG}.{GH_PAGES}/text-fabric/tf/about/layeredsearch.html"
 SOURCE_URL = f"{GH_URL}/{ORG}/{REPO}"
 ISSUE_URL = f"{SOURCE_URL}/issues"
+TUT_URL = f"{NB_TUT_URL}/{NAME}/start.ipynb"
 
 TF_ORG = "CambridgeSemiticsLab"
 TF_REPO = "nena_tf"
@@ -120,5 +122,10 @@ URLS = dict(
         "alphabet",
         WRITING_URL,
         "characters and transliteration",
-    )
+    ),
+    related=(
+        "text-fabric nena",
+        TUT_URL,
+        "using Text-Fabric on the same corpus",
+    ),
 )

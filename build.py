@@ -208,9 +208,9 @@ def serve(page):
 
 def incVersion(version):
     parts = version.split('@', 1)
-    v = int(parts[0].lstrip("0"), base=16)
+    v = int(parts[0].lstrip("v").lstrip("x").lstrip("0"), base=16)
     now = dt.utcnow().isoformat(timespec="seconds")
-    return f"{v + 1:>04x}@{now}"
+    return f"vx{v + 1:>02x}@{now}"
 
 
 def replaceVersion(mask):

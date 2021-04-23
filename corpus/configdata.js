@@ -90,13 +90,18 @@ const configData = {
     "alphabet",
     "https://annotation.github.io/text-fabric/tf/writing/neoaramaic.html",
     "characters and transliteration"
+   ],
+   "related": [
+    "text-fabric nena",
+    "https://nbviewer.jupyter.org/github/annotation/tutorials/tree/master/nena/start.ipynb",
+    "using Text-Fabric on the same corpus"
    ]
   },
   "captions": {
    "title": "NENA phono search"
   },
   "description": "\n<p>Phonetic search interface for the <a id=\"corpus2link\" href=\"#\"></a>.</p>\n<p>This is a standalone app. You download it to your computer, and then it works without\nconnection to the internet.</p>\n<p>This web app is by:</p>\n<ul>\n    <li><a id=\"author3link\" href=\"#\"></a> (initiator)\n    <li><a id=\"author2link\" href=\"#\"></a> (corpus developer)\n    <li><a id=\"authorlink\" href=\"#\"></a> (software developer)\n</ul>\n    ",
-  "appVersion": "000e@2021-04-22T10:22:14"
+  "appVersion": "vx10@2021-04-23T10:26:29"
  },
  "containerType": "sentence",
  "simpleBase": false,

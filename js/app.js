@@ -203,7 +203,6 @@ class AppProvider {
   }
   test() {
     const { providers: { Features } } = this
-    const { features } = Features
     Features.init()
     Features.test()
   }

@@ -153,7 +153,7 @@ class JobProvider {
 const indices = {
   capability: `highlight submatches with different colors`,
   missing: `only highlight the complete matches with one color`,
-  support: `✅ Chrome >90, ✅ Firefox >90, ✅ Edge > 88, ❌ Safari`,
+  support: `✅ Chrome >=90, ✅ Firefox >=90, ✅ Edge >=88, ❎ Safari >=14.2 (implemented, not yet released)`,
   data: {
     text: "abc123-----def456",
     pattern: "[a-z]([a-z])[a-z][0-9]([0-9])[0-9]",
@@ -576,7 +576,17 @@ class StateProvider {
     return jobState
   }
   startjslice(incoming) {
-    const { data } = this
+    const {
+      data,
+      Features: { features: { indices: { can } } },
+    } = this
+    const { settings, settings: { multihl } = {} } = incoming
+    if (multihl === null && can) {
+      settings.multihl = true
+    }
+    else if (multihl !== null && !can) {
+      settings.multihl = null
+    }
     const freshJobState = this.initjslice()
     this.merge(freshJobState, incoming, [])
     data.jobState = freshJobState

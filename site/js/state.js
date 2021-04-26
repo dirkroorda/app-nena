@@ -262,7 +262,18 @@ export class StateProvider {
     /* create a starting jobState out of an incoming jobState,
      * which is safely merged into an initial jobState
      */
-    const { data } = this
+    const {
+      data,
+      Features: { features: { indices: { can } } },
+    } = this
+
+    const { settings, settings: { multihl } = {} } = incoming
+    if (multihl === null && can) {
+      settings.multihl = true
+    }
+    else if (multihl !== null && !can) {
+      settings.multihl = null
+    }
 
     const freshJobState = this.initjslice()
     this.merge(freshJobState, incoming, [])

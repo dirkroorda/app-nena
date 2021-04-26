@@ -210,7 +210,7 @@ def incVersion(version):
     parts = version.split('@', 1)
     v = int(parts[0].lstrip("v").lstrip("x").lstrip("0"), base=16)
     now = dt.utcnow().isoformat(timespec="seconds")
-    return f"vx{v + 1:>02x}@{now}"
+    return f"v{v + 1:>02}@{now}"
 
 
 def replaceVersion(mask):

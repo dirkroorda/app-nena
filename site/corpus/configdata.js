@@ -101,7 +101,7 @@ const configData = {
    "title": "NENA phono search"
   },
   "description": "\n<p>Phonetic search interface for the <a id=\"corpus2link\" href=\"#\"></a>.</p>\n<p>This is a standalone app. You download it to your computer, and then it works without\nconnection to the internet.</p>\n<p>This web app is by:</p>\n<ul>\n    <li><a id=\"author3link\" href=\"#\"></a> (initiator)\n    <li><a id=\"author2link\" href=\"#\"></a> (corpus developer)\n    <li><a id=\"authorlink\" href=\"#\"></a> (software developer)\n</ul>\n    ",
-  "appVersion": "vx10@2021-04-23T10:26:29"
+  "appVersion": "v24@2021-04-26T12:37:30"
  },
  "containerType": "sentence",
  "simpleBase": false,

@@ -1,6 +1,6 @@
 import os
 
-APP_VERSION = "vx10@2021-04-23T10:26:29"
+APP_VERSION = "v24@2021-04-26T12:37:30"
 
 NAME = "nena"
 GH = os.path.expanduser("~/github")

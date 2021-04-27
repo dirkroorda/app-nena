@@ -267,7 +267,7 @@ export class StateProvider {
       Features: { features: { indices: { can } } },
     } = this
 
-    const { settings, settings: { multihl } = {} } = incoming
+    const { settings = {}, settings: { multihl } = {} } = incoming
     if (multihl === null && can) {
       settings.multihl = true
     }

@@ -153,7 +153,13 @@ class JobProvider {
 const indices = {
   capability: `highlight submatches with different colors`,
   missing: `only highlight the complete matches with one color`,
-  support: `✅ Chrome >=90, ✅ Firefox >=90, ✅ Edge >=88, ❎ Safari >=14.2 (implemented, not yet released)`,
+  support: `
+✅ Chrome >=90<br>
+✅ Firefox >=90<br>
+✅ Wondows: Edge >=88<br>
+❎ MacOS: Safari >14.2 upcoming <br>
+❎ i(Pad)OS: all browsers >14.5 upcoming<br>
+`,
   data: {
     text: "abc123-----def456",
     pattern: "[a-z]([a-z])[a-z][0-9]([0-9])[0-9]",
@@ -580,7 +586,7 @@ class StateProvider {
       data,
       Features: { features: { indices: { can } } },
     } = this
-    const { settings, settings: { multihl } = {} } = incoming
+    const { settings = {}, settings: { multihl } = {} } = incoming
     if (multihl === null && can) {
       settings.multihl = true
     }

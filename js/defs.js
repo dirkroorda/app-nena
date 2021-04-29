@@ -15,6 +15,10 @@ export const RESULTCOL = "nr"
 export const BUTTON = {
   nodeseq: { on: "nodes start at 1", off: "nodes as in text-fabric" },
   autoexec: { on: "auto search", off: "use button to search" },
+  exporthl: {
+    on: "mark matches in export with « »",
+    off: "don't mark matches in export with « »",
+  },
   multihl: {
     no: "cannot highlight colors per (group)",
     on: "highlight colors per (group)",
@@ -47,6 +51,9 @@ node numbers are exactly as in Text Fabric`,
   autoexec: `search automatically after each change
 OR
 only search after you hit the search button`,
+  exporthl: `when exporting we could mark the matches by means of « »
+OR
+we can refrain from doing so`,
   multihl: `highlight sub matches for the parts between () with different colors
 OR
 use a single highlight color for the complete match

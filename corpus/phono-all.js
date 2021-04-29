@@ -14,6 +14,10 @@ const RESULTCOL = "nr"
 const BUTTON = {
   nodeseq: { on: "nodes start at 1", off: "nodes as in text-fabric" },
   autoexec: { on: "auto search", off: "use button to search" },
+  exporthl: {
+    on: "mark matches in export with « »",
+    off: "don't mark matches in export with « »",
+  },
   multihl: {
     no: "cannot highlight colors per (group)",
     on: "highlight colors per (group)",
@@ -42,6 +46,9 @@ node numbers are exactly as in Text Fabric`,
   autoexec: `search automatically after each change
 OR
 only search after you hit the search button`,
+  exporthl: `when exporting we could mark the matches by means of « »
+OR
+we can refrain from doing so`,
   multihl: `highlight sub matches for the parts between () with different colors
 OR
 use a single highlight color for the complete match
@@ -550,6 +557,7 @@ class StateProvider {
       settings: {
         autoexec: true,
         nodeseq: true,
+        exporthl: false,
         multihl: can ? true : null,
       },
       query: {},
@@ -2076,7 +2084,7 @@ class SearchProvider {
       tabNl,
     } = this
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const { settings: { nodeseq } } = State.getj()
+    const { settings: { nodeseq, exporthl } } = State.getj()
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
       return
@@ -2104,7 +2112,7 @@ class SearchProvider {
       const tipRep = (tipStr == null) ? "" : `(=${tipStr})`
       let piece = ""
       for (const [hl, val] of spans) {
-        if (hl >= 0) {
+        if (exporthl && hl >= 0) {
           const hlRep = (hl == 0) ? "" : `${hl}=`
           piece += `«${hlRep}${val}»`
         }
@@ -2156,7 +2164,7 @@ class SearchProvider {
         typeNodes.push([false, (result[nType] ?? []).map(x => genNodeTsv(x))])
       }
       for (const nType of contentTypes) {
-        typeNodes.push([true, (result[nType] ?? []).map(x => genNodeTsv(x))])
+        typeNodes.push([false, (result[nType] ?? []).map(x => genNodeTsv(x))])
       }
       const tsv = []
       const maxLines = Math.max(

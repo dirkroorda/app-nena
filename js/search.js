@@ -826,7 +826,7 @@ export class SearchProvider {
     } = this
 
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const { settings: { nodeseq } } = State.getj()
+    const { settings: { nodeseq, exporthl } } = State.getj()
 
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
@@ -864,7 +864,7 @@ export class SearchProvider {
       let piece = ""
 
       for (const [hl, val] of spans) {
-        if (hl >= 0) {
+        if (exporthl && hl >= 0) {
           const hlRep = (hl == 0) ? "" : `${hl}=`
           piece += `«${hlRep}${val}»`
         }
@@ -926,7 +926,7 @@ export class SearchProvider {
         typeNodes.push([false, (result[nType] ?? []).map(x => genNodeTsv(x))])
       }
       for (const nType of contentTypes) {
-        typeNodes.push([true, (result[nType] ?? []).map(x => genNodeTsv(x))])
+        typeNodes.push([false, (result[nType] ?? []).map(x => genNodeTsv(x))])
       }
       const tsv = []
       const maxLines = Math.max(
@@ -958,7 +958,7 @@ export class SearchProvider {
       return tsv
     }
 
-    /* generates the html for all relevant results around a focus position in the
+    /* generates the tsv for all relevant results around a focus position in the
      * table of results
      */
     if (resultsComposed == null) {

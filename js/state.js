@@ -178,6 +178,10 @@ export class StateProvider {
          */
         nodeseq: true,
 
+        /* whether to mark matches in tsv exports
+         */
+        exporthl: false,
+
         /* whether to highlight groups with different colors
          * only if the browser supports it
          */

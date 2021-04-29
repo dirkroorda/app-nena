@@ -82,7 +82,7 @@ const indices = {
   getHlText(text, highlights) {
     /* auxiliary function to apply highlights to a text
      *
-     * The highlights are given as a map from character positions to
+     * The highlights are given as a mapping from character positions to
      * highlight groups.
      *
      * First the text is converted to a series of spans with the same

@@ -28,8 +28,8 @@ export class MemProvider {
   }
 
   init() {
-    const { Config: { name: appName } } = this
-    this.appPrefix = `ls/${appName}/`
+    const { Config: { dataset, client } } = this
+    this.appPrefix = `ls/${dataset}/${client}/`
     this.keyLast = `${this.appPrefix}LastJob`
     this.keyPrefix = `${this.appPrefix}Keys/`
     this.keyLength = this.keyPrefix.length

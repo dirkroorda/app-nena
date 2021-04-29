@@ -37,17 +37,14 @@ export class GuiProvider {
     const {
       Config: {
         ntypesR,
-        appVersion,
+        lsVersion,
         description,
         urls,
-        captions: { title },
         layers, levels,
       },
     } = this
-    $("head>title").html(title)
-    $("#title").html(title)
     $("#description").html(description)
-    $("#appversion").html(appVersion.replace(/@/, " @ "))
+    $("#appversion").html(lsVersion.replace(/@/, " @ "))
 
     $("go").html(SEARCH.dirty)
 

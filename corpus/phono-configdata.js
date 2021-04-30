@@ -2,7 +2,7 @@ const configData = {
  "defs": {
   "dataset": "nena",
   "client": "phono",
-  "lsVersion": "v042@2021-04-29T15:05:13",
+  "lsVersion": "v043@2021-04-29T16:19:35",
   "org": "annotation",
   "repo": "app-nena",
   "urls": {

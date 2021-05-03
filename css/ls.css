@@ -207,14 +207,14 @@ button.medium, a.medium {
   background-color: var(--query-back);
 }
 /* entries in the query table for levels (node types) */
-.unit {
+.focus {
   border-radius: 0.2rem;
   padding: 0.2rem;
   border-width: 0;
   color: var(--txtbtn-off-fore);
   background-color: var(--txtbtn-off-back);
 }
-.unit.on {
+.focus.on {
   color: var(--txtbtn-on-fore);
   font-weight: bold;
   background-color: var(--txtbtn-on-back);
@@ -354,7 +354,7 @@ td.stat {
 
 /* settings */
 
-button.setting {
+summary.setting, button.setting {
   width: 100%;
   border-radius: 0.4rem;
   padding: 0.2rem;

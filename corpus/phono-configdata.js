@@ -2,7 +2,7 @@ const configData = {
  "defs": {
   "dataset": "nena",
   "client": "phono",
-  "lsVersion": "v043@2021-04-29T16:19:35",
+  "lsVersion": "v044@2021-04-30T08:35:48",
   "org": "annotation",
   "repo": "app-nena",
   "urls": {
@@ -53,7 +53,7 @@ const configData = {
    ],
    "lsdoc": [
     "user manual",
-    "https://annotation.github.io/layered-search/ls/about/layeredsearch.html",
+    "https://annotation.github.io/text-fabric/tf/about/clientmanual.html",
     "user manual for this search interface"
    ],
    "datadoc": [
@@ -67,8 +67,8 @@ const configData = {
     "online repository of the underlying text-fabric data"
    ],
    "generator": [
-    "layered-search",
-    "https://github.com/annotation/layered-search",
+    "text-fabric/client",
+    "https://github.com/annotation/text-fabric/tree/master/tf/client",
     "source code of the generator of this search interface"
    ],
    "source": [
@@ -130,7 +130,7 @@ const configData = {
    "text"
   ]
  },
- "containerType": "sentence",
+ "focusType": "sentence",
  "ntypesinit": {
   "dialect": 539379,
   "text": 713308,

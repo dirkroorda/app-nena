@@ -1,7 +1,7 @@
 /*eslint-env jquery*/
 
 import {
-  SEARCH, TIP, MAXINPUT, DEFAULTJOB, QUWINDOW, FLAGSDEFAULT, BUTTON, UNITTEXT,
+  SEARCH, TIP, MAXINPUT, DEFAULTJOB, QUWINDOW, FLAGSDEFAULT, BUTTON, FOCUSTEXT,
   BOOL,
 } from "./defs.js"
 
@@ -164,9 +164,9 @@ export class GuiProvider {
       ntype="${nType}"
       title="${TIP.expand}"
     ></button></td>
-    <td><button type="button" name="ctype" class="unit"
+    <td><button type="button" name="ctype" class="focus"
       ntype="${nType}"
-      title="${TIP.unit}"
+      title="${TIP.focus}"
     >result</button></td>
     <td></td>
     <td><button type="button" name="visible" class="visible"
@@ -434,18 +434,18 @@ export class GuiProvider {
       }
       this.clearBrowserState()
     })
-    /* handle changes in the container type
+    /* handle changes in the focus type
      */
-    const units = $(`button[name="ctype"]`)
-    units.off("click").click(e => {
+    const focuses = $(`button[name="ctype"]`)
+    focuses.off("click").click(e => {
       e.preventDefault()
       const elem = $(e.target)
       const nType = elem.attr("ntype")
-      const { containerType } = State.getj()
-      if (nType == containerType) {
+      const { focusType } = State.getj()
+      if (nType == focusType) {
         return
       }
-      State.setj({ containerType: nType })
+      State.setj({ focusType: nType })
       Search.runQuery({ compose: [true] })
       Search.runQuery({ display: [] })
       this.applyContainer(nType)
@@ -670,7 +670,7 @@ export class GuiProvider {
   applyQuery() {
     const { Config, State } = this
     const { ntypes, layers } = Config
-    const { query, containerType, visibleLayers } = State.getj()
+    const { query, focusType, visibleLayers } = State.getj()
 
     for (const nType of ntypes) {
       const { [nType]: tpInfo = {} } = layers
@@ -700,7 +700,7 @@ export class GuiProvider {
         )
       }
     }
-    this.applyContainer(containerType)
+    this.applyContainer(focusType)
   }
   applyExec(nType, layer) {
     const { State } = this
@@ -782,29 +782,29 @@ export class GuiProvider {
     this.setButton("expand", `[ntype="${nType}"]`, useExpand, expandText)
   }
 
-  applyContainer(containerType) {
-    /* update the tags on the buttons for the containerType selection
+  applyContainer(focusType) {
+    /* update the tags on the buttons for the focusType selection
      * Only one of them can be on, they are function-wise radio buttons
      */
     const { Config: { ntypes, ntypesI } } = this
 
-    const containerIndex = ntypesI.get(containerType)
+    const focusIndex = ntypesI.get(focusType)
     for (const nType of ntypes) {
       const nTypeIndex = ntypesI.get(nType)
-      const k = (containerIndex == nTypeIndex)
-        ? "r" : (containerIndex < nTypeIndex)
+      const k = (focusIndex == nTypeIndex)
+        ? "r" : (focusIndex < nTypeIndex)
         ? "a" : "d"
       const elem = $(`button[name="ctype"][ntype="${nType}"]`)
-      elem.html(UNITTEXT[k])
+      elem.html(FOCUSTEXT[k])
     }
     this.setButton("ctype", ``, false)
-    this.setButton("ctype", `[ntype="${containerType}"]`, true)
+    this.setButton("ctype", `[ntype="${focusType}"]`, true)
 
     /* also mark the corresponding row in the statistics table
      */
 
     const statRows = $(`tr.stat`)
-    const statContainer = $(`tr.stat[ntype="${containerType}"]`)
+    const statContainer = $(`tr.stat[ntype="${focusType}"]`)
     statRows.removeClass("focus")
     statContainer.addClass("focus")
   }

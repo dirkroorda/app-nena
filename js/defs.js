@@ -19,6 +19,10 @@ export const BUTTON = {
     on: "mark matches in export with « »",
     off: "don't mark matches in export with « »",
   },
+  exportsr: {
+    on: "use columns for extra layers (export only)",
+    off: "use rows for extra layers (export only)",
+  },
   multihl: {
     no: "cannot highlight colors per (group)",
     on: "highlight colors per (group)",
@@ -33,7 +37,7 @@ export const BUTTON = {
   },
 }
 
-export const UNITTEXT = { r: "row unit", a: "context", d: "content" }
+export const FOCUSTEXT = { r: "focus", a: "context", d: "content" }
 
 export const FLAGSDEFAULT = { i: true, m: true, s: false }
 
@@ -54,12 +58,18 @@ only search after you hit the search button`,
   exporthl: `when exporting we could mark the matches by means of « »
 OR
 we can refrain from doing so`,
+  exportsr: `when exporting, if there are multiple layers in a level,
+we could show them in separate ROWS:
+this violates the 1-result-1-row principle, but the results maybe easier to read.
+OR
+we can show them in additional columns:
+this keeps every result in a single row, but rows may grow very wide`,
   multihl: `highlight sub matches for the parts between () with different colors
 OR
 use a single highlight color for the complete match
 N.B.: this might not be supported in your browser`,
   expand: "whether to show inactive layers",
-  unit: "make this the row unit",
+  focus: "make this the focus",
   exec: "whether this pattern is used in the search",
   visible: "whether this layer is visible in the results",
   visibletp: "whether node numbers are visible in the results",

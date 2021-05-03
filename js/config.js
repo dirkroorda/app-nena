@@ -17,7 +17,7 @@ export class ConfigProvider {
     const {
       defs: { lsVersion, org, repo, dataset, client, description, urls },
       levels,
-      containerType, simpleBase,
+      focusType, simpleBase,
       ntypes, ntypesinit, ntypessize,
       utypeOf, dtypeOf,
       layers, visible,
@@ -97,11 +97,11 @@ export class ConfigProvider {
     /* computed attributes for convenience
      */
 
-    /* the default container type
+    /* the default focus type
      * if it is missing, we fill in a middle type
      */
     const pos = Math.round(ntypes.length / 2)
-    this.containerType = containerType || ntypes[pos]
+    this.focusType = focusType || ntypes[pos]
 
     /* array of types in reversed order
      */

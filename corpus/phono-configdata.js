@@ -2,12 +2,12 @@ const configData = {
  "defs": {
   "dataset": "nena",
   "client": "phono",
-  "lsVersion": "v044@2021-04-30T08:35:48",
+  "lsVersion": "v045@2021-05-03T08:37:10",
   "org": "annotation",
   "repo": "app-nena",
   "urls": {
    "cheatsheet": [
-    "cheatsheet",
+    "regexp cheatsheet",
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet",
     "cheatsheet of regular expressions"
    ],
@@ -77,11 +77,6 @@ const configData = {
     "source code of the definition of this search interface"
    ],
    "issue": [
-    "Feature requests, bugs, feedback",
-    "https://github.com/annotation/app-nena/issues",
-    "report issues"
-   ],
-   "issue2": [
     "Report an issue",
     "https://github.com/annotation/app-nena/issues",
     "report issues"

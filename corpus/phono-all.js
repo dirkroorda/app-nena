@@ -64,7 +64,7 @@ OR
 use a single highlight color for the complete match
 N.B.: this might not be supported in your browser`,
   expand: "whether to show inactive layers",
-  focus: "make this the focus",
+  focus: "make this the focus level",
   exec: "whether this pattern is used in the search",
   visible: "whether this layer is visible in the results",
   visibletp: "whether node numbers are visible in the results",
@@ -568,7 +568,7 @@ class StateProvider {
         autoexec: true,
         nodeseq: true,
         exporthl: true,
-        exportsr: true,
+        exportsr: false,
         multihl: can ? true : null,
       },
       query: {},
@@ -781,7 +781,11 @@ class GuiProvider {
       }
       const bState = (useValue === null) ? "no" : value ? "on" : "off"
       const buttonHtml = `
-        <button type="button" name="${name}" class="setting ${bState}"></button>
+        <button
+          type="button" name="${name}"
+          class="setting"
+          title="${TIP[name]}"
+          ${bState}"></button>
       `
       if (name == "multihl") {
         const canRep = can ? "✅ in this browser" : "❌ in this browser"
@@ -2124,8 +2128,7 @@ class SearchProvider {
       upperTypes, contentTypes,
       cols, layersPerType,
     } = this.getLayersPerType(exportsr)
-    const colsRep = cols.map(x => `${x}\t`)
-    const header = `${RESULTCOL}\t${colsRep.join("")}\n`
+    const header = `${RESULTCOL}\t${cols.join("\t")}\n`
     const genValueTsv = (nType, layer, node) => {
       if (layer == "_") {
         return `${nodeseq ? node - ntypesinit[nType] + 1 : node} `

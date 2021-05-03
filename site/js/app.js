@@ -105,7 +105,7 @@
  * In this app, the logic is: layered search.
  *
  * See:
- * (https://annotation.github.io/text-fabric/tf/about/layeredsearch.html)
+ * (https://annotation.github.io/text-fabric/tf/about/clientmanual.html)
  *
  */
 

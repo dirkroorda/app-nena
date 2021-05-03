@@ -122,7 +122,7 @@ export class StateProvider {
       /* array of results
        * when a composeType is chosen, we generate a table of results from tpResults
        * A result consists of
-       * - a node of the containerType: the result node
+       * - a node of the focusType: the result node
        * - its ancestor nodes from higher type
        * - all of its descendent nodes in lower types.
        * A result only contains the nodes, not yet actual matched text.
@@ -133,7 +133,7 @@ export class StateProvider {
 
       /* a mapping of nodes to node types,
        * for all nodes that occur in rendered results
-       * including non-matching descendants of matching container nodes
+       * including non-matching descendants of matching focus nodes
        */
       resultTypeMap: null,
 
@@ -158,7 +158,7 @@ export class StateProvider {
      * This is the first step in guaranteeing that the jobState has a fixed shape.
      */
     const {
-      Config: { ntypes, containerType, layers, visible },
+      Config: { ntypes, focusType, layers, visible },
       Features: { features: { indices: { can } } },
     } = this
 
@@ -177,6 +177,15 @@ export class StateProvider {
          * or are exactly the TF node numbers
          */
         nodeseq: true,
+
+        /* whether to mark matches in tsv exports
+         */
+        exporthl: true,
+
+        /* whether to keep results in single rows in tsv exports
+         * even if there are multiple layers per level
+         */
+        exportsr: true,
 
         /* whether to highlight groups with different colors
          * only if the browser supports it
@@ -209,7 +218,7 @@ export class StateProvider {
 
       /* the node type used for composing results
        */
-      containerType,
+      focusType,
 
       /* per node type and layer whether the layer is visible in the results
        */

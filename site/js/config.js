@@ -15,9 +15,9 @@ export class ConfigProvider {
      */
 
     const {
-      defs: { appVersion, org, repo, name, description, urls, captions },
+      defs: { lsVersion, org, repo, dataset, client, description, urls },
       levels,
-      containerType, simpleBase,
+      focusType, simpleBase,
       ntypes, ntypesinit, ntypessize,
       utypeOf, dtypeOf,
       layers, visible,
@@ -25,19 +25,23 @@ export class ConfigProvider {
 
     /* the version stamp of this app
      */
-    this.appVersion = appVersion
+    this.lsVersion = lsVersion
 
     /* the Github organization of the app
      */
     this.org = org
 
-    /* the Github organization of the app
+    /* the Github repo of the app
      */
     this.repo = repo
 
-    /* the Github repo of the app
+    /* the dataset name of the app
      */
-    this.name = name
+    this.dataset = dataset
+
+    /* the client name of the app
+     */
+    this.client = client
 
     /* the description of the configData
      */
@@ -51,9 +55,6 @@ export class ConfigProvider {
      * For each kind, there is a pair consisting of the href and the title of the url
      */
     this.urls = urls
-    /* Captions for several elements
-     */
-    this.captions = captions
 
     /* the base type of the configData, e.g. word or letter
      */
@@ -85,22 +86,22 @@ export class ConfigProvider {
      */
     this.ntypessize = ntypessize
 
-    /* map from type to one-higher type
+    /* mapping from type to one-higher type
      */
     this.utypeOf = utypeOf
 
-    /* map from type to one-lower type
+    /* mapping from type to one-lower type
      */
     this.dtypeOf = dtypeOf
 
     /* computed attributes for convenience
      */
 
-    /* the default container type
+    /* the default focus type
      * if it is missing, we fill in a middle type
      */
     const pos = Math.round(ntypes.length / 2)
-    this.containerType = containerType || ntypes[pos]
+    this.focusType = focusType || ntypes[pos]
 
     /* array of types in reversed order
      */

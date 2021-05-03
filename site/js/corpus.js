@@ -49,7 +49,7 @@ export class CorpusProvider {
   }
 
   decompress() {
-    /* The map "up" is expanded. We also compute its converse, "down".
+    /* The mapping "up" is expanded. We also compute its converse, "down".
      */
     const { up } = corpusData
 

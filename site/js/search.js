@@ -14,7 +14,7 @@ export class SearchProvider {
  * 2. weed (the heart of the layered search algorithm):
  *    - intersect across node types (using projection to upward and downward levels)
  * 3. compose:
- *    - organize the result nodes around the nodes in a container type
+ *    - organize the result nodes around the nodes in a focus type
  * 4. display:
  *    - draw the table of results on the interface by screenfuls
  *    - make navigation controls for moving the focus through the table
@@ -401,25 +401,25 @@ export class SearchProvider {
   }
 
   composeResults(recomputeFocus) {
-    /* divided search results into chunks by containerType
-     * The results are organized by the nodes that have containerType as node type.
+    /* divided search results into chunks by focusType
+     * The results are organized by the nodes that have focusType as node type.
      * Each result is an object with as keys a nodetype and as values some
      * results in that node type.
-     * If the node type is higher than or equal than the container type, the
+     * If the node type is higher than or equal than the focus type, the
      * results are just nodes.
-     * If the node type is one lower than the container type, the results are
-     * pairs [d, descendants], where d is the nodem, and descendants is a nested array
+     * If the node type is one lower than the focus type, the results are
+     * pairs [d, descendants], where d is the node, and descendants is a nested array
      * of the descendants of d.
      * Nodes lower than this will not make it into the levels, because they are
-     * subsumed in the descendants of the children of the container node.
+     * subsumed in the descendants of the children of the focus node.
      *
      * The result at the position that has currently focus on the interface,
      * is marked by means of a class.
      *
      * recomputeFocus = true:
-     * If we do a new compose because the user has changed the container type
-     * we estimate the focus position in the new container type based on the
-     * focus position in the old container type
+     * If we do a new compose because the user has changed the focus type
+     * we estimate the focus position in the new focus type based on the
+     * focus position in the old focus type
      * We adjust the interface to the new focus pos (slider and number controls)
      */
     const { Config: { ntypesI, utypeOf }, Corpus: { up }, State } = this
@@ -434,10 +434,10 @@ export class SearchProvider {
       focusPos: oldFocusPos,
       prevFocusPos: oldPrevFocusPos,
       dirty: oldDirty,
-      containerType,
+      focusType,
     } = State.getj()
 
-    const { [containerType]: { nodes: containerNodes } = {} } = tpResults
+    const { [focusType]: { nodes: focusNodes } = {} } = tpResults
 
     const oldNResults = oldResultsComposed == null ? 1 : oldResultsComposed.length
     const oldNResultsP = Math.max(oldNResults, 1)
@@ -448,17 +448,17 @@ export class SearchProvider {
       resultsComposed, resultTypeMap,
     } = State.sets({ resultsComposed: [], resultTypeMap: new Map() })
 
-    if (containerNodes) {
-      for (const cn of containerNodes) {
+    if (focusNodes) {
+      for (const cn of focusNodes) {
 
         /* collect the upnodes
          */
-        resultTypeMap.set(cn, containerType)
+        resultTypeMap.set(cn, focusType)
 
-        const levels = { [containerType]: [cn] }
+        const levels = { [focusType]: [cn] }
 
         let un = cn
-        let uType = containerType
+        let uType = focusType
 
         while (up.has(un)) {
           un = up.get(un)
@@ -472,7 +472,7 @@ export class SearchProvider {
 
         /* collect the down nodes
          */
-        const descendants = this.getDescendants(cn, ntypesI.get(containerType))
+        const descendants = this.getDescendants(cn, ntypesI.get(focusType))
         for (const desc of descendants) {
           const d = (typeof desc === NUMBER) ? desc : desc[0]
           const dType = resultTypeMap.get(d)
@@ -577,10 +577,10 @@ export class SearchProvider {
     return { spans, tipStr }
   }
 
-  getLayersPerType() {
+  getLayersPerType(colPerLayer) {
     const { Config: { ntypesR, ntypesI, layers }, State } = this
-    const { containerType, visibleLayers } = State.getj()
-    const containerIndex = ntypesI.get(containerType)
+    const { focusType, visibleLayers, settings: { nodeseq } } = State.getj()
+    const focusIndex = ntypesI.get(focusType)
 
     const layersPerType = new Map()
 
@@ -596,11 +596,32 @@ export class SearchProvider {
 
     const visibleTypes = ntypesR.filter(x => layersPerType.get(x).length > 0)
 
-    const contextTypes = visibleTypes.filter(x => ntypesI.get(x) > containerIndex)
-    const rowUnitTypes = visibleTypes.filter(x => ntypesI.get(x) == containerIndex)
-    const contentTypes = ntypesR.filter(x => ntypesI.get(x) < containerIndex)
-    const firstContentTypes = (contentTypes.length == 0) ? [] : [contentTypes[0]]
-    const cols = contextTypes.concat(rowUnitTypes).concat(firstContentTypes)
+    const contextTypes = visibleTypes.filter(x => ntypesI.get(x) > focusIndex)
+    const focusTypes = visibleTypes.filter(x => ntypesI.get(x) == focusIndex)
+    const contentTypes = ntypesR.filter(x => ntypesI.get(x) < focusIndex)
+    const upperTypes = contextTypes.concat(focusTypes)
+    //const firstContentTypes = (contentTypes.length == 0) ? [] : [contentTypes[0]]
+    //const cols = contextTypes.concat(focusTypes).concat(firstContentTypes)
+    let cols
+    if (colPerLayer) {
+      cols = []
+      for (const nType of visibleTypes) {
+        const nIndex = ntypesI.get(nType)
+        const typeRep = (nIndex < focusIndex)
+          ? `${focusType}-content:${nType}`
+          : (nIndex === focusIndex)
+            ? `${nType}-content:`
+            : nType
+
+        for (const layer of layersPerType.get(nType)) {
+          const layerRep = (layer === "_") ? (nodeseq ? "seqno" : "node") : layer
+          cols.push(`${typeRep}:${layerRep}`)
+        }
+      }
+    }
+    else {
+      cols = contextTypes.concat(focusTypes).concat(`${focusType}-content`)
+    }
 
     const layersContent = []
     for (const cnType of contentTypes) {
@@ -609,9 +630,9 @@ export class SearchProvider {
 
     return {
       contextTypes,
-      rowUnitTypes,
+      focusTypes,
       contentTypes,
-      upperTypes: contextTypes.concat(rowUnitTypes),
+      upperTypes,
       cols,
       layersPerType,
       layersContent,
@@ -625,9 +646,9 @@ export class SearchProvider {
      * but the user can move the focus position in various ways.
      * Per result this is visible:
      *   Context nodes are rendered highlighted
-     *   The container nodes themselves are rendered as single nodes
+     *   The focus nodes themselves are rendered as single nodes
      *     if they have content, otherwise they are left out
-     *   The children of the container node are rendered with
+     *   The children of the focus node are rendered with
      *   all of descendants (recursively),
      *     where the descendants that have results are highlighted.
      */
@@ -808,7 +829,7 @@ export class SearchProvider {
    * All results will be exported, not only the ones that are displayed
    * on the screen.
    * One result per row, with the same information per result that is currently active:
-   * the same row-unit, the same visibility of layers and node numbers.
+   * the same focus, the same visibility of layers and node numbers.
    *
    * The resulting tsv is written in UTF-16-LE encoding for optimal interoperability
    * with Excel
@@ -826,7 +847,7 @@ export class SearchProvider {
     } = this
 
     const { resultTypeMap, tpResults, resultsComposed } = State.gets()
-    const { settings: { nodeseq } } = State.getj()
+    const { settings: { nodeseq, exporthl, exportsr } } = State.getj()
 
     if (tpResults == null) {
       State.sets({ resultsComposed: null })
@@ -836,7 +857,7 @@ export class SearchProvider {
     const {
       upperTypes, contentTypes,
       cols, layersPerType,
-    } = this.getLayersPerType()
+    } = this.getLayersPerType(exportsr)
 
     const colsRep = cols.map(x => `${x}\t`)
     const header = `${RESULTCOL}\t${colsRep.join("")}\n`
@@ -864,7 +885,7 @@ export class SearchProvider {
       let piece = ""
 
       for (const [hl, val] of spans) {
-        if (hl >= 0) {
+        if (exporthl && hl >= 0) {
           const hlRep = (hl == 0) ? "" : `${hl}=`
           piece += `«${hlRep}${val}»`
         }
@@ -923,42 +944,56 @@ export class SearchProvider {
        */
       const typeNodes = []
       for (const nType of upperTypes) {
-        typeNodes.push([false, (result[nType] ?? []).map(x => genNodeTsv(x))])
+        typeNodes.push((result[nType] ?? []).map(x => genNodeTsv(x)))
       }
       for (const nType of contentTypes) {
-        typeNodes.push([true, (result[nType] ?? []).map(x => genNodeTsv(x))])
+        typeNodes.push((result[nType] ?? []).map(x => genNodeTsv(x)))
       }
+
       const tsv = []
-      const maxLines = Math.max(
-        ...typeNodes.map(
-          x => Math.max(...x[1].map(y => y.length))
-        )
-      )
-      for (let i = 0; i < maxLines; i++) {
+
+      if (exportsr) {
         const line = [`${s + 1}`]
-        for (const [separate, chunks] of typeNodes) {
-          line.push("\t")
+        for (const chunks of typeNodes) {
+          const fields = []
           let first = true
-          let sep = ""
           for (const chunk of chunks) {
-            if (sep) {
-              line.push(sep)
-            }
-            line.push((i < chunk.length) ? chunk[i] : "")
-            if (first) {
-              first = false
-              if (separate) {
-                sep = "\t"
+            for (let i = 0; i < chunk.length; i++) {
+              if (first) {
+                fields[i] = ""
               }
+              const piece = chunk[i]
+              fields[i] += piece
+            }
+            first = false
+          }
+          line.push(fields.join("\t"))
+        }
+        tsv.push(`${line.join("\t")}\n`)
+      }
+      else {
+        const maxLayers = Math.max(
+          ...typeNodes.map(
+            x => Math.max(...x.map(y => y.length))
+          )
+        )
+
+        for (let i = 0; i < maxLayers; i++) {
+          const line = [`${s + 1}`]
+          for (const chunks of typeNodes) {
+            line.push("\t")
+            for (const chunk of chunks) {
+              line.push((i < chunk.length) ? chunk[i] : "")
             }
           }
+          tsv.push(`${line.join("")}\n`)
         }
-        tsv.push(`${line.join("")}\n`)
       }
+      this.tell({ typeNodes, tsv })
       return tsv
     }
 
-    /* generates the html for all relevant results around a focus position in the
+    /* generates the tsv for all relevant results around a focus position in the
      * table of results
      */
     if (resultsComposed == null) {
@@ -981,6 +1016,9 @@ export class SearchProvider {
     const { Log, Disk, State } = this
 
     const { jobName } = State.gets()
+    const { focusType, settings: { exporthl, exportsr } } = State.getj()
+    const jobExtraSR = exportsr ? "-xc" : "-xr"
+    const jobExtraHL = exporthl ? "-hl" : ""
 
     const expr = $("#exportr")
     const runerror = $("#runerror")
@@ -1003,7 +1041,9 @@ export class SearchProvider {
     }
     if (errors.length == 0) {
       try {
-        Disk.download(text, jobName, "tsv", true)
+        Disk.download(
+          text, `${jobName}-${focusType}${jobExtraSR}${jobExtraHL}`, "tsv", true
+        )
       }
       catch (error) {
         errors.push({ where: "download", error })

@@ -1,10 +1,7 @@
 short: phonological and full-text layers in multiple transcriptions
 
 description: >-
-  <p>Phonetic search interface for the <a id="corpus2link" href="#"></a>.</p>
-  <p>This is a standalone app.
-  You download it to your computer, and then it works without
-  connection to the internet.</p>
+  <p>Phonetic search interface for <a id="corpus2link" href="#"></a>.</p>
   <p>This search interface is by:</p>
   <ul>
       <li><a id="author2link" href="#"></a> («author2.role»)

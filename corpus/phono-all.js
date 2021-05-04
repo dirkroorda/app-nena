@@ -1362,7 +1362,7 @@ class GuiProvider {
       Search.runQuery({ allSteps: true })
     }
   }
-  applyFocus() {
+  applyPosition() {
     const { State } = this
     const { resultsComposed } = State.gets()
     const { focusPos } = State.getj()
@@ -1420,7 +1420,7 @@ class GuiProvider {
         min2p.addClass("active")
       }
     }
-    const rTarget = $(`.focus`)
+    const rTarget = $(`#resultsbody>tr.focus`)
     if (rTarget != null && rTarget[0] != null) {
       rTarget[0].scrollIntoView({ block: "center", behavior: "smooth" })
     }
@@ -1480,7 +1480,7 @@ class MemProvider {
   }
   init() {
     const { Config: { dataset, client } } = this
-    this.appPrefix = `ls/${dataset}/${client}/`
+    this.appPrefix = `tf.client/${dataset}/${client}/`
     this.keyLast = `${this.appPrefix}LastJob`
     this.keyPrefix = `${this.appPrefix}Keys/`
     this.keyLength = this.keyPrefix.length
@@ -2109,7 +2109,7 @@ class SearchProvider {
     const html = genResultsHtml()
     const resultsbody = $("#resultsbody")
     resultsbody.html(html)
-    Gui.applyFocus()
+    Gui.applyPosition()
   }
   tabular() {
     const {

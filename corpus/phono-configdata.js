@@ -1,6 +1,6 @@
 const configData = {
  "defs": {
-  "lsVersion": "v047@2021-05-03T14:38:23",
+  "lsVersion": "v048@2021-05-04T10:41:55",
   "dataset": "nena",
   "client": "phono",
   "org": "annotation",
@@ -12,7 +12,7 @@ const configData = {
     "cheatsheet of regular expressions"
    ],
    "license": [
-    "license",
+    "MIT",
     "https://mit-license.org",
     "website of MIT license"
    ],
@@ -68,12 +68,12 @@ const configData = {
    ],
    "generator": [
     "text-fabric/client",
-    "https://github.com/annotation/text-fabric/tree/master/tf/client",
-    "source code of the generator of this search interface"
+    "https://annotation.github.io/text-fabric/tf/client/make/build.html",
+    "the generator of this search interface"
    ],
    "source": [
     "app-nena",
-    "https://github.com/annotation/app-nena",
+    "https://github.com/annotation/app-nena/tree/master/layeredsearch",
     "source code of the definition of this search interface"
    ],
    "issue": [
@@ -83,7 +83,7 @@ const configData = {
    ],
    "package": [
     "download",
-    "https://annotation.github.io/app-nena/phono.zip",
+    "phono.zip",
     "zip file for offline use"
    ],
    "writing": [
@@ -97,7 +97,7 @@ const configData = {
     "using Text-Fabric on the same corpus"
    ]
   },
-  "description": "<p>Phonetic search interface for the <a id=\"corpus2link\" href=\"#\"></a>.</p> <p>This is a standalone app. You download it to your computer, and then it works without connection to the internet.</p> <p>This search interface is by:</p> <ul>\n    <li><a id=\"author2link\" href=\"#\"></a> (client)\n    <li><a id=\"author1link\" href=\"#\"></a> (corpus developer)\n</ul>"
+  "description": "<p>Phonetic search interface for <a id=\"corpus2link\" href=\"#\"></a>.</p> <p>This search interface is by:</p> <ul>\n    <li><a id=\"author2link\" href=\"#\"></a> (lead researcher)\n    <li><a id=\"author1link\" href=\"#\"></a> (corpus developer)\n</ul>"
  },
  "ntypes": [
   "word",

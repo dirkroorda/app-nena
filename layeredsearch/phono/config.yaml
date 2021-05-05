@@ -8,6 +8,14 @@ description: >-
       <li><a id="author1link" href="#"></a> («author1.role»)
   </ul>
 
+defaultSettings:
+  autoexec: true
+  nodeseq: true
+  exporthl: true
+  exportsr: true
+  multihl: true
+  simple: false
+
 layerSettings:
   word:
     description: Some words are affixed to others without intervening space.

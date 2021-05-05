@@ -1,0 +1,63 @@
+short: fuzzy search
+
+description: >-
+  <p>Simple search interface for <a id="corpus2link" href="#"></a>.</p>
+  <p>This search interface is by:</p>
+  <ul>
+      <li><a id="author2link" href="#"></a> («author2.role»)
+      <li><a id="author1link" href="#"></a> («author1.role»)
+  </ul>
+
+defaultSettings:
+  autoexec: true
+  nodeseq: true
+  exporthl: false
+  exportsr: true
+  multihl: true
+  simple: true
+
+layerSettings:
+  word:
+    description: Some words are affixed to others without intervening space.
+    layers:
+      fuzzy:
+        afterDefault: /
+        afterFeature: fuzzy_end
+        default: ¿
+        description: 'text representation: <code>maqilbinna</code>'
+        example: mute
+        feature: fuzzy
+        pos: null
+        visible: true
+  sentence:
+    afterDefault: "\n"
+    focus: true
+    description: Sentences are delimited by full stops.
+  line:
+    afterDefault: "\n"
+    description: Lines are really paragraphs.
+    layers:
+      number:
+        default: -1
+        description: line number
+        feature: line_number
+        pos: null
+        visible: true
+  text:
+    afterDefault: "\n"
+    description: Texts are stories, having some metadata, consisting of lines.
+    layers:
+      title:
+        default: ¿
+        description: title of a text
+        example: A
+        feature: title
+        pos: null
+        visible: true
+      dialect:
+        ascend: dialect
+        default: ¿
+        description: dialect of a text <code>Barwar Urmi_C</code>
+        feature: dialect
+        pos: null
+        visible: true

@@ -16,6 +16,6 @@ It is online, but it works on your computer, in the browser.
 
 Just click
 [nena-search](https://annotation.github.io/app-nena/)
-and of you go.
+and off you go.
 
 ![ls](ls.png)

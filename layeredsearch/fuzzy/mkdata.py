@@ -8,8 +8,8 @@ def makeLegends(maker):
 
 
 def record(maker):
-    api = maker.api
-    TF = api.TF
+    A = maker.A
+    api = A.api
     F = api.F
     Fs = api.Fs
     L = api.L
@@ -20,10 +20,10 @@ def record(maker):
     clientConfig = maker.clientConfig
     typesLower = clientConfig["typesLower"]
 
-    TF.indent(reset=True)
-    TF.info("preparing ... ")
+    A.indent(reset=True)
+    A.info("preparing ... ")
 
-    TF.info("start recording")
+    A.info("start recording")
 
     up = {}
     texts = {}
@@ -39,7 +39,7 @@ def record(maker):
         texts[nType] = {name: None for name in ti}
         positions[nType] = {name: None for name in ti if ti[name]["pos"] is None}
         recorders[nType] = {
-            name: Recorder(TF.api) for name in ti if ti[name]["pos"] is None
+            name: Recorder(api) for name in ti if ti[name]["pos"] is None
         }
         accumulators[nType] = {name: [] for name in ti if ti[name]["pos"] is not None}
 
@@ -57,6 +57,7 @@ def record(maker):
             descend = info.get("descend", False)
             ascend = info.get("ascend", False)
             feature = info.get("feature", None)
+            featureFunc = Fs(feature).v
             afterFeature = info.get("afterFeature", None)
             afterDefault = info.get("afterDefault", None)
             vMap = info.get("legend", None)
@@ -65,7 +66,7 @@ def record(maker):
             if descend:
                 value = ""
                 for n in L.d(node, otype=descend):
-                    val = Fs(feature).v(n)
+                    val = featureFunc(n)
                     if vMap:
                         val = vMap.get(val, default)
                     else:
@@ -74,7 +75,7 @@ def record(maker):
                     value += str(val)
             else:
                 refNode = L.u(node, otype=ascend)[0] if ascend else node
-                value = Fs(info["feature"]).v(refNode)
+                value = featureFunc(refNode)
                 if vMap:
                     value = vMap.get(value, default)
                 else:
@@ -193,6 +194,8 @@ def record(maker):
     data = dict(
         texts=texts,
         positions=positions,
-        up=up,
+        up=maker.compress(up),
     )
     maker.data = data
+    sys.stdout.write("\n")
+    A.info("done")

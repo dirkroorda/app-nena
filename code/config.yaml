@@ -31,7 +31,7 @@ provenanceSpec:
   org: CambridgeSemiticsLab
   repo: nena_tf
   version: 'alpha'
-  webBase: '{urlGh}/{org}/nena_corpus/blob/master/nena'
+  webBase: '{urlGh}/{org}/nena_corpus/blob/master/texts'
   webHint: Show this title in the NENA repository
   webUrl: '{webBase}/{version}/<1>/<2>.nena'
 typeDisplay:

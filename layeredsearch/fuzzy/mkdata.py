@@ -31,29 +31,29 @@ def record(maker):
     recorders = {}
     accumulators = {}
 
-    for (nType, typeInfo) in layerSettings.items():
+    for (level, typeInfo) in layerSettings.items():
         ti = typeInfo.get("layers", None)
         if ti is None:
             continue
 
-        texts[nType] = {name: None for name in ti}
-        positions[nType] = {name: None for name in ti if ti[name]["pos"] is None}
-        recorders[nType] = {
-            name: Recorder(api) for name in ti if ti[name]["pos"] is None
+        texts[level] = {layer: None for layer in ti}
+        positions[level] = {layer: None for layer in ti if ti[layer]["pos"] is None}
+        recorders[level] = {
+            layer: Recorder(api) for layer in ti if ti[layer]["pos"] is None
         }
-        accumulators[nType] = {name: [] for name in ti if ti[name]["pos"] is not None}
+        accumulators[level] = {layer: [] for layer in ti if ti[layer]["pos"] is not None}
 
     def addValue(node):
         returnValue = None
 
-        nType = F.otype.v(node)
-        typeInfo = layerSettings[nType]
+        level = F.otype.v(node)
+        typeInfo = layerSettings[level]
         theseLayers = typeInfo.get("layers", {})
 
         first = True
 
-        for name in theseLayers:
-            info = theseLayers[name]
+        for layer in theseLayers:
+            info = theseLayers[layer]
             descend = info.get("descend", False)
             ascend = info.get("ascend", False)
             feature = info.get("feature", None)
@@ -89,9 +89,9 @@ def record(maker):
             value = f"{value}{afterVal}"
 
             if pos is None:
-                recorders[nType][name].add(value)
+                recorders[level][layer].add(value)
             else:
-                accumulators[nType][name].append(value)
+                accumulators[level][layer].append(value)
 
             if first:
                 returnValue = value
@@ -100,8 +100,8 @@ def record(maker):
         return returnValue
 
     def addAfterValue(node):
-        nType = F.otype.v(node)
-        typeInfo = layerSettings[nType]
+        level = F.otype.v(node)
+        typeInfo = layerSettings[level]
         afterFeature = typeInfo.get("afterFeature", None)
         afterDefault = typeInfo.get("afterDefault", None)
         value = ""
@@ -111,49 +111,53 @@ def record(maker):
             if not value:
                 value = afterDefault
         if value:
-            addAll(nType, value)
+            addAll(level, value)
 
-    def addAll(nType, value):
-        lowerTypes = typesLower[nType]
-        for nType in lowerTypes:
-            if nType in recorders:
-                for x in recorders[nType].values():
+    def addAll(level, value):
+        lowerTypes = typesLower[level]
+        for lType in lowerTypes:
+            if lType in recorders:
+                for x in recorders[lType].values():
                     x.add(value)
-            if nType in accumulators:
-                for x in accumulators[nType].values():
+            if lType in accumulators:
+                for x in accumulators[lType].values():
                     x.append(value)
 
     def deliverAll():
-        for (nType, typeInfo) in recorders.items():
-            for (name, x) in typeInfo.items():
-                texts[nType][name] = x.text()
+        A.info("wrap recorders for delivery")
+        for (level, typeInfo) in recorders.items():
+            A.info(f"\t{level}")
+            for (layer, x) in typeInfo.items():
+                A.info(f"\t\t{layer}")
+                texts[level][layer] = x.text()
                 # here we are going to use that there is at most one node per node type
                 # that corresponds to a character position
-                positions[nType][name] = [
-                    tuple(nodes)[0] if nodes else None for nodes in x.positions()
-                ]
+                positions[level][layer] = x.positions(simple=True)
 
-        for (nType, typeInfo) in accumulators.items():
-            for (name, x) in typeInfo.items():
-                texts[nType][name] = "".join(x)
+        A.info("wrap accumulators for delivery")
+        for (level, typeInfo) in accumulators.items():
+            A.info(f"\t{level}")
+            for (layer, x) in typeInfo.items():
+                A.info(f"\t\t{layer}")
+                texts[level][layer] = "".join(x)
 
     def startNode(node):
         # we have organized recorders by node type
         # we only record nodes of matching type in recorders
 
-        nType = F.otype.v(node)
+        level = F.otype.v(node)
 
-        if nType in recorders:
-            for rec in recorders[nType].values():
+        if level in recorders:
+            for rec in recorders[level].values():
                 rec.start(node)
 
     def endNode(node):
         # we have organized recorders by node type
         # we only record nodes of matching type in recorders
-        nType = F.otype.v(node)
+        level = F.otype.v(node)
 
-        if nType in recorders:
-            for rec in recorders[nType].values():
+        if level in recorders:
+            for rec in recorders[level].values():
                 rec.end(node)
 
     # note the `up[n] = m` statements below:

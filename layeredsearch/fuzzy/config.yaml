@@ -16,6 +16,11 @@ defaultSettings:
   multihl: true
   simple: true
 
+defaultFlags:
+  i: true
+  m: true
+  s: false
+
 layerSettings:
   word:
     description: Some words are affixed to others without intervening space.
@@ -24,7 +29,7 @@ layerSettings:
         afterDefault: /
         afterFeature: fuzzy_end
         default: ¿
-        description: 'text representation: <code>maqilbinna</code>'
+        description: text representation
         example: mute
         feature: fuzzy
         pos: null
@@ -57,7 +62,7 @@ layerSettings:
       dialect:
         ascend: dialect
         default: ¿
-        description: dialect of a text <code>Barwar Urmi_C</code>
+        description: dialect of a text
         feature: dialect
         pos: null
         visible: true

@@ -16,6 +16,82 @@ defaultSettings:
   multihl: true
   simple: false
 
+defaultFlags:
+  i: true
+  m: true
+  s: false
+
+keyboard:
+  'š': '$'
+  'č̣': '%'
+  'k̭': '&'
+  'ʿ': '('
+  'ʾ': ')'
+  'č̭': '*'
+  'ṱ': '+'
+  'ŭ': '2'
+  'ɛ': '3'
+  'ɟ': '4'
+  'č': '5'
+  'ð': '6'
+  'ð̣': '6.'
+  'ž': '7'
+  'θ': '8'
+  'ə': '9'
+  'č': '>c'
+  'č̣': '>c.'
+  'č̭': '>c<'
+  'š': '>s'
+  'ž': '>z'
+  'ă': '@'
+  'ā': 'A'
+  'ḍ': 'D'
+  'ē': 'E'
+  'ġ': 'G'
+  'ḥ': 'H'
+  'ī': 'I'
+  'ḷ': 'L'
+  'ṃ': 'M'
+  'ō': 'O'
+  'p̣': 'P'
+  'ṛ': 'R'
+  'ṣ': 'S'
+  'ṭ': 'T'
+  'ū': 'U'
+  'ẓ': 'Z'
+  'ð̣': '^'
+  'á': "a'"
+  'ɑ': 'a'
+  'ā́': "a-'"
+  'ā': 'a-'
+  'ā̀': 'a-`'
+  'ắ': "a>'"
+  'ă': 'a>'
+  'ằ': 'a>`'
+  'à': 'a`'
+  'c̭': 'c<'
+  'ḍ': 'd.'
+  'ē': 'e-'
+  'ġ': 'g.'
+  'ḥ': 'h.'
+  'ı': 'i~'
+  'ī': 'i-'
+  'ĭ': 'i>'
+  'k̭': 'k<'
+  'ḷ': 'l.'
+  'ṃ': 'm.'
+  'ō': 'o-'
+  'p̣': 'p.'
+  'p̌': 'p<'
+  'p̭': 'p<'
+  'ṛ': 'r.'
+  'ṣ': 's.'
+  'ṭ': 't'
+  'ṱ': 't<'
+  'ū': 'u-'
+  'ŭ': 'u<'
+  'ẓ': 'z.'
+
 layerSettings:
   word:
     description: Some words are affixed to others without intervening space.
@@ -24,7 +100,7 @@ layerSettings:
         afterDefault: /
         afterFeature: text_end
         default: ¿
-        description: 'text precise, complete, uses non-ascii: <code>maqəlbə̀nna</code>'
+        description: text precise, complete, uses non-ascii
         feature: text
         pos: null
         visible: true
@@ -32,7 +108,7 @@ layerSettings:
         afterDefault: /
         afterFeature: full_end
         default: ¿
-        description: 'text representation: <code>maq9lb9`nna</code>'
+        description: text representation
         feature: full
         pos: null
         visible: false
@@ -40,7 +116,7 @@ layerSettings:
         afterDefault: /
         afterFeature: fuzzy_end
         default: ¿
-        description: 'text representation: <code>maqilbinna</code>'
+        description: text representation
         example: mute
         feature: fuzzy
         pos: null
@@ -49,7 +125,7 @@ layerSettings:
         afterDefault: /
         afterFeature: lite_end
         default: ¿
-        description: 'text representation: <code>maq9lb9nna</code>'
+        description: text representation
         feature: lite
         pos: null
         visible: false
@@ -58,7 +134,7 @@ layerSettings:
         afterFeature: fuzzy_end
         default: z
         descend: letter
-        description: 'phonetic class: <code>CVCVCCVCCV</code>'
+        description: phonetic class
         feature: phonetic_class
         pos: null
         visible: false
@@ -67,7 +143,7 @@ layerSettings:
         afterFeature: fuzzy_end
         default: z
         descend: letter
-        description: 'phonation: <code>PzzzPVzPPz</code>'
+        description: phonation
         feature: phonation
         pos: cls
         visible: false
@@ -76,7 +152,7 @@ layerSettings:
         afterFeature: fuzzy_end
         default: z
         descend: letter
-        description: 'phonetic place: <code>BzXzDBzDDz</code>'
+        description: phonetic place
         feature: phonetic_place
         pos: cls
         visible: false
@@ -85,7 +161,7 @@ layerSettings:
         afterFeature: fuzzy_end
         default: z
         descend: letter
-        description: 'phonetic manner: <code>NzAzLAzNNz</code>'
+        description: phonetic manner
         feature: phonetic_manner
         pos: cls
         visible: false

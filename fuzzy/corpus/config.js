@@ -1,4 +1,5 @@
 const configData = {
+ "memSavingMethod": 0,
  "mainConfig": {
   "description": {
    "simple": "<div id=\"title\">nena-fuzzy search</div>",
@@ -14,7 +15,7 @@ const configData = {
   }
  },
  "defs": {
-  "lsVersion": "v064@2021-05-11T18:05:15",
+  "lsVersion": "v070@2021-05-20T14:27:48",
   "dataset": "nena",
   "client": "fuzzy",
   "org": "annotation",
@@ -160,28 +161,14 @@ const configData = {
  "keyboard": null,
  "focusType": "sentence",
  "ntypesinit": {
-  "dialect": 539379,
-  "text": 713308,
-  "paragraph": 578369,
-  "line": 575825,
-  "sentence": 578719,
-  "subsentence": 688811,
-  "inton": 539381,
-  "stress": 595045,
   "word": 713434,
-  "letter": 1
+  "line": 575825,
+  "text": 713308
  },
  "ntypessize": {
-  "dialect": 2,
-  "text": 126,
-  "paragraph": 350,
-  "line": 2544,
-  "sentence": 16326,
-  "subsentence": 24497,
-  "inton": 36444,
-  "stress": 93766,
   "word": 120151,
-  "letter": 539378
+  "line": 2544,
+  "text": 126
  },
  "dtypeOf": {
   "sentence": "word",

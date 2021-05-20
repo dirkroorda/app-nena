@@ -1,3 +1,7 @@
+linkLevelMin: 1
+linkLevelMin: 2
+memSavingMethod: 0
+
 short: fuzzy search
 
 description: >-

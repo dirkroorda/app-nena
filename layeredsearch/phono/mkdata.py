@@ -102,18 +102,17 @@ def record(maker):
     A.info("start recording")
 
     up = {}
-    texts = {}
-    positions = {}
     recorders = {}
     accumulators = {}
+    maker.up = up
+    maker.recorders = recorders
+    maker.accumulators = accumulators
 
     for (level, typeInfo) in layerSettings.items():
         ti = typeInfo.get("layers", None)
         if ti is None:
             continue
 
-        texts[level] = {layer: None for layer in ti}
-        positions[level] = {layer: None for layer in ti if ti[layer]["pos"] is None}
         recorders[level] = {
             layer: Recorder(api) for layer in ti if ti[layer]["pos"] is None
         }
@@ -199,24 +198,6 @@ def record(maker):
                 for x in accumulators[lType].values():
                     x.append(value)
 
-    def deliverAll():
-        A.info("wrap recorders for delivery")
-        for (level, typeInfo) in recorders.items():
-            A.info(f"\t{level}")
-            for (layer, x) in typeInfo.items():
-                A.info(f"\t\t{layer}")
-                texts[level][layer] = x.text()
-                # here we are going to use that there is at most one node per node type
-                # that corresponds to a character position
-                positions[level][layer] = x.positions(simple=True)
-
-        A.info("wrap accumulators for delivery")
-        for (level, typeInfo) in accumulators.items():
-            A.info(f"\t{level}")
-            for (layer, x) in typeInfo.items():
-                A.info(f"\t\t{layer}")
-                texts[level][layer] = "".join(x)
-
     def startNode(node):
         # we have organized recorders by node type
         # we only record nodes of matching type in recorders
@@ -267,15 +248,5 @@ def record(maker):
         addAfterValue(text)
         endNode(text)
 
-    deliverAll()
-
-    sys.stdout.write("\n")
-
-    data = dict(
-        texts=texts,
-        positions=positions,
-        up=maker.compress(up),
-    )
-    maker.data = data
     sys.stdout.write("\n")
     A.info("done")

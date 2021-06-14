@@ -15,7 +15,7 @@ const configData = {
   }
  },
  "defs": {
-  "lsVersion": "v071@2021-05-20T14:27:52",
+  "lsVersion": "v076@2021-06-14T11:31:35",
   "dataset": "nena",
   "client": "phono",
   "org": "annotation",
@@ -103,7 +103,7 @@ const configData = {
    ],
    "package": [
     "download",
-    "phono.zip",
+    "../phono.zip",
     "zip file for offline use"
    ],
    "writing": [

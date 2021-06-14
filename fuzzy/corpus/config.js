@@ -15,7 +15,7 @@ const configData = {
   }
  },
  "defs": {
-  "lsVersion": "v070@2021-05-20T14:27:48",
+  "lsVersion": "v075@2021-06-14T11:31:30",
   "dataset": "nena",
   "client": "fuzzy",
   "org": "annotation",
@@ -103,7 +103,7 @@ const configData = {
    ],
    "package": [
     "download",
-    "fuzzy.zip",
+    "../fuzzy.zip",
     "zip file for offline use"
    ],
    "writing": [

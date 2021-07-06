@@ -15,7 +15,7 @@ const configData = {
   }
  },
  "defs": {
-  "lsVersion": "v076@2021-06-14T11:31:35",
+  "lsVersion": "v075@2021-07-06T15:13:35",
   "dataset": "nena",
   "client": "phono",
   "org": "annotation",
@@ -207,11 +207,13 @@ const configData = {
  "focusType": "sentence",
  "ntypesinit": {
   "word": 713434,
+  "sentence": 578719,
   "line": 575825,
   "text": 713308
  },
  "ntypessize": {
   "word": 120151,
+  "sentence": 16326,
   "line": 2544,
   "text": 126
  },

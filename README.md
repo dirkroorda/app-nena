@@ -3,8 +3,8 @@
 # Northeastern Neo-Aramaic Corpus
 
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/annotation/app-nena/)](https://archive.softwareheritage.org/browse/origin/https://github.com/annotation/app-nena/)
-
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3909532.svg)](https://doi.org/10.5281/zenodo.3909532)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 This is the
 [Text-Fabric](https://github.com/annotation/text-fabric)
@@ -19,3 +19,8 @@ Just click
 and off you go.
 
 ![ls](ls.png)
+
+# Author
+
+[Dirk Roorda](https://github.com/dirkroorda)
+
